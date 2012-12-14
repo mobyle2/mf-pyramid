@@ -1,0 +1,14 @@
+This is a new development, mainly for own training, and not for use yet.
+
+admin provides annotations on a Ming object (@admin) to analyse objects and create actions and forms on objects automatically.
+
+Goal is to generate an admin dashboard for each object (show/edit/delete per object and list of objects)
+
+renderer is in charge of generating HTML per attribute type.
+
+more customization will also be available to force type of the attribute (Checkbox etc...)
+
+Pyramid routes and templates will be set automatically
+
+
+LICENSE: LGPL
