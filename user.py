@@ -61,7 +61,7 @@ if __name__ == "__main__":
   
   print user.html()
 
-  print user.html(["name","email"])
+  #print user.html(["name","email"])
 
   print "Errors: "+str(user.__field_errors)
 

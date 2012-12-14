@@ -1,5 +1,5 @@
-# TODO manage lists, dict
-# rendercomposite, how to get value for sub object?
+# TODO manage lists
+
 
 from datetime import datetime
 import logging
@@ -8,6 +8,8 @@ class AbstractRenderer:
 
   klass = None
   name = None
+
+  err = False
 
   def __init__(self,klass,name):
     self.name = name
@@ -23,6 +25,7 @@ class AbstractRenderer:
     print "validate "+str(self)
 
   def bind(self,request,instance,name,parent = []):
+    self.err = False
     parentname = ''
     if parent is not None:
       for p in parent:
@@ -33,6 +36,7 @@ class AbstractRenderer:
     try:
       value = self.unserialize(request[instance.__class__.__name__+parentname+"["+name+"]"])
     except Exception as e:
+      self.err = True
       return [name]
     if value is not None:
       if parent:
@@ -50,7 +54,8 @@ class TextRenderer(AbstractRenderer):
     parentname = ''
     if parent:
       parentname = '['+parent+']'
-    return '<label>'+self.name.title()+'</label><input id="'+self.klass+parentname+'['+self.name+']" name="'+self.klass+parentname+'['+self.name+']"   value="'+(str(value or ''))+'"/>'
+    return _htmlTextField(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
+    #return '<label>'+self.name.title()+'</label><input id="'+self.klass+parentname+'['+self.name+']" name="'+self.klass+parentname+'['+self.name+']"   value="'+(str(value or ''))+'"/>'
 
 
   def validate(self,value):
@@ -69,10 +74,11 @@ class BooleanRenderer(AbstractRenderer):
      parentname = ''
      if parent:
        parentname = '['+parent+']'
-     html= '<input type="checkbox" id="'+self.klass+parentname+'['+self.name+']" name="'+self.klass+parentname+'['+self.name+']" value="'+str(value)+'"'
-     if value == True:
-       html += ' checked'
-     html += '/> '+self.name.title()+'<br>'
+     html = _htmlCheckBox(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
+     #html= '<input type="checkbox" id="'+self.klass+parentname+'['+self.name+']" name="'+self.klass+parentname+'['+self.name+']" value="'+str(value)+'"'
+     #if value == True:
+     #  html += ' checked'
+     #html += '/> '+self.name.title()+'<br>'
      return html
 
   def validate(self,value):
@@ -170,12 +176,12 @@ class CompositeRenderer(AbstractRenderer):
     return html
 
   def bind(self,request,instance,name,parent = []):
+    self.err = False
     parent.extend([name])
     errs = []
     for renderer in self._renderers:
       value = None
       obj = getattr(instance,name)
-      print "##DEBUG "+name+": "+str(obj)
       err = renderer.bind(request,instance,renderer.name,parent)
       if err:
         errs.extend(err)
@@ -207,3 +213,23 @@ class FloatRenderer(AbstractRenderer):
       raise Exception("value is not correct type")
 
 
+
+def _htmlTextField(id,name,value,error = False):
+  errorClass = ''
+  if error:
+    errorClass = 'error'
+  return '<div class="mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="text" id="'+id+'" name="'+id+']"   value="'+(str(value or ''))+'"/></div></div>'
+
+def _htmlCheckBox(id,name,value,error = False):
+  errorClass = ''
+  if error:
+    errorClass = 'error'
+  checked = ''
+  if value:
+     checked = 'checked'
+  return '<div class="mf-checkbox control-group '+errorClass+'"><label class="checkbox"><input type="checkbox" value="'+str(value)+' id="'+id+'" name="'+id+'" '+checked+'>'+name+'</label></div>'
+ 
+
+
+def _htmlControls():
+  return '<div class="form-actions"><button type="submit" class="btn btn-primary">Save changes</button></div>'
