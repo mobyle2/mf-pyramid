@@ -4,6 +4,8 @@ import logging
 from ming import Field,schema
 from renderer import *
 
+import logging
+
 
 """
 TODO
@@ -47,19 +49,19 @@ def field_renderer(klass,name,attr_type):
      Gets a renderer for Field type attributes
      """
      if attr_type == str:
-         print(name+" is Field string ")
+         logging.debug(name+" is Field string ")
          return TextRenderer(klass,name)
      elif attr_type == int:
-         print(name+" is Field integer")
+         logging.debug(name+" is Field integer")
          return IntegerRenderer(klass,name)
      elif attr_type == schema.ObjectId:
-         print(name+" is Field ObjectId")
+         logging.debug(name+" is Field ObjectId")
          return HiddenRenderer(klass,name)
      elif attr_type == bool:
-         print(name+" is Field bool")
+         logging.debug(name+" is Field bool")
          return BooleanRenderer(klass,name)
      elif isinstance(attr_type,dict):
-         print(name+" is Field dict")
+         logging.debug(name+" is Field dict")
          return CompositeRenderer(klass,name,attr_type)         
      else:
          raise Exception(str(attr_type)+" is not a managed type")
@@ -76,13 +78,13 @@ def renderer(klass,name,attr):
      rtype: AbstractRenderer
      """
      if isinstance(attr,str):
-         print(name+" is string")
+         logging.debug(name+" is string")
          return TextRenderer(klass,name)
      elif isinstance(attr,int):
-         print(name+" is integer")
+         logging.debug(name+" is integer")
          return IntegerRenderer(klass,name)
      elif isinstance(attr,bool):
-         print(name+" is Field bool")
+         logging.debug(name+" is Field bool")
          return BooleanRenderer(klass,name)
      elif isinstance(attr,Field):
          field = klass.field_renderer(klass,name,attr.type)
@@ -107,7 +109,11 @@ def render(self,fields = None):
     if not fields:
       fields = sorted(self.__class__.__render_fields)
     for name in fields:
-        html += self.__class__.__render_fields[name].render(getattr(self,name))
+        value = getattr(self,name)
+        if isinstance(value,Field):
+          # not yet set and no default
+          value = None
+        html += self.__class__.__render_fields[name].render(value)
     return html
 
 

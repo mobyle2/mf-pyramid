@@ -1,7 +1,9 @@
 # TODO manage lists
+# TODO manage connections to other objects
 
 
 from datetime import datetime
+
 import logging
 
 class AbstractRenderer:
@@ -52,10 +54,11 @@ class TextRenderer(AbstractRenderer):
 
   def render(self,value = None, parent = None):
     parentname = ''
+    if value is None:
+      value = ''
     if parent:
       parentname = '['+parent+']'
     return _htmlTextField(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
-    #return '<label>'+self.name.title()+'</label><input id="'+self.klass+parentname+'['+self.name+']" name="'+self.klass+parentname+'['+self.name+']"   value="'+(str(value or ''))+'"/>'
 
 
   def validate(self,value):
@@ -71,14 +74,12 @@ class TextRenderer(AbstractRenderer):
 class BooleanRenderer(AbstractRenderer):
 
   def render(self,value = False, parent = None):
+     if value is None:
+       value = False
      parentname = ''
      if parent:
        parentname = '['+parent+']'
      html = _htmlCheckBox(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
-     #html= '<input type="checkbox" id="'+self.klass+parentname+'['+self.name+']" name="'+self.klass+parentname+'['+self.name+']" value="'+str(value)+'"'
-     #if value == True:
-     #  html += ' checked'
-     #html += '/> '+self.name.title()+'<br>'
      return html
 
   def validate(self,value):
@@ -113,11 +114,13 @@ class BooleanRenderer(AbstractRenderer):
 
 class IntegerRenderer(AbstractRenderer):
 
-  def render(self,value = 0, parent = None):
+  def render(self,value = None, parent = None):
+    if value is None:
+      value = 0
     parentname = ''
     if parent:
       parentname = '['+parent+']'
-    return '<label>'+self.name.title()+'</label><input id="'+self.klass+parentname+'['+self.name+']" "'+self.klass+parentname+'['+self.name+']" value="'+str(value)+'"/>'
+    return _htmlNumber(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
 
   def validate(self,value):
     intvalue = 0
@@ -136,6 +139,8 @@ class IntegerRenderer(AbstractRenderer):
 class HiddenRenderer(TextRenderer):
 
   def render(self,value = None, parent = None):
+    if value is None:
+      value = ''
     parentname = ''
     if parent:
       parentname = '['+parent+']'
@@ -166,7 +171,7 @@ class CompositeRenderer(AbstractRenderer):
     parentname = ''
     if parent:
       parentname = '['+parent+']'
-    html = '<div class="composite" id="'+self.klass+parentname+'['+self.name+']">'
+    html = '<div class="mf-composite" id="'+self.klass+parentname+'['+self.name+']"><h3>'+self.name+'</h3>'
     for renderer in self._renderers:
       obj = None
       if hasattr(value,renderer.name):
@@ -192,11 +197,13 @@ class CompositeRenderer(AbstractRenderer):
 
 class FloatRenderer(AbstractRenderer):
 
-  def render(self,value = 0, parent = None):
+  def render(self,value = None, parent = None):
+    if value is None:
+      value = 0.0
     parentname = ''
     if parent:
       parentname = '['+parent+']'
-    return '<label>'+self.name.title()+'</label><input id="'+self.klass+parentname+'['+self.name+']" "'+self.klass+parentname+'['+self.name+']" value="'+str(value)+'"/>'
+    return _htmlNumber(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
 
   def validate(self,value):
     intvalue = 0
@@ -227,9 +234,14 @@ def _htmlCheckBox(id,name,value,error = False):
   checked = ''
   if value:
      checked = 'checked'
-  return '<div class="mf-checkbox control-group '+errorClass+'"><label class="checkbox"><input type="checkbox" value="'+str(value)+' id="'+id+'" name="'+id+'" '+checked+'>'+name+'</label></div>'
+  return '<div class="mf-checkbox control-group '+errorClass+'"><div class="controls"><label class="checkbox"><input type="checkbox" value="'+str(value)+' id="'+id+'" name="'+id+'" '+checked+'>'+name+'</label></div></div>'
  
+def _htmlNumber(id,name,value,error = False):
+  errorClass = ''
+  if error:
+    errorClass = 'error'
+  return '<div class="mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="number" id="'+id+'" name="'+id+'" value="'+str(value)+'"/></div></div>'
 
 
 def _htmlControls():
-  return '<div class="form-actions"><button type="submit" class="btn btn-primary">Save changes</button></div>'
+  return '<div class="form-actions mf-form"><button type="submit" class="btn btn-primary">Save changes</button></div>'
