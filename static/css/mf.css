@@ -1,4 +1,8 @@
 
+.mf-textfield {
+  margin: 5px;
+}
+
 .mf-composite {
   border-style: solid;
   border-color: black;

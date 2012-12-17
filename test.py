@@ -32,7 +32,7 @@ print '''
 
   <div id="page"><form class="form-horizontal">'''
     
-print user.html( ['name', 'email', 'age', 'admin', 'options', 'mongo'])
+print user.html( ['_id','name', 'email', 'age', 'admin', 'options', 'mongo'])
 
 print '''</form></div>
   <script src="/static/bootstrap/js/bootstrap.min.js"></script>  

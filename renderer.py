@@ -3,6 +3,7 @@
 
 
 from datetime import datetime
+from ming import Field,schema
 
 import logging
 
@@ -12,6 +13,10 @@ class AbstractRenderer:
   name = None
 
   err = False
+
+  @staticmethod
+  def controls():
+    return _htmlControls()
 
   def __init__(self,klass,name):
     self.name = name
@@ -54,7 +59,7 @@ class TextRenderer(AbstractRenderer):
 
   def render(self,value = None, parent = None):
     parentname = ''
-    if value is None:
+    if value is None or isinstance(value,Field):
       value = ''
     if parent:
       parentname = '['+parent+']'
@@ -74,7 +79,7 @@ class TextRenderer(AbstractRenderer):
 class BooleanRenderer(AbstractRenderer):
 
   def render(self,value = False, parent = None):
-     if value is None:
+     if value is None or isinstance(value,Field):
        value = False
      parentname = ''
      if parent:
@@ -115,7 +120,7 @@ class BooleanRenderer(AbstractRenderer):
 class IntegerRenderer(AbstractRenderer):
 
   def render(self,value = None, parent = None):
-    if value is None:
+    if value is None or isinstance(value,Field):
       value = 0
     parentname = ''
     if parent:
@@ -139,12 +144,12 @@ class IntegerRenderer(AbstractRenderer):
 class HiddenRenderer(TextRenderer):
 
   def render(self,value = None, parent = None):
-    if value is None:
+    if value is None or isinstance(value,Field):
       value = ''
     parentname = ''
     if parent:
       parentname = '['+parent+']'
-    return '<input type="hidden" id="'+self.klass+parentname+'['+self.name+']" "'+self.klass+parentname+'['+self.name+']" value="'+str(value or '')+'"/>'
+    return _htmlHidden(self.klass+parentname+'['+self.name+']',self.name,value)
 
 
 class DateTimeRenderer(AbstractRenderer):
@@ -185,7 +190,6 @@ class CompositeRenderer(AbstractRenderer):
     parent.extend([name])
     errs = []
     for renderer in self._renderers:
-      value = None
       obj = getattr(instance,name)
       err = renderer.bind(request,instance,renderer.name,parent)
       if err:
@@ -198,7 +202,7 @@ class CompositeRenderer(AbstractRenderer):
 class FloatRenderer(AbstractRenderer):
 
   def render(self,value = None, parent = None):
-    if value is None:
+    if value is None or isinstance(value,Field):
       value = 0.0
     parentname = ''
     if parent:
@@ -225,7 +229,10 @@ def _htmlTextField(id,name,value,error = False):
   errorClass = ''
   if error:
     errorClass = 'error'
-  return '<div class="mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="text" id="'+id+'" name="'+id+']"   value="'+(str(value or ''))+'"/></div></div>'
+  return '<div class="mf-field mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="text" id="'+id+'" name="'+id+']"   value="'+(str(value or ''))+'"/></div></div>'
+
+def _htmlHidden(id,name,value):
+  return '<div class="mf-field mf-textfield control-group"><div class="controls"><input type="hidden" id="'+id+'" name="'+id+']"   value="'+(str(value or ''))+'"/></div></div>'
 
 def _htmlCheckBox(id,name,value,error = False):
   errorClass = ''
@@ -234,14 +241,14 @@ def _htmlCheckBox(id,name,value,error = False):
   checked = ''
   if value:
      checked = 'checked'
-  return '<div class="mf-checkbox control-group '+errorClass+'"><div class="controls"><label class="checkbox"><input type="checkbox" value="'+str(value)+' id="'+id+'" name="'+id+'" '+checked+'>'+name+'</label></div></div>'
+  return '<div class="mf-field mf-checkbox control-group '+errorClass+'"><div class="controls"><label class="checkbox"><input type="checkbox" value="'+str(value)+' id="'+id+'" name="'+id+'" '+checked+'>'+name+'</label></div></div>'
  
 def _htmlNumber(id,name,value,error = False):
   errorClass = ''
   if error:
     errorClass = 'error'
-  return '<div class="mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="number" id="'+id+'" name="'+id+'" value="'+str(value)+'"/></div></div>'
+  return '<div class="mf-field mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="number" id="'+id+'" name="'+id+'" value="'+str(value)+'"/></div></div>'
 
 
 def _htmlControls():
-  return '<div class="form-actions mf-form"><button type="submit" class="btn btn-primary">Save changes</button></div>'
+  return '<div class="form-actions mf-form"><button type="submit" class="btn btn-primary">Save</button></div>'

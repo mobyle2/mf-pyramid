@@ -58,11 +58,10 @@ if __name__ == "__main__":
   request["User[options][categories]"] = "cat2"
 
   user.bind_form(request)
-  
   print user.html()
 
   #print user.html(["name","email"])
 
   print "Errors: "+str(user.__field_errors)
 
-  #print str(User.__render_fields)
+  print str(User.__render_fields)

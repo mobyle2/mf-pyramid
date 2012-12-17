@@ -2,6 +2,7 @@ import pprint
 import logging
 
 from ming import Field,schema
+
 from renderer import *
 
 import logging
@@ -84,7 +85,7 @@ def renderer(klass,name,attr):
          logging.debug(name+" is integer")
          return IntegerRenderer(klass,name)
      elif isinstance(attr,bool):
-         logging.debug(name+" is Field bool")
+         logging.debug(name+" is bool")
          return BooleanRenderer(klass,name)
      elif isinstance(attr,Field):
          field = klass.field_renderer(klass,name,attr.type)
@@ -110,10 +111,11 @@ def render(self,fields = None):
       fields = sorted(self.__class__.__render_fields)
     for name in fields:
         value = getattr(self,name)
-        if isinstance(value,Field):
+        #if isinstance(value,Field):
           # not yet set and no default
-          value = None
+          #value = None
         html += self.__class__.__render_fields[name].render(value)
+    html += AbstractRenderer.controls()
     return html
 
 
