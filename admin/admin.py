@@ -1,8 +1,18 @@
+"""
+.. module:: admin
+   :synopsis: admin annotations
+
+.. moduleauthor:: Olivier Sallou <olivier.sallou@irisa.fr>
+
+
+"""
 import pprint
 import logging
+from datetime import datetime
 
 from ming import Field,schema
 
+import renderer
 from renderer import *
 
 import logging
@@ -26,6 +36,11 @@ define as annotation relationship to an other object?
 
 
 class Admin:
+  '''
+   Defines annotations and pyramid routes for an administration
+   dashboard gneeration
+  '''
+
   # Add static list of klass
   __klasses = []
 
@@ -33,6 +48,8 @@ class Admin:
   def addKlass(klass):
     """
     Adds a class to the admin dashboard
+    :param klass: Class to manage
+    :type klass: class
     """
     Admin.__klasses.append(klass)
 
@@ -48,6 +65,7 @@ class Admin:
 def field_renderer(klass,name,attr_type):
      """
      Gets a renderer for Field type attributes
+     :returns: AbstractRenderer -- Renderer for the attribute
      """
      if attr_type == str:
          logging.debug(name+" is Field string ")
@@ -61,6 +79,9 @@ def field_renderer(klass,name,attr_type):
      elif attr_type == bool:
          logging.debug(name+" is Field bool")
          return BooleanRenderer(klass,name)
+     elif attr_type == datetime:
+         logging.debug(name+" is Field datetime")
+         return DateTimeRenderer(klass,name)
      elif isinstance(attr_type,dict):
          logging.debug(name+" is Field dict")
          return CompositeRenderer(klass,name,attr_type)         
@@ -87,6 +108,9 @@ def renderer(klass,name,attr):
      elif isinstance(attr,bool):
          logging.debug(name+" is bool")
          return BooleanRenderer(klass,name)
+     elif isinstance(attr,datetime):
+         logging.debug(name+" is datetime")
+         return DateTimeRenderer(klass,name)
      elif isinstance(attr,Field):
          field = klass.field_renderer(klass,name,attr.type)
          return field

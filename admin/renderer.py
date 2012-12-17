@@ -1,14 +1,23 @@
-# TODO manage lists
-# TODO manage connections to other objects
+"""
+.. module:: admin
+   :synopsis: HTML renderers per object type
 
+.. moduleauthor:: Olivier Sallou <olivier.sallou@irisa.fr>
+
+
+"""
 
 from datetime import datetime
 from ming import Field,schema
+import time
+import re
 
 import logging
 
 class AbstractRenderer:
-
+  '''
+  Base class for all renderers
+  '''
   klass = None
   name = None
 
@@ -16,6 +25,9 @@ class AbstractRenderer:
 
   @staticmethod
   def controls():
+    '''Return buttons for the form
+    :returns: str - HTML for buttons
+    '''
     return _htmlControls()
 
   def __init__(self,klass,name):
@@ -23,15 +35,40 @@ class AbstractRenderer:
     self.klass = klass.__name__
 
   def render(self,value = None, parent = None):
+    '''Return HTML for component
+    Not implemented
+    '''
+
     raise Exception("Not implemented")
 
   def unserialize(self,value):
+    '''Return a value from input string
+    :param value: Value from the form request
+    :type value: str
+    according to original attribute type
+    :returns: object - Value for the attribute
+    '''
+
     raise Exception("Not implemented")
 
   def validate(self,attr):
-    print "validate "+str(self)
+    '''Checks that request form value is correct
+     Not implemented
+    '''
+    raise Exception("Not implemented")
 
   def bind(self,request,instance,name,parent = []):
+    '''Bind a request form parameter to the
+     object instance attribute
+    :param request: Form request list
+    :type request: dict
+    :param instance: Object instance to bind
+    :type instance: object
+    :param name: Parameter to bind
+    :type name: str
+    :param parent: list of parent attributes in case of composite renderer
+    :type parent: list
+    '''
     self.err = False
     parentname = ''
     if parent is not None:
@@ -56,6 +93,9 @@ class AbstractRenderer:
         setattr(instance,name,value)
 
 class TextRenderer(AbstractRenderer):
+  '''Renderer for Text inputs
+  '''
+
 
   def render(self,value = None, parent = None):
     parentname = ''
@@ -77,6 +117,9 @@ class TextRenderer(AbstractRenderer):
 
 
 class BooleanRenderer(AbstractRenderer):
+  '''Renderer for booleans
+  '''
+
 
   def render(self,value = False, parent = None):
      if value is None or isinstance(value,Field):
@@ -118,6 +161,9 @@ class BooleanRenderer(AbstractRenderer):
       raise Exception("value is not correct type")
 
 class IntegerRenderer(AbstractRenderer):
+  '''Renderer for integer inputs
+  '''
+
 
   def render(self,value = None, parent = None):
     if value is None or isinstance(value,Field):
@@ -142,6 +188,9 @@ class IntegerRenderer(AbstractRenderer):
       raise Exception("value is not correct type")
 
 class HiddenRenderer(TextRenderer):
+  '''Renderer for hidden inputs such as ObjectIds
+  '''
+
 
   def render(self,value = None, parent = None):
     if value is None or isinstance(value,Field):
@@ -153,16 +202,39 @@ class HiddenRenderer(TextRenderer):
 
 
 class DateTimeRenderer(AbstractRenderer):
+  '''Renderer for date/time inputs
+  '''
+
 
   def render(self,value = datetime.now(), parent= None):
-    raise Exception("not yet implemented")
+    if value is None or isinstance(value,Field):
+      value = ''
+    parentname = ''
+    if parent:
+      parentname = '['+parent+']'
+    return _htmlDateTime(self.klass+parentname+'['+self.name+']',self.name,str(value))
+
+  def unserialize(self,value):
+      try:
+        print "unserialize date "+value
+        print "date? "+str(datetime.strptime(value))
+        return datetime.strptime(value)
+      except Exception as e:
+        raise Exception('badly formatted date')  
+      #raise Exception("not yet implemented")
 
 class ArrayRenderer(AbstractRenderer):
+  '''Renderer for lists of renderers
+  '''
+
 
   def render(self,value = None, parent = None):
     raise Exception("not yet implemented")
 
 class CompositeRenderer(AbstractRenderer):
+  '''Renderer for compisite inputs (objects within objects)
+  '''
+
 
   _renderers = []
 
@@ -200,6 +272,9 @@ class CompositeRenderer(AbstractRenderer):
     raise Exception("not yet implemented")
 
 class FloatRenderer(AbstractRenderer):
+  '''Renderer for float inputs
+  '''
+
 
   def render(self,value = None, parent = None):
     if value is None or isinstance(value,Field):
@@ -231,6 +306,12 @@ def _htmlTextField(id,name,value,error = False):
     errorClass = 'error'
   return '<div class="mf-field mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="text" id="'+id+'" name="'+id+']"   value="'+(str(value or ''))+'"/></div></div>'
 
+def _htmlDateTime(id,name,value,error = False):
+  errorClass = ''
+  if error:
+    errorClass = 'error'
+  return '<div class="mf-field mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="datetime" id="'+id+'" name="'+id+']"   value="'+(str(value or ''))+'"/></div></div>'
+
 def _htmlHidden(id,name,value):
   return '<div class="mf-field mf-textfield control-group"><div class="controls"><input type="hidden" id="'+id+'" name="'+id+']"   value="'+(str(value or ''))+'"/></div></div>'
 
@@ -252,3 +333,61 @@ def _htmlNumber(id,name,value,error = False):
 
 def _htmlControls():
   return '<div class="form-actions mf-form"><button type="submit" class="btn btn-primary">Save</button></div>'
+
+
+def parseDateTime(s):
+  """Create datetime object representing date/time
+     expressed in a string
+ 
+  Takes a string in the format produced by calling str()
+  on a python datetime object and returns a datetime
+  instance that would produce that string.
+ 
+  Acceptable formats are: "YYYY-MM-DD HH:MM:SS.ssssss+HH:MM",
+              "YYYY-MM-DD HH:MM:SS.ssssss",
+              "YYYY-MM-DD HH:MM:SS+HH:MM",
+              "YYYY-MM-DD HH:MM:SS"
+  Where ssssss represents fractional seconds.	 The timezone
+  is optional and may be either positive or negative
+  hours/minutes east of UTC.
+  """
+  if s is None:
+    return None
+  # Split string in the form 2007-06-18 19:39:25.3300-07:00
+  # into its constituent date/time, microseconds, and
+  # timezone fields where microseconds and timezone are
+  # optional.
+  m = re.match(r'(.*?)(?:\.(\d+))?(([-+]\d{1,2}):(\d{2}))?$',
+         str(s))
+  datestr, fractional, tzname, tzhour, tzmin = m.groups()
+ 
+  # Create tzinfo object representing the timezone
+  # expressed in the input string.  The names we give
+  # for the timezones are lame: they are just the offset
+  # from UTC (as it appeared in the input string).  We
+  # handle UTC specially since it is a very common case
+  # and we know its name.
+  if tzname is None:
+    tz = None
+  else:
+    tzhour, tzmin = int(tzhour), int(tzmin)
+    if tzhour == tzmin == 0:
+      tzname = 'UTC'
+    tz = FixedOffset(timedelta(hours=tzhour,
+                   minutes=tzmin), tzname)
+ 
+  # Convert the date/time field into a python datetime
+  # object.
+  x = datetime.strptime(datestr, "%Y-%m-%d %H:%M:%S")
+ 
+  # Convert the fractional second portion into a count
+  # of microseconds.
+  if fractional is None:
+    fractional = '0'
+  fracpower = 6 - len(fractional)
+  fractional = float(fractional) * (10 ** fracpower)
+ 
+  # Return updated datetime object with microseconds and
+  # timezone information.
+  return x.replace(microsecond=int(fractional), tzinfo=tz)
+
