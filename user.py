@@ -1,5 +1,6 @@
-from admin import Admin
-from admin import *
+import admin.admin
+from admin.admin import Admin
+from admin.admin import *
 from ming import Field,schema
 from ming.datastore import DataStore
 from ming import Session, create_datastore
@@ -21,6 +22,7 @@ class User:
   age = Field(int)
   admin = Field(bool, if_missing = False)
   options = Field(dict( tags=str, categories=str))
+  creation_date = Field(datetime, if_missing=datetime.utcnow())
 
 
   def html(self, fields = None):
@@ -35,6 +37,7 @@ if __name__ == "__main__":
   user.age = 28
   user.admin = True
   user.options.tags = 'tag1'
+  user.creation_date = datetime.utcnow()
 
   #print user.metadata.fields
   print user.html()

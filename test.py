@@ -7,6 +7,7 @@ request["User[email]"] = "test@nomail.com"
 request["User[age]"] = "39"
 request["User[admin]"] = "nimportequoi"
 request["User[options][categories]"] = "cat2"
+request["User[creation_date]"] = "2012-12-17 12:47:04.432328"
 
 
 user = User()
@@ -32,7 +33,7 @@ print '''
 
   <div id="page"><form class="form-horizontal">'''
     
-print user.html( ['_id','name', 'email', 'age', 'admin', 'options', 'mongo'])
+print user.html( ['_id','name', 'email', 'age', 'admin', 'creation_date','options', 'mongo'])
 
 print '''</form></div>
   <script src="/static/bootstrap/js/bootstrap.min.js"></script>  

@@ -1,5 +1,6 @@
-from admin import Admin
-from admin import *
+import admin.admin
+from admin.admin import Admin
+from admin.admin import *
 from ming import Field,schema
 from ming.datastore import DataStore
 from ming import Session, create_datastore
