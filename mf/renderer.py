@@ -96,6 +96,8 @@ class FormRenderer(AbstractRenderer):
   ''' Render a form with fields
   '''
 
+  prefix = ''
+
   def render(self,klass,fields):
     '''Render the HTML for the form
     :param klass: instance object to render
@@ -104,7 +106,7 @@ class FormRenderer(AbstractRenderer):
     :type fields: list
     :return: str HTML form
     '''
-    html='<form class="mf-form form-horizontal" action="'+(klass.__class__.__name__).lower()+'s/'+str(getattr(klass,"_id"))+'" type="POST">'
+    html='<form class="mf-form form-horizontal" action="'+FormRenderer.prefix+'/'+(klass.__class__.__name__).lower()+'s/'+str(getattr(klass,"_id"))+'" type="POST">'
     for name in fields:
         value = getattr(klass,name)
         html += klass.get_renderer(name).render(value)

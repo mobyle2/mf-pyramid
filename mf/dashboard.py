@@ -8,6 +8,7 @@
 """
 import annotation
 from annotation import Annotation
+from renderer import FormRenderer
 
 class Dashboard:
   ''' Manage administration dashboard for pyramid
@@ -25,6 +26,8 @@ class Dashboard:
     '''
     if klasses is None:
       return
+    if prefix is not None:
+      FormRenderer.prefix = prefix
     for klass in klasses:
       Annotation.addKlass(klass)
       #if config is not None:
