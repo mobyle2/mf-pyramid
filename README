@@ -14,10 +14,13 @@ TODO:
  add routes
  add views
  add templates
- renderers: date, time, list
-
+ renderers: list
+ test date,time
 
 LICENSE: LGPL
+
+WARNING: there are considerations with pymongo and ming versions to take into account.
+Code is currently related to ming 3.0, not binded to latest pymongo.
 
 USAGE:
 
