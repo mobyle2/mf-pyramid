@@ -34,7 +34,8 @@ class Annotation:
     :param klass: Class to manage
     :type klass: class
     """
-    Admin.__klasses.append(klass)
+    if klass not in Admin.__klasses:
+      Admin.__klasses.append(klass)
 
   @staticmethod
   def dump():
