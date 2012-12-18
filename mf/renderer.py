@@ -104,7 +104,7 @@ class FormRenderer(AbstractRenderer):
     :type fields: list
     :return: str HTML form
     '''
-    html='<form action="'+(klass.__class__.__name__).lower()+'s/'+str(getattr(klass,"_id"))+'" type="POST">'
+    html='<form class="mf-form form-horizontal" action="'+(klass.__class__.__name__).lower()+'s/'+str(getattr(klass,"_id"))+'" type="POST">'
     for name in fields:
         value = getattr(klass,name)
         html += klass.get_renderer(name).render(value)
@@ -329,7 +329,7 @@ def _htmlDateTime(id,name,value,error = False):
   errorClass = ''
   if error:
     errorClass = 'error'
-  return '<div class="mf-field mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="datetime" id="'+id+'" name="'+id+']"   value="'+(str(value or ''))+'"/></div></div>'
+  return '<div class="mf-field mf-datetime control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="datetime" id="'+id+'" name="'+id+']"   value="'+(str(value or ''))+'"/></div></div>'
 
 def _htmlHidden(id,name,value):
   return '<div class="mf-field mf-textfield control-group"><div class="controls"><input type="hidden" id="'+id+'" name="'+id+']"   value="'+(str(value or ''))+'"/></div></div>'
@@ -347,11 +347,11 @@ def _htmlNumber(id,name,value,error = False):
   errorClass = ''
   if error:
     errorClass = 'error'
-  return '<div class="mf-field mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="number" id="'+id+'" name="'+id+'" value="'+str(value)+'"/></div></div>'
+  return '<div class="mf-field mf-numberfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="number" id="'+id+'" name="'+id+'" value="'+str(value)+'"/></div></div>'
 
 
 def _htmlControls():
-  return '<div class="form-actions mf-form"><button type="submit" class="btn btn-primary">Save</button></div>'
+  return '<div class="form-actions mf-actions"><button type="submit" class="btn btn-primary">Save</button></div>'
 
 
 def parseDateTime(s):
