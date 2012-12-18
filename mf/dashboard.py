@@ -9,7 +9,7 @@
 import annotation
 from annotation import Annotation
 
-class Dashboard
+class Dashboard:
   ''' Manage administration dashboard for pyramid
   '''
 

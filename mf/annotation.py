@@ -34,15 +34,19 @@ class Annotation:
     :param klass: Class to manage
     :type klass: class
     """
-    if klass not in Admin.__klasses:
-      Admin.__klasses.append(klass)
+    if klass not in Annotation.__klasses:
+      Annotation.__klasses.append(klass)
+
+  @staticmethod
+  def klasses():
+    return Annotation.__klasses
 
   @staticmethod
   def dump():
     """
     Print the classes managed in the dashboard
     """
-    for item in Admin.__klasses:
+    for item in Annotation.__klasses:
         print item
 
 @staticmethod
@@ -179,6 +183,5 @@ def mf_decorator(klass):
         if not callable(attr) and not name.startswith('__'):
             klass.__render_fields[name] = klass.renderer(klass,name,attr)
 
-    #Admin.addKlass(klass)
     return klass
 
