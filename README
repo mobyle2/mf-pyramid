@@ -10,6 +10,12 @@ more customization will also be available to force type of the attribute (Checkb
 
 Pyramid routes and templates will be set automatically
 
+TODO:
+ add routes
+ add views
+ add templates
+ renderers: date, time, list
+
 
 LICENSE: LGPL
 
