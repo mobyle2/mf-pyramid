@@ -228,18 +228,35 @@ class DateTimeRenderer(AbstractRenderer):
   '''Renderer for date/time inputs
   '''
 
+  # datetime, date, time
+  type = 'datetime'
 
-  def render(self,value = datetime.now(), parent= None):
-    if value is None or isinstance(value,Field):
-      value = ''
+  def render(self,value = None, parent= None):
     parentname = ''
     if parent:
       parentname = '['+parent+']'
-    return _htmlDateTime(self.klass+parentname+'['+self.name+']',self.name,str(value))
+
+    if value is None or isinstance(value,Field):
+      strvalue = ''
+    else:
+      strvalue = ''
+      if type == 'datetime':
+        strvalue = value.strftime('%y/%m/%d %H:%M:%s')
+      elif type == 'date':
+        strvalue = value.strftime("%d/%m/%y")
+      elif type == 'time':
+        strvalue = value.strftime('%H:%M:%s')
+    return _htmlDateTime(self.klass+parentname+'['+self.name+']',self.name,strvalue,self.err, type)
 
   def unserialize(self,value):
       try:
-        return parseDateTime(value)
+        if type == 'datetime':
+          #return parseDateTime(value)
+	  return datetime.strptime(value,'%y/%m/%d %H:%M:%s')
+        elif type == 'date':
+          return datetime.date.strptime(value,"%Y-%m-%d")
+        elif type == 'time':
+          return datetime.time.strptime(value,"%H:%M:%S")
       except Exception as e:
         raise Exception('badly formatted date')  
       #raise Exception("not yet implemented")
@@ -247,9 +264,45 @@ class DateTimeRenderer(AbstractRenderer):
 class ArrayRenderer(AbstractRenderer):
   '''Renderer for lists of renderers
   '''
+  _renderers = []
 
+  def __init__(self,klass,name,attr):
+    AbstractRenderer.__init__(self,klass,name)
+    for obj in attr:
+      self._renderers.append(klass.field_renderer(klass,name,attr[obj]))
 
-  def render(self,value = None, parent = None):
+  def render(self,value=None,parent = None):
+    parentname = ''
+    if parent:
+      parentname = '['+parent+']'
+    html = '<div class="mf-array">'
+    for index in range(len(value)):
+      renderer =  self._renderers[index]
+      val = self.value[index]
+      html += renderer.render(val,self.name,parent)
+    html += '</div>'
+    return html
+
+  def bind(self,request,instance,name,parent = []):
+    raise Exception("not yet implemented")
+    # TODO how to get the nth element of the request name param?
+    # request.params.getall returns a list, request.params.getone return a value 
+
+    # elts of  array could be array of composite, need to know the entire request params
+    # but should remove treatment elts
+    # Add a clone of IMultiDict with remove possibility?
+
+    # Or use request.items => [('pref', 'red'), ('pref', 'blue')] then manage array and search with an appropriate parser
+  
+    self.err = False
+    errs = []    
+    for renderer in self._renderers:
+      err = renderer.bind(request,instance,renderer.name,parent)
+      if err:
+        errs.extend(err)
+    return errs
+
+  def unserialize(self,value):
     raise Exception("not yet implemented")
 
 class CompositeRenderer(AbstractRenderer):
@@ -296,7 +349,6 @@ class FloatRenderer(AbstractRenderer):
   '''Renderer for float inputs
   '''
 
-
   def render(self,value = None, parent = None):
     if value is None or isinstance(value,Field):
       value = 0.0
@@ -327,11 +379,11 @@ def _htmlTextField(id,name,value,error = False):
     errorClass = 'error'
   return '<div class="mf-field mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="text" id="'+id+'" name="'+id+']"   value="'+(str(value or ''))+'"/></div></div>'
 
-def _htmlDateTime(id,name,value,error = False):
+def _htmlDateTime(id,name,value,error = False, type = 'datetime'):
   errorClass = ''
   if error:
     errorClass = 'error'
-  return '<div class="mf-field mf-datetime control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="datetime" id="'+id+'" name="'+id+']"   value="'+(str(value or ''))+'"/></div></div>'
+  return '<div class="mf-field mf-datetime control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="'+type+'" id="'+id+'" name="'+id+']"   value="'+(str(value or ''))+'"/></div></div>'
 
 def _htmlHidden(id,name,value):
   return '<div class="mf-field mf-textfield control-group"><div class="controls"><input type="hidden" id="'+id+'" name="'+id+']"   value="'+(str(value or ''))+'"/></div></div>'
