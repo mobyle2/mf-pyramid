@@ -1,11 +1,4 @@
-"""
-.. module:: mf
-   :synopsis: Mingflow annotations
 
-.. moduleauthor:: Olivier Sallou <olivier.sallou@irisa.fr>
-
-
-"""
 import pprint
 import logging
 from datetime import datetime
@@ -31,6 +24,7 @@ class Annotation:
   def addKlass(klass):
     """
     Adds a class to the admin dashboard
+
     :param klass: Class to manage
     :type klass: class
     """
@@ -53,6 +47,7 @@ class Annotation:
 def field_renderer(klass,name,attr_type):
      """
      Gets a renderer for Field type attributes
+
      :returns: AbstractRenderer -- Renderer for the attribute
      """
      if attr_type == str:
@@ -80,6 +75,7 @@ def field_renderer(klass,name,attr_type):
 def renderer(klass,name,attr):
      """
      Gets a renderer for an attribute
+
      param: name of the attribute
      type: str
      param: attribute of the object
@@ -108,6 +104,7 @@ def renderer(klass,name,attr):
 def render(self,fields = None):
     """
     Render in HTML form an object
+
     param: fields List of fields to show
     type: list
     rparam: HTML form
@@ -128,6 +125,9 @@ def get_renderer(self,name):
 def bind_form(self,request):
     """
     Binds a request dictionnary to the object
+
+    :param request: request.params.items() in the form [ (key1,value1), (key1,value2), (key2,value1), ...]
+    :type request: array
     """
     self.__field_errors = []
     for name in self.__class__.__render_fields:
@@ -137,7 +137,7 @@ def bind_form(self,request):
         if isinstance(renderer,CompositeRenderer):
             err = renderer.bind(request,self,name)
             if err is not None:
-              self.__field_errors.extend(err)            
+              self.__field_errors.extend(err)           
         else:
           if self.__class__.__name__+"["+name+"]" in request:
             err = renderer.bind(request,self,name)

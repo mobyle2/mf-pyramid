@@ -1,11 +1,4 @@
-"""
-.. module:: mf
-   :synopsis: Mingflow annotations
 
-.. moduleauthor:: Olivier Sallou <olivier.sallou@irisa.fr>
-
-
-"""
 import annotation
 from annotation import Annotation
 from renderer import FormRenderer
@@ -17,6 +10,7 @@ class Dashboard:
   @staticmethod
   def add_dashboard(klasses, config = None, prefix = ''):
     ''' Adds a list of class to the dashboard
+
     :param klasses: list of object class to add to the dashboard
     :type klasses: list
     :param config: Pyramid Configurator

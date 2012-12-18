@@ -21,6 +21,12 @@ Contents:
    :private-members:
    :special-members:
 
+.. automodule:: mf.dashboard
+   :members:
+   :private-members:
+   :special-members:
+
+
 
 
 Indices and tables

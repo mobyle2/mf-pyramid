@@ -1,11 +1,3 @@
-"""
-.. module:: mf
-   :synopsis: HTML renderers per object type
-
-.. moduleauthor:: Olivier Sallou <olivier.sallou@irisa.fr>
-
-
-"""
 
 from datetime import datetime
 from ming import Field,schema
@@ -26,6 +18,7 @@ class AbstractRenderer:
   @staticmethod
   def controls():
     '''Return buttons for the form
+
     :returns: str - HTML for buttons
     '''
     return _htmlControls()
@@ -36,6 +29,7 @@ class AbstractRenderer:
 
   def render(self,value = None, parent = None):
     '''Return HTML for component
+
     Not implemented
     '''
 
@@ -43,9 +37,9 @@ class AbstractRenderer:
 
   def unserialize(self,value):
     '''Return a value from input string
+
     :param value: Value from the form request
     :type value: str
-    according to original attribute type
     :returns: object - Value for the attribute
     '''
 
@@ -53,6 +47,7 @@ class AbstractRenderer:
 
   def validate(self,attr):
     '''Checks that request form value is correct
+
      Not implemented
     '''
     raise Exception("Not implemented")
@@ -60,6 +55,7 @@ class AbstractRenderer:
   def bind(self,request,instance,name,parent = []):
     '''Bind a request form parameter to the
      object instance attribute
+
     :param request: Form request list
     :type request: dict
     :param instance: Object instance to bind
@@ -69,16 +65,21 @@ class AbstractRenderer:
     :param parent: list of parent attributes in case of composite renderer
     :type parent: list
     '''
+
     self.err = False
     parentname = ''
     if parent is not None:
       for p in parent:
         parentname += "["+p+"]"
-    if not request.has_key(instance.__class__.__name__+parentname+"["+name+"]"):
-       return []
+    #if not request.has_key(instance.__class__.__name__+parentname+"["+name+"]"):
+    #   return []
+    paramvalue = self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]")
+    if paramvalue is None:
+      return []
     value = None
     try:
-      value = self.unserialize(request[instance.__class__.__name__+parentname+"["+name+"]"])
+      #value = self.unserialize(request[instance.__class__.__name__+parentname+"["+name+"]"])
+      value = self.unserialize(paramvalue)
     except Exception as e:
       self.err = True
       return [name]
@@ -91,6 +92,25 @@ class AbstractRenderer:
         
       else:
         setattr(instance,name,value)
+    return []
+
+
+  def get_param(self,request,name):
+    ''' Get the first value from request parameter
+    and remove it from array
+
+    :param request: HTML request object
+    :type request: array
+    :param name: parameter to search
+    :type name: str
+    :return: str - Value from the form
+    '''
+    for index in range(len(request)):
+      key,value = request[index]
+      if key == name:
+        request.pop(index)
+        return value
+    return None
 
 class FormRenderer(AbstractRenderer):
   ''' Render a form with fields
@@ -100,6 +120,7 @@ class FormRenderer(AbstractRenderer):
 
   def render(self,klass,fields):
     '''Render the HTML for the form
+
     :param klass: instance object to render
     :type klass: object
     :param fields: optional list of fields to display
@@ -284,16 +305,7 @@ class ArrayRenderer(AbstractRenderer):
     return html
 
   def bind(self,request,instance,name,parent = []):
-    raise Exception("not yet implemented")
-    # TODO how to get the nth element of the request name param?
-    # request.params.getall returns a list, request.params.getone return a value 
 
-    # elts of  array could be array of composite, need to know the entire request params
-    # but should remove treatment elts
-    # Add a clone of IMultiDict with remove possibility?
-
-    # Or use request.items => [('pref', 'red'), ('pref', 'blue')] then manage array and search with an appropriate parser
-  
     self.err = False
     errs = []    
     for renderer in self._renderers:
