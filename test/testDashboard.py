@@ -31,9 +31,10 @@ class TestDashboard(unittest.TestCase):
 
   def test_bind_user(self):
     Dashboard.add_dashboard([User])
-    request = dict()
-    request["User[name]"] = "sample"
-    request["User[email]"] = "test@nomail.com"
+    request = [("User[name]","sample"), ("User[email]","test@nomail.com")]
+    #request = dict()
+    #request["User[name]"] = "sample"
+    #request["User[email]"] = "test@nomail.com"
     user = User()
     user.bind_form(request)
     assert(user.name == "sample")
@@ -45,9 +46,10 @@ class TestDashboard(unittest.TestCase):
     user.name = "Walter"
     user.email = "Bishop"
     user.m.save()
-    request = dict()
-    request["User[name]"] = "sample"
-    request["User[email]"] = "test@nomail.com"
+    request = [("User[name]","sample"), ("User[email]","test@nomail.com")]
+    #request = dict()
+    #request["User[name]"] = "sample"
+    #request["User[email]"] = "test@nomail.com"
     user.bind_form(request)
     user.m.save()
     assert(user.name == "sample")

@@ -53,18 +53,4 @@ if __name__ == "__main__":
   assert r.validate(1)
   assert not r.validate('blo')
 
-  request = dict()
-  request["User[name]"] = "test"
-  request["User[email]"] = "test@nomail.com"
-  request["User[age]"] = "39"
-  request["User[admin]"] = "nimportequoi"
-  request["User[options][categories]"] = "cat2"
 
-  user.bind_form(request)
-  print user.html()
-
-  #print user.html(["name","email"])
-
-  print "Errors: "+str(user.__field_errors)
-
-  print str(User.__render_fields)
