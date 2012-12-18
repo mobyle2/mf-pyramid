@@ -11,7 +11,7 @@ from datetime import datetime
 from ming import Field,schema
 import time
 import re
-
+import string
 import logging
 
 class AbstractRenderer:
@@ -91,6 +91,27 @@ class AbstractRenderer:
         
       else:
         setattr(instance,name,value)
+
+class FormRenderer(AbstractRenderer):
+  ''' Render a form with fields
+  '''
+
+  def render(self,klass,fields):
+    '''Render the HTML for the form
+    :param klass: instance object to render
+    :type klass: object
+    :param fields: optional list of fields to display
+    :type fields: list
+    :return: str HTML form
+    '''
+    html='<form action="'+(klass.__class__.__name__).lower()+'s/'+str(getattr(klass,"_id"))+'" type="POST">'
+    for name in fields:
+        value = getattr(klass,name)
+        html += klass.get_renderer(name).render(value)
+    html += AbstractRenderer.controls()
+    html += '</form>'
+    return html
+
 
 class TextRenderer(AbstractRenderer):
   '''Renderer for Text inputs

@@ -32,7 +32,8 @@ class Dashboard:
       #  config.add_view('mf.views.view_'+klass.__name__+"s",name='view_'+klass.__name__+"s",route_name=klass.__name__+"s",renderer="dashboard_list.mako")
       #  config.add_route(klass.__name__,prefix+"/"+klass.__name__+"s/{id}")
       #  config.add_view('mf.views.view_'+klass.__name__,name='view_'+klass.__name__,route_name=klass.__name__+"s",renderer="dashboard_edit.mako")
-    config.add_route('mf_list',prefix+'/'+{objname}+'s/')
-    config.add_route('mf_edit',prefix+'/'+{objname}+'s/'+{id})
-    config.scan('mf.views')
+    if config is not None:
+      config.add_route('mf_list',prefix+'/'+{objname}+'s/')
+      config.add_route('mf_edit',prefix+'/'+{objname}+'s/'+{id})
+      config.scan('mf.views')
 

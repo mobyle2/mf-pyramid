@@ -113,22 +113,10 @@ def render(self,fields = None):
     rparam: HTML form
     rtype: str
     """
-    html=""
-    attributes = dir(self)
-    #for name in attributes:
-    #    attr = getattr(self,name)
-    #    if not callable(attr) and not name.startswith('__'):
-    #        self.__render_fields[name] = self.renderer(name,attr)
     if not fields:
       fields = sorted(self.__class__.__render_fields)
-    for name in fields:
-        value = getattr(self,name)
-        #if isinstance(value,Field):
-          # not yet set and no default
-          #value = None
-        html += self.__class__.__render_fields[name].render(value)
-    html += AbstractRenderer.controls()
-    return html
+    form = FormRenderer(self.__class__,None)
+    return form.render(self,fields)
 
 
 def get_renderer(self,name):
