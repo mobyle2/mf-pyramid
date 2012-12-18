@@ -1,6 +1,6 @@
 """
-.. module:: admin
-   :synopsis: admin annotations
+.. module:: mf
+   :synopsis: Mingflow annotations
 
 .. moduleauthor:: Olivier Sallou <olivier.sallou@irisa.fr>
 
@@ -18,24 +18,7 @@ from renderer import *
 import logging
 
 
-"""
-TODO
-add routes (klass klass/id get,post,delete)
-add views (generic template for list or object display)
-defaults to klass name, then add parameter to optionally set the name
-
-admin.klass -> /admin/klass
-
-define as annotation relationship to an other object?
-
-@has_one(Project)
-@has_many(Jobs)
-...
-
-"""
-
-
-class Admin:
+class Annotation:
   '''
    Defines annotations and pyramid routes for an administration
    dashboard gneeration
@@ -177,7 +160,7 @@ def bind_form(self,request):
 
 
 
-def admin_decorator(klass):
+def mf_decorator(klass):
     klass.__field_errors = []
     klass.__render_fields = dict()
     original_methods = klass.__dict__.copy()

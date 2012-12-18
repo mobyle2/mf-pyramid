@@ -1,5 +1,5 @@
 """
-.. module:: admin
+.. module:: mf
    :synopsis: HTML renderers per object type
 
 .. moduleauthor:: Olivier Sallou <olivier.sallou@irisa.fr>
@@ -216,9 +216,7 @@ class DateTimeRenderer(AbstractRenderer):
 
   def unserialize(self,value):
       try:
-        print "unserialize date "+value
-        print "date? "+str(datetime.strptime(value))
-        return datetime.strptime(value)
+        return parseDateTime(value)
       except Exception as e:
         raise Exception('badly formatted date')  
       #raise Exception("not yet implemented")

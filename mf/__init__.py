@@ -1,4 +1,4 @@
-"""An administration dashboard generation for Ming
+"""An HTML form generation for Ming from object descriptors
 
 .. moduleauthor:: Olivier Sallou <olivier.sallou@irisa.fr>
 

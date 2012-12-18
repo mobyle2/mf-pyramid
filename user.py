@@ -1,6 +1,6 @@
-import admin.admin
-from admin.admin import Admin
-from admin.admin import *
+import mf.annotation
+#from admin.admin import Admin
+from mf.annotation import *
 from ming import Field,schema
 from ming.datastore import DataStore
 from ming import Session, create_datastore
@@ -8,7 +8,7 @@ from ming import Session, create_datastore
 bind = create_datastore("%s%s"%('mongodb://localhost:27017','test'))
 session = Session(bind)
 
-@admin_decorator
+@mf_decorator
 class User:
 
   class __mongometa__:

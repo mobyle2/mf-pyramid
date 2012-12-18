@@ -11,12 +11,12 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-.. automodule:: admin.admin
+.. automodule:: mf.annotation
    :members:
    :private-members:
    :special-members:
 
-.. automodule:: admin.renderer
+.. automodule:: mf.renderer
    :members:
    :private-members:
    :special-members:
