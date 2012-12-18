@@ -19,5 +19,22 @@ TODO:
 
 LICENSE: LGPL
 
+USAGE:
+
+add mf_decorator above your Ming classes
+
+For dashboard, to add User and Group, insert in Pyramid init :
+
+Dashboard.add_dashboard([User,Group],config)
+
+Warning: this should be added after your routes declaration because it insertts generic routes to match objets:
+
+/Users/
+/Users/id
+/Groups/
+/Groups/ida
+...
+
+Acknowledgements:
 
 parseDateTime from http://aralbalkan.com/1512
