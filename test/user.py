@@ -1,15 +1,15 @@
 import mf.annotation
 #from admin.admin import Admin
 from mf.annotation import *
-from ming import Field,schema
+from ming import Document,Field,schema
 from ming.datastore import DataStore
 from ming import Session, create_datastore
 
-bind = create_datastore("%s%s"%('mongodb://localhost:27017','test'))
+bind = create_datastore("%s%s"%('mongodb://localhost:27017','mftest'))
 session = Session(bind)
 
 @mf_decorator
-class User:
+class User(Document):
 
   class __mongometa__:
       session = session
