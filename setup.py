@@ -7,5 +7,6 @@ setup(name='MingForm',
       description='Ming Form and Pyramid Administration Dashboard',
       author='Olivier Sallou',
       author_email='olivier.sallou@irisa.fr',
+      license='LGPL',
       py_modules=['mf'],
      )
