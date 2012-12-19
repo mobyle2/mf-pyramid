@@ -14,8 +14,9 @@ TODO:
  add routes
  add views
  add templates
- renderers: list
  test date,time
+
+ views: extract object class from route
 
 
 LICENSE: LGPL
@@ -25,7 +26,9 @@ Code is currently related to ming 3.0, not binded to latest pymongo.
 
 USAGE:
 
-add mf_decorator above your Ming classes
+User must have *all* acl permissions on *mf.dashboard.Dashboard* to access the dashboard view via /admin as well as to the add/edit/delete operations on objects
+
+Add mf_decorator above your Ming classes
 
 For dashboard, to add User and Group, insert in Pyramid init :
 
@@ -33,11 +36,23 @@ Dashboard.add_dashboard([User,Group],config)
 
 Warning: this should be added after your routes declaration because it insertts generic routes to match objets:
 
-/Users/
-/Users/id
-/Groups/
-/Groups/ida
+/users/ (GET/PUT)
+/users/id (POST,DELETE)
+/groups/
+/groups/id
 ...
+
+If user must have only limited access to a query, i.e list only a subset of an object (/users), it is necessary to add to the object a function defined as:
+
+def my(self):
+  '''
+  Return a mongodb filter on object
+  ....
+  return filter
+
+If this function is not defined, then all elements are available via GET method.
+
+
 
 Acknowledgements:
 

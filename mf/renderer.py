@@ -65,7 +65,6 @@ class AbstractRenderer:
     :param parent: list of parent attributes in case of composite renderer
     :type parent: list
     '''
-
     self.err = False
     parentname = ''
     if parent is not None:
@@ -73,7 +72,7 @@ class AbstractRenderer:
         parentname += "["+p+"]"
     #if not request.has_key(instance.__class__.__name__+parentname+"["+name+"]"):
     #   return []
-    paramvalue = self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]")
+    paramvalue = self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]",True)
     if paramvalue is None:
       return []
     value = None
@@ -87,15 +86,21 @@ class AbstractRenderer:
       if parent:
         obj = instance
         for p in parent:
-          obj = getattr(obj,p)
-        setattr(obj,name,value)
+          if isinstance(obj,dict):
+            obj = obj[p]
+          else:
+            obj = getattr(obj,p)
+        if isinstance(obj,dict):
+          obj[name]=value
+        else:
+          setattr(obj,name,value)
         
       else:
         setattr(instance,name,value)
     return []
 
 
-  def get_param(self,request,name):
+  def get_param(self,request,name,delete = False):
     ''' Get the first value from request parameter
     and remove it from array
 
@@ -108,7 +113,8 @@ class AbstractRenderer:
     for index in range(len(request)):
       key,value = request[index]
       if key == name:
-        request.pop(index)
+        if delete:
+          request.pop(index)
         return value
     return None
 
@@ -130,6 +136,7 @@ class FormRenderer(AbstractRenderer):
     html='<form class="mf-form form-horizontal" action="'+FormRenderer.prefix+'/'+(klass.__class__.__name__).lower()+'s/'+str(getattr(klass,"_id"))+'" type="POST">'
     for name in fields:
         value = getattr(klass,name)
+        logging.debug("Render "+name+" for class "+klass.__class__.__name__)
         html += klass.get_renderer(name).render(value)
     html += AbstractRenderer.controls()
     html += '</form>'
@@ -261,13 +268,13 @@ class DateTimeRenderer(AbstractRenderer):
       strvalue = ''
     else:
       strvalue = ''
-      if type == 'datetime':
+      if self.type == 'datetime':
         strvalue = value.strftime('%y/%m/%d %H:%M:%s')
-      elif type == 'date':
+      elif self.type == 'date':
         strvalue = value.strftime("%d/%m/%y")
-      elif type == 'time':
+      elif self.type == 'time':
         strvalue = value.strftime('%H:%M:%s')
-    return _htmlDateTime(self.klass+parentname+'['+self.name+']',self.name,strvalue,self.err, type)
+    return _htmlDateTime(self.klass+parentname+'['+self.name+']',self.name,strvalue,self.err, self.type)
 
   def unserialize(self,value):
       try:
@@ -285,12 +292,12 @@ class DateTimeRenderer(AbstractRenderer):
 class ArrayRenderer(AbstractRenderer):
   '''Renderer for lists of renderers
   '''
-  _renderers = []
+  #_renderers = []
 
-  def __init__(self,klass,name,attr):
-    AbstractRenderer.__init__(self,klass,name)
-    for obj in attr:
-      self._renderers.append(klass.field_renderer(klass,name,attr[obj]))
+  #def __init__(self,klass,name,attr):
+    #AbstractRenderer.__init__(self,klass,name)
+    #for obj in attr:
+    #  self._renderers.append(klass.renderer(klass,name,attr[obj]))
 
   def render(self,value=None,parent = None):
     parentname = ''
@@ -298,8 +305,9 @@ class ArrayRenderer(AbstractRenderer):
       parentname = '['+parent+']'
     html = '<div class="mf-array">'
     for index in range(len(value)):
-      renderer =  self._renderers[index]
-      val = self.value[index]
+      renderer = self.klass.renderer(self.klass,self.name,value[index])
+      #renderer =  self._renderers[index]
+      val = value[index]
       html += renderer.render(val,self.name,parent)
     html += '</div>'
     return html
@@ -327,7 +335,7 @@ class CompositeRenderer(AbstractRenderer):
   def __init__(self,klass,name,attr):
     AbstractRenderer.__init__(self,klass,name)
     for obj  in attr:
-      self._renderers.append(klass.field_renderer(klass,obj,attr[obj]))
+      self._renderers.append(klass.renderer(klass,obj,attr[obj]))
   
 
   def render(self,value = None, parent = None):
@@ -337,7 +345,9 @@ class CompositeRenderer(AbstractRenderer):
     html = '<div class="mf-composite" id="'+self.klass+parentname+'['+self.name+']"><h3>'+self.name+'</h3>'
     for renderer in self._renderers:
       obj = None
-      if hasattr(value,renderer.name):
+      if isinstance(value,dict):
+        obj = value[renderer.name]
+      elif hasattr(value,renderer.name):
         obj = getattr(value,renderer.name)
       html += renderer.render(obj,self.name)
     html += '</div>'
@@ -389,16 +399,16 @@ def _htmlTextField(id,name,value,error = False):
   errorClass = ''
   if error:
     errorClass = 'error'
-  return '<div class="mf-field mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="text" id="'+id+'" name="'+id+']"   value="'+(str(value or ''))+'"/></div></div>'
+  return '<div class="mf-field mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="text" id="'+id+'" name="'+id+'"   value="'+(str(value or ''))+'"/></div></div>'
 
 def _htmlDateTime(id,name,value,error = False, type = 'datetime'):
   errorClass = ''
   if error:
     errorClass = 'error'
-  return '<div class="mf-field mf-datetime control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="'+type+'" id="'+id+'" name="'+id+']"   value="'+(str(value or ''))+'"/></div></div>'
+  return '<div class="mf-field mf-datetime control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="'+type+'" id="'+id+'" name="'+id+'"   value="'+(str(value or ''))+'"/></div></div>'
 
 def _htmlHidden(id,name,value):
-  return '<div class="mf-field mf-textfield control-group"><div class="controls"><input type="hidden" id="'+id+'" name="'+id+']"   value="'+(str(value or ''))+'"/></div></div>'
+  return '<div class="mf-field mf-textfield control-group"><div class="controls"><input type="hidden" id="'+id+'" name="'+id+'"   value="'+(str(value or ''))+'"/></div></div>'
 
 def _htmlCheckBox(id,name,value,error = False):
   errorClass = ''
