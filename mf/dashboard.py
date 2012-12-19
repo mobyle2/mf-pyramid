@@ -30,11 +30,11 @@ class Dashboard:
       #  config.add_route(klass.__name__,prefix+"/"+klass.__name__+"s/{id}")
       #  config.add_view('mf.views.view_'+klass.__name__,name='view_'+klass.__name__,route_name=klass.__name__+"s",renderer="dashboard_edit.mako")
     if config is not None:
-      config.add_route('mf_list',prefix+'/'+{objname}+'s/')
-      config.add_route('mf_add',prefix+'/'+{objname}+'s/')
-      config.add_route('mf_show',prefix+'/'+{objname}+'s/'+{id})
-      config.add_route('mf_delete',prefix+'/'+{objname}+'s/'+{id})
-      config.add_route('mf_edit',prefix+'/'+{objname}+'s/'+{id})
-      config.add_route('mf_admin',prefix/'/admin')
+      config.add_route('mf_list',prefix+'/{objname}s/')
+      config.add_route('mf_add',prefix+'/{objname}s/')
+      config.add_route('mf_show',prefix+'/{objname}s/{id}')
+      config.add_route('mf_delete',prefix+'/{objname}s/{id}')
+      config.add_route('mf_edit',prefix+'/{objname}s/{id}')
+      config.add_route('mf_admin',prefix+'/admin')
       config.scan('mf.views')
 
