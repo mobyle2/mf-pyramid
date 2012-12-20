@@ -9,8 +9,8 @@
   function loadObject(id) {
     route = '/'+curObject.toLowerCase()+'s/'+id;
     $.getJSON(route, function(data) {
-      $("#show").html("<p>"+data["user"]["name"]+"</p>");
-      $("#show").show();
+      $("#show-"+curObject).show();
+      json2form(data["user"],"");
      });
   }
 
@@ -41,6 +41,37 @@
       tbody += '</tbody>';
       $("#table-"+id).html(thead+tbody);
       $("#list-"+id).show();
+     });
+   }
+
+
+   /**
+   * Map a json result to a form
+   */
+   function json2form(data,parent) {
+     $.each(data, function(key, val) {
+     if(jQuery.isPlainObject(val)) {
+       if(val['$date']!=null){
+         var objdate = new Date(val['$date']);
+         var objdatestr = objdate.toString()
+         var type = $('#'+curObject+parent+'\\['+key+'\\]').attr('type');
+         if (type == 'date') { objdatestr = objdate.toDateString(); }
+         if (type == 'time') { objdatestr = objdate.toTimeString(); }
+         $('#'+curObject+parent+'\\['+key+'\\]').val(objdatestr);
+       }
+       else if(val['$oid']!=null){
+         $('#'+curObject+parent+'\\['+key+'\\]').val(val['$oid']);
+       }
+       else {
+         var newparent = parent + '\\['+key+'\\]';
+         json2form(val,newparent);
+       }
+     }
+     else { 
+       console.log("update "+key+" search "+'#'+curObject+parent+'\\['+key+'\\]'+" with val "+val);
+       $('#'+curObject+parent+'\\['+key+'\\]').val(val);
+     }
+
      });
    }
 

@@ -18,7 +18,7 @@ class User:
   admin = False
   options = { 'tags': '' , 'categories': '' }
   creation_date = datetime.utcnow()
-
+  today = date.today()
 
   def html(self, fields = None):
     return self.render(fields)

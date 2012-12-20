@@ -17,12 +17,11 @@
 % endfor
 
 % for object in klasses:
-<div id="show-${object.__name__}" class="1mf-object">
+<div id="show-${object.__name__}" class="mf-object">
   ${object().render() | n}
 </div>
 % endfor
 
-<div id="show" class="mf-object">
 
 </div>
 
