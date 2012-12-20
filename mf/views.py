@@ -51,7 +51,7 @@ def mf_list(request):
       objlist.append(obj)
     response = { 'object' :  objname, 'status': 'list', objname : objlist }
     objlist = json.dumps(objlist, default=json_util.default)
-    return Response(objlist)
+    return Response(body=objlist,content_type = "application/json")
 
 
 #@view_config(name='mf_show', route_name='mf_show', renderer='json', request_method='GET')
@@ -64,7 +64,7 @@ def mf_show(request):
     obj= collection.find_one(filter)
     response = { 'object' :  objname, 'status': 'list', objname : obj, 'filter' : filter }
     response = json.dumps(response, default=json_util.default)
-    return Response(response)
+    return Response(body=response,content_type = "application/json")
 
 #@view_config(name='mf_edit', route_name='mf_edit', renderer='json', request_method='POST', context='mf.dashboard.Dashboard', permission='all')
 def mf_edit(request):
