@@ -83,5 +83,5 @@ def mf_admin(request):
     objects = []
     for klass in Annotation.klasses():
       objects.append(klass.__name__)
-    return {'objects':objects}
+    return {'objects':objects, 'klasses': Annotation.klasses()}
 

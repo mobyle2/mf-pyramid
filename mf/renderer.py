@@ -417,7 +417,7 @@ def _htmlCheckBox(id,name,value,error = False):
   checked = ''
   if value:
      checked = 'checked'
-  return '<div class="mf-field mf-checkbox control-group '+errorClass+'"><div class="controls"><label class="checkbox"><input type="checkbox" value="'+str(value)+' id="'+id+'" name="'+id+'" '+checked+'>'+name+'</label></div></div>'
+  return '<div class="mf-field mf-checkbox control-group '+errorClass+'"><div class="controls"><label class="checkbox"><input type="checkbox" value="'+str(value)+'" id="'+id+'" name="'+id+'" '+checked+'>'+name+'</label></div></div>'
  
 def _htmlNumber(id,name,value,error = False):
   errorClass = ''

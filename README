@@ -11,13 +11,7 @@ more customization will also be available to force type of the attribute (Checkb
 Pyramid routes and templates will be set automatically
 
 TODO:
- add routes
- add views
- add templates
- test date,time
-
- views: extract object class from route
-
+  add possibility to defined which fields to show (and order per object for list and simple form)
 
 LICENSE: LGPL
 
