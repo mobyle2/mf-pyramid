@@ -27,7 +27,7 @@ if __name__ == '__main__':
     db.drop_collection('users')
     u1 = {"name": "Mike", "age" : 30, "email" : "nomail", "creation_date" : datetime.utcnow(), "options" : { 'tags': '' , 'categories': '' } }
     db.users.insert(u1)
-    u2 = {"name": "Tommy", "age" : 40, "email" : "nomail", "creation_date" : datetime.utcnow(), "options" : { 'tags': 'cool' , 'categories': '' } }
+    u2 = {"name": "Tommy", "admin" : True, "age" : 40, "email" : "nomail", "creation_date" : datetime.utcnow(), "options" : { 'tags': 'cool' , 'categories': '' } }
     db.users.insert(u2)
     Dashboard.add_dashboard([User],config)
     app = config.make_wsgi_app()

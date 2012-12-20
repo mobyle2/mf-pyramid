@@ -7,6 +7,7 @@
   * Loads an object and shows its form
   */
   function loadObject(id) {
+    clear_form_elements("#show-"+curObject);
     route = '/'+curObject.toLowerCase()+'s/'+id;
     $.getJSON(route, function(data) {
       $("#show-"+curObject).show();
@@ -25,18 +26,36 @@
     $.getJSON(route, function(data) {
       var thead = '<thead><tr>';
       var tbody = '<tr>';
-      var first = 1;
+
+      var keys = new Array();
       $.each(data, function(obj) {
-        tbody += '<tr id="'+data[obj]["_id"]["$oid"]+'" class="mf-list-object '+id+'">';
+        //tbody += '<tr id="'+data[obj]["_id"]["$oid"]+'" class="mf-list-object '+id+'">';
         $.each(data[obj], function(key, val) {
-          if(! jQuery.isPlainObject(val)) {
-            if(first == 1) { thead += "<th>"+key+"</th>"; }
-            tbody += "<td>"+val+"</td>";
+          if(! jQuery.isPlainObject(val) || val['$date']!=null) {
+            if ( $.inArray(key, keys) < 0) {
+              keys.push(key)
+            }
+            //tbody += "<td>"+val+"</td>";
           }
         });
-        tbody += "</tr>";
-        first = 0;
+        //tbody += "</tr>";
+
       });
+      // Table header
+      $.each(keys, function(key) { thead += "<th>"+keys[key]+"</th>"; });
+      // Now for each object get values from key
+      $.each(data, function(obj) {
+        tbody += '<tr id="'+data[obj]["_id"]["$oid"]+'" class="mf-list-object '+id+'">';
+        $.each(keys, function(key) {
+           var val = data[obj][keys[key]];
+           if(jQuery.isPlainObject(val) && val['$date']!=null) {
+             val = new Date(val['$date']);
+           }
+          tbody += "<td>"+val+"</td>";
+        });
+        tbody += "</tr>";
+      });
+
       thead += '</tr></thead>';
       tbody += '</tbody>';
       $("#table-"+id).html(thead+tbody);
@@ -68,10 +87,38 @@
        }
      }
      else { 
-       console.log("update "+key+" search "+'#'+curObject+parent+'\\['+key+'\\]'+" with val "+val);
        $('#'+curObject+parent+'\\['+key+'\\]').val(val);
+       if($('#'+curObject+parent+'\\['+key+'\\]').attr('type')=='checkbox')  {
+         if(val == 'True' || val == 1) {
+           $('#'+curObject+parent+'\\['+key+'\\]').attr('checked', true);
+         }
+         else {
+           $('#'+curObject+parent+'\\['+key+'\\]').attr('checked', true);
+         }
+       }
      }
 
      });
    }
+
+  /**
+  * Clear the form elements
+  */
+  function clear_form_elements(ele) {
+    $(ele).find(':input').each(function() {
+        switch(this.type) {
+            case 'password':
+            case 'select-multiple':
+            case 'select-one':
+            case 'text':
+            case 'textarea':
+                $(this).val('');
+                break;
+            case 'checkbox':
+            case 'radio':
+                this.checked = false;
+        }
+    });
+  }
+
 

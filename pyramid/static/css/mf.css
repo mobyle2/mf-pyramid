@@ -1,5 +1,5 @@
 
-.mf-textfield {
+.mf-field {
   margin: 5px;
 }
 
@@ -8,6 +8,7 @@
   border-color: black;
   border-width: 1px;
   padding: 5px;
+  display: inline-block;
 }
 
 .mf-textfield {

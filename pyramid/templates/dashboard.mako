@@ -17,7 +17,7 @@
 % endfor
 
 % for object in klasses:
-<div id="show-${object.__name__}" class="mf-object">
+<div id="show-${object.__name__}" class="mf-object offset1">
   ${object().render() | n}
 </div>
 % endfor
