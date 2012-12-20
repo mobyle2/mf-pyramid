@@ -23,6 +23,9 @@ class Annotation:
   # Add static list of klass
   __klasses = []
 
+  # static mongodb connection
+  db_conn = None
+
   @staticmethod
   def addKlass(klass):
     """

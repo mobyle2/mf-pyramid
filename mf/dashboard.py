@@ -8,6 +8,15 @@ class Dashboard:
   ''' Manage administration dashboard for pyramid
   '''
 
+
+  @staticmethod
+  def set_connection(conn):
+    '''Sets the db connection to mongo
+    :param conn: MongoDB connection objects
+    :type conn: Connection
+    '''
+    Annotation.db_conn = conn
+
   @staticmethod
   def add_dashboard(klasses, config = None, prefix = ''):
     ''' Adds a list of class to the dashboard
@@ -25,11 +34,6 @@ class Dashboard:
       FormRenderer.prefix = prefix
     for klass in klasses:
       Annotation.addKlass(klass)
-      #if config is not None:
-      #  config.add_route(klass.__name__+"s",prefix+"/"+klass.__name__+"s")
-      #  config.add_view('mf.views.view_'+klass.__name__+"s",name='view_'+klass.__name__+"s",route_name=klass.__name__+"s",renderer="dashboard_list.mako")
-      #  config.add_route(klass.__name__,prefix+"/"+klass.__name__+"s/{id}")
-      #  config.add_view('mf.views.view_'+klass.__name__,name='view_'+klass.__name__,route_name=klass.__name__+"s",renderer="dashboard_edit.mako")
     if config is not None:
       config.add_route('mf_list',prefix+'/{objname}s/')
       config.add_route('mf_add',prefix+'/{objname}s/')
@@ -43,5 +47,5 @@ class Dashboard:
       config.add_view(mf_delete, route_name='mf_delete', renderer='json', request_method='DELETE', permission='all')
       config.add_view(mf_add, route_name='mf_add', renderer='json', request_method='PUT', permission='all')
       config.add_view(mf_admin, route_name='mf_admin', renderer='dashboard.mako', permission='all')
-      #config.scan('mf')
+      #config.scan()
 
