@@ -1,12 +1,22 @@
 from pyramid.view import view_config
 from pyramid.response import Response
+from annotation import Annotation
 
 view_config(name='mf_list', route_name='mf_list', renderer='json', request_method='GET')
 def mf_list(request):
-     # TODO get klass from route  objname
-     #attr = getattr(klass,'my')
-     #   if attr is not None and callable(attr):
-     #     filter = klass().attr()
+    objname = request.matchdict['objname']
+    objklass = None
+    for klass in Annotation.klasses():
+      if klass.__name__.lower() == objname:
+        objklass = klass
+        break
+    if objklass is None:
+      return {}
+    attr = None
+    if hasattr(objklass(),'my'):
+      attr = getattr(objklass(),'my')
+    if attr is not None and callable(attr):
+        filter = klass().attr()
     return {'status': 'list'}
 
 

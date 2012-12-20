@@ -2,6 +2,7 @@
 import annotation
 from annotation import Annotation
 from renderer import FormRenderer
+from views import *
 
 class Dashboard:
   ''' Manage administration dashboard for pyramid
@@ -36,5 +37,11 @@ class Dashboard:
       config.add_route('mf_delete',prefix+'/{objname}s/{id}')
       config.add_route('mf_edit',prefix+'/{objname}s/{id}')
       config.add_route('mf_admin',prefix+'/admin')
-      config.scan('mf.views')
+      config.add_view(mf_list, route_name='mf_list', renderer='json', request_method='GET')
+      config.add_view(mf_show, route_name='mf_show', renderer='json', request_method='GET')
+      config.add_view(mf_edit, route_name='mf_edit', renderer='json', request_method='POST', permission='all')
+      config.add_view(mf_delete, route_name='mf_delete', renderer='json', request_method='DELETE', permission='all')
+      config.add_view(mf_add, route_name='mf_add', renderer='json', request_method='PUT', permission='all')
+      config.add_view(mf_admin, route_name='mf_admin', renderer='dashboard.mako', permission='all')
+      #config.scan('mf')
 
