@@ -133,7 +133,7 @@ class FormRenderer(AbstractRenderer):
     :type fields: list
     :return: str HTML form
     '''
-    html='<form class="mf-form form-horizontal" action="'+FormRenderer.prefix+'/'+(klass.__class__.__name__).lower()+'s/'+str(getattr(klass,"_id"))+'" type="POST">'
+    html='<form class="mf-form form-horizontal">'
     for name in fields:
         value = getattr(klass,name)
         logging.debug("Render "+name+" for class "+klass.__class__.__name__)
@@ -282,7 +282,7 @@ class DateTimeRenderer(AbstractRenderer):
           #return parseDateTime(value)
 	  return datetime.strptime(value,'%y/%m/%d %H:%M:%s')
         elif type == 'date':
-          return datetime.date.strptime(value,"%Y-%m-%d")
+          return datetime.date.strptime(value,"%d/%m/%y")
         elif type == 'time':
           return datetime.time.strptime(value,"%H:%M:%S")
       except Exception as e:
@@ -427,7 +427,7 @@ def _htmlNumber(id,name,value,error = False):
 
 
 def _htmlControls():
-  return '<div class="form-actions mf-actions"><button type="submit" class="btn btn-primary">Save</button></div>'
+  return '<div class="form-actions mf-actions"><button class="btn btn-primary">Save</button></div>'
 
 
 def parseDateTime(s):

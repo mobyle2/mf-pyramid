@@ -10,7 +10,6 @@
     clear_form_elements("#show-"+curObject);
     route = '/'+curObject.toLowerCase()+'s/'+id;
     $.getJSON(route, function(data) {
-      $("#show-"+curObject).show();
       json2form(data["user"],"");
      });
   }
@@ -19,21 +18,25 @@
   * Loads a list of objects and create a sortable table
   */
   function loadObjectList(id) {
-    
+    clear_form_elements("#show-"+curObject);
     $(".mf-list").hide();
     $(".mf-object").hide();
+    $("#show-"+curObject).show();
     route = '/'+id.toLowerCase()+'s/';
     $.getJSON(route, function(data) {
       var thead = '<thead><tr>';
       var tbody = '<tr>';
 
       var keys = new Array();
+      var types = {};
       $.each(data, function(obj) {
         //tbody += '<tr id="'+data[obj]["_id"]["$oid"]+'" class="mf-list-object '+id+'">';
         $.each(data[obj], function(key, val) {
-          if(! jQuery.isPlainObject(val) || val['$date']!=null) {
+          if( (!jQuery.isPlainObject(val)) || val['$date']!=null) {
+            var type = $('#'+curObject+'\\['+key+'\\]').attr('type');
             if ( $.inArray(key, keys) < 0) {
               keys.push(key)
+              types[key] = type
             }
             //tbody += "<td>"+val+"</td>";
           }
@@ -48,8 +51,18 @@
         tbody += '<tr id="'+data[obj]["_id"]["$oid"]+'" class="mf-list-object '+id+'">';
         $.each(keys, function(key) {
            var val = data[obj][keys[key]];
-           if(jQuery.isPlainObject(val) && val['$date']!=null) {
-             val = new Date(val['$date']);
+           // Bson does not permit python time or date conversion, so we store them as string.
+           if((jQuery.isPlainObject(val) && val['$date']!=null) || (types[keys[key]] == 'date') || (types[keys[key]] == 'time')) {          
+             if (types[keys[key]] == 'date') {
+               //val = dateFormat(val,'yyyy/mm/dd');
+             }
+             else if (types[keys[key]] == 'time') {
+               //val = dateFormat(val,'hh:MM:ss');
+             }
+             else {
+               val = new Date(val['$date']);
+               val = dateFormat(val,'yyyy/mm/dd hh:MM:ss');
+             }
            }
           tbody += "<td>"+val+"</td>";
         });

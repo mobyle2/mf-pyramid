@@ -166,13 +166,7 @@ def bind_form(self,request):
             err = renderer.bind(request,self,name)
             if err is not None:
               self.__field_errors.extend(err)       
-
-
-        #if self.__class__.__name__+"["+name+"]" in request:
-          
-          #err = renderer.bind(request,self,name)
-          #if err is not None:
-          #  self.__field_errors.append(err)
+    return self.__field_errors
 
 
 

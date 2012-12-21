@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="/static/css/bootstrap.min.css" media="screen">
   <link rel="stylesheet" href="/static/css/bootstrap-responsive.min.css">
   <script src="/static/js/jquery-1.8.3.min.js"></script>
+  <script src="/static/js/date.format.js"></script>
   <script src="/static/js/dashboard.js"></script>
 </head>
 

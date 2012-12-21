@@ -76,7 +76,22 @@ def mf_delete(request):
 
 #@view_config(name='mf_add', route_name='mf_add', renderer='json', request_method='PUT', context='mf.dashboard.Dashboard', permission='all')
 def mf_add(request):
-    return {'status':'add'}
+    objklass = None
+    objname = request.matchdict['objname']
+    for klass in Annotation.klasses():
+      if pluralize(klass.__name__) == pluralize(objname):
+        objklass = klass
+        break
+    if objklass is None:
+      response = json.dumps({ 'status' : 1, 'error' : [], 'message' : 'Object does not exist' }, default=json_util.default)
+      return Response(body = response,content_type = "application/json")
+    
+    err = objklass().bind_form(request.params.items())
+    status = 0
+    if err:
+      status = 1
+    response = json.dumps({ 'status' : status, 'error' : err, 'message' : '' }, default=json_util.default)
+    return Response(body = response, content_type = "application/json")
 
 #@view_config(name='mf_admin', route_name='mf_admin', renderer='dashboard.mako', context='mf.dashboard.Dashboard', permission='all')
 def mf_admin(request):
