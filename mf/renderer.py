@@ -26,6 +26,7 @@ class AbstractRenderer:
   def __init__(self,klass,name):
     self.name = name
     self.klass = klass.__name__
+    self.err = False
 
   def render(self,value = None, parent = None):
     '''Return HTML for component
@@ -73,7 +74,7 @@ class AbstractRenderer:
     #if not request.has_key(instance.__class__.__name__+parentname+"["+name+"]"):
     #   return []
     paramvalue = self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]",True)
-    if paramvalue is None:
+    if paramvalue is None or paramvalue == '':
       return []
     value = None
     try:
@@ -133,7 +134,7 @@ class FormRenderer(AbstractRenderer):
     :type fields: list
     :return: str HTML form
     '''
-    html='<form class="mf-form form-horizontal">'
+    html='<form class="mf-form form-horizontal" id="mf-form-'+klass.__class__.__name__+'">'
     for name in fields:
         value = getattr(klass,name)
         logging.debug("Render "+name+" for class "+klass.__class__.__name__)

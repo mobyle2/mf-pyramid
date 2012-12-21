@@ -8,9 +8,9 @@
   <meta name="author" content="Mobyle team">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" href="/static/favicon.ico">
-  <link rel="stylesheet" href="/static/css/mf.css">
   <link rel="stylesheet" href="/static/css/bootstrap.min.css" media="screen">
   <link rel="stylesheet" href="/static/css/bootstrap-responsive.min.css">
+  <link rel="stylesheet" href="/static/css/mf.css">
   <script src="/static/js/jquery-1.8.3.min.js"></script>
   <script src="/static/js/date.format.js"></script>
   <script src="/static/js/dashboard.js"></script>

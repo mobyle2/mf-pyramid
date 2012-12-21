@@ -1,6 +1,7 @@
 from pyramid.view import view_config
 from pyramid.response import Response
 from mf.annotation import Annotation
+from mf.renderer import FormRenderer
 #from mf.dashboard import Dashboard
 
 import json
@@ -98,5 +99,5 @@ def mf_admin(request):
     objects = []
     for klass in Annotation.klasses():
       objects.append(klass.__name__)
-    return {'objects':objects, 'klasses': Annotation.klasses()}
+    return {'objects':objects, 'klasses': Annotation.klasses(), 'prefix': FormRenderer.prefix }
 

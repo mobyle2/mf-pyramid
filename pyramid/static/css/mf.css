@@ -1,3 +1,6 @@
+.mf-error {
+  border-color: red  ! important;
+}
 
 .mf-field {
   margin: 5px;

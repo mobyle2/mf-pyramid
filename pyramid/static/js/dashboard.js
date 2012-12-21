@@ -4,6 +4,37 @@
    var curObject;
 
   /**
+  * Submit the form
+  */
+  function mfsubmit(prefix) {
+     id = $("#"+curObject+"\\[_id\\]").val();
+     method = "POST";
+     if(id ==null || id == '') { method = "PUT"; id = "" }
+     $.ajax({type:method, data: $("#mf-form-"+curObject).serialize(), url: prefix+"/"+curObject.toLowerCase()+"s/"+id,
+            success: function(msg){
+               if(msg["status"]==1) {
+                 $.each(msg["error"], function(err){
+                     $("#"+curObject+'\\['+msg["error"][err]+'\\]').attr('class','mf-error');
+                  });
+
+                 $("#mf-flash").attr('class','alert alert-error');
+                 $("#mf-flash").text(curObject+" could not be saved");
+               }
+               else {
+                 clear_form_elements("#show-"+curObject);
+                 $("#mf-flash").attr('class','alert alert-success');
+                 $("#mf-flash").text(curObject+" successfully added");
+               }
+
+            },
+            error: function(){
+                alert('An error occured during transaction');
+            }
+        });
+   }
+
+
+  /**
   * Loads an object and shows its form
   */
   function loadObject(id) {
@@ -118,6 +149,9 @@
   * Clear the form elements
   */
   function clear_form_elements(ele) {
+    $("div").removeClass("error");
+    $("#mf-flash").attr('class','');
+    $("#mf-flash").text("");
     $(ele).find(':input').each(function() {
         switch(this.type) {
             case 'password':
@@ -125,6 +159,7 @@
             case 'select-one':
             case 'text':
             case 'textarea':
+                $(this).attr('class','');
                 $(this).val('');
                 break;
             case 'checkbox':

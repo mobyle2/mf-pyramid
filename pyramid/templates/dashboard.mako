@@ -8,7 +8,7 @@
   <li><a href="#" class="dashboard-item" id="${object}">${object}s</a></li>
   % endfor
 </ul>
-
+<div id="mf-flash" class="mf-flash"></div>
 % for object in objects:
 <div id="list-${object}" class="mf-list">
   <table class="mf-table table table-hover" id="table-${object}">
@@ -43,7 +43,7 @@
    });
 
    $(".mf-form").submit(function() {
-     alert('Handler for .submit() called.');
+     mfsubmit("${prefix}");
      return false;
    });
 
