@@ -343,7 +343,7 @@ class CompositeRenderer(AbstractRenderer):
     parentname = ''
     if parent:
       parentname = '['+parent+']'
-    html = '<div class="mf-composite" id="'+self.klass+parentname+'['+self.name+']"><h3>'+self.name+'</h3>'
+    html = '<div class="mf-composite" id="'+self.klass+parentname+'['+self.name+']"><span class="mf-composite-label">'+self.name+'</span>'
     for renderer in self._renderers:
       obj = None
       if isinstance(value,dict):

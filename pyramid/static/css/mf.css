@@ -2,6 +2,11 @@
   border-color: red  ! important;
 }
 
+.mf-composite-label {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
 .mf-field {
   margin: 5px;
 }
