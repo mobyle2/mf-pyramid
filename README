@@ -11,7 +11,10 @@ more customization will also be available to force type of the attribute (Checkb
 Pyramid routes and templates will be set automatically
 
 TODO:
-  add possibility to defined which fields to show (and order per object for list and simple form)
+  see bugs/features in github
+  - finish mf_add to real add the object in mongo
+  - add delete
+  - add edit
 
 LICENSE: LGPL
 
