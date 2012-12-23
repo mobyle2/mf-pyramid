@@ -433,7 +433,7 @@ def _htmlNumber(id,name,value,error = False):
 
 
 def _htmlControls(name):
-  return '<div class="form-actions mf-actions"><button id="mf-save-'+name+'" class="mf-btn btn btn-primary">Save</button><button id=mf-clear-'+name+'" class="mf-btn btn btn-primary">Clear</button></div>'
+  return '<div class="form-actions mf-actions"><button id="mf-save-'+name+'" class="mf-btn btn btn-primary">Save</button><button id=mf-clear-'+name+'" class="mf-btn btn btn-primary">Clear</button><button id=mf-delete-'+name+'" class="mf-btn btn btn-danger">Delete</button></div>'
 
 
 def parseDateTime(s):
