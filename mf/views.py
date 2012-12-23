@@ -69,11 +69,24 @@ def mf_show(request):
 
 #@view_config(name='mf_edit', route_name='mf_edit', renderer='json', request_method='POST', context='mf.dashboard.Dashboard', permission='all')
 def mf_edit(request):
+    objname = request.matchdict['objname']
+    filter = mf_filter(objname)
+    filter["_id"] = ObjectId(request.matchdict['id'])
+    objlist = []
+    collection = Annotation.db_conn[pluralize(objname)]
+    obj= collection.find_one(filter)
     return {'status':'edit'}
 
 #@view_config(name='mf_delete', route_name='mf_delete', renderer='json', request_method='DELETE', context='mf.dashboard.Dashboard', permission='all')
 def mf_delete(request):
-    return {'status':'delete'}
+    objname = request.matchdict['objname']
+    filter = mf_filter(objname)
+    filter["_id"] = ObjectId(request.matchdict['id'])
+    objlist = []
+    collection = Annotation.db_conn[pluralize(objname)]
+    obj = collection.remove(filter)
+    response = json.dumps({ 'status' : 0, 'error' : [], 'message' : 'Object deleted' }, default=json_util.default)
+    return Response(body = response,content_type = "application/json")
 
 #@view_config(name='mf_add', route_name='mf_add', renderer='json', request_method='PUT', context='mf.dashboard.Dashboard', permission='all')
 def mf_add(request):
@@ -84,6 +97,7 @@ def mf_add(request):
         objklass = klass
         break
     if objklass is None:
+      # TODO add object in mongo
       response = json.dumps({ 'status' : 1, 'error' : [], 'message' : 'Object does not exist' }, default=json_util.default)
       return Response(body = response,content_type = "application/json")
     

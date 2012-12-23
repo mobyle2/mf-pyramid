@@ -2,6 +2,11 @@
   border-color: red  ! important;
 }
 
+.mf-btn {
+  margin: 10px;
+}
+
+
 .mf-composite-label {
   font-size: 1.2em;
   font-weight: bold;

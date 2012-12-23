@@ -94,7 +94,7 @@ def renderer(klass,name,attr):
      rparam: renderer for the attribute
      rtype: AbstractRenderer
      """
-     if isinstance(attr,str) or attr == None:
+     if isinstance(attr,str) or attr == None or isinstance(attr,basestring):
          logging.debug(name+" is string")
          return TextRenderer(klass,name)
      elif isinstance(attr,bool):

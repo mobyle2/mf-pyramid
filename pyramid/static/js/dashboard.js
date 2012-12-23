@@ -14,7 +14,12 @@
             success: function(msg){
                if(msg["status"]==1) {
                  $.each(msg["error"], function(err){
-                     $("#"+curObject+'\\['+msg["error"][err]+'\\]').attr('class','mf-error');
+                     params = msg["error"][err].split('.');
+                     errparam = '';
+                     for(var i=0;i<params.length;i++) {
+                       errparam += '\\['+params[i]+'\\]'
+                     }
+                     $("#"+curObject+errparam).attr('class','mf-error');
                   });
 
                  $("#mf-flash").attr('class','alert alert-error');
@@ -23,7 +28,12 @@
                else {
                  clear_form_elements("#show-"+curObject);
                  $("#mf-flash").attr('class','alert alert-success');
-                 $("#mf-flash").text(curObject+" successfully added");
+                 if(method == "POST") {
+                   $("#mf-flash").text(curObject+" successfully updated");
+                 }
+                 else { 
+                   $("#mf-flash").text(curObject+" successfully added");
+                 }
                }
 
             },

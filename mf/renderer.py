@@ -15,13 +15,13 @@ class AbstractRenderer:
 
   err = False
 
-  @staticmethod
-  def controls():
+
+  def controls(self):
     '''Return buttons for the form
 
     :returns: str - HTML for buttons
     '''
-    return _htmlControls()
+    return _htmlControls(self.klass)
 
   def __init__(self,klass,name):
     self.name = name
@@ -82,7 +82,12 @@ class AbstractRenderer:
       value = self.unserialize(paramvalue)
     except Exception as e:
       self.err = True
-      return [name]
+      if parent is not None:
+       error = ''
+       for p in parent:
+         error += p+"."
+      error+= name
+      return [error]
     if value is not None:
       if parent:
         obj = instance
@@ -116,7 +121,7 @@ class AbstractRenderer:
       if key == name:
         if delete:
           request.pop(index)
-        return value
+        return str(value)
     return None
 
 class FormRenderer(AbstractRenderer):
@@ -139,7 +144,7 @@ class FormRenderer(AbstractRenderer):
         value = getattr(klass,name)
         logging.debug("Render "+name+" for class "+klass.__class__.__name__)
         html += klass.get_renderer(name).render(value)
-    html += AbstractRenderer.controls()
+    html += self.controls()
     html += '</form>'
     return html
 
@@ -159,7 +164,7 @@ class TextRenderer(AbstractRenderer):
 
 
   def validate(self,value):
-    return isinstance(value,str)
+    return isinstance(value,basestring)
 
   def unserialize(self,value):
     if self.validate(value):
@@ -427,8 +432,8 @@ def _htmlNumber(id,name,value,error = False):
   return '<div class="mf-field mf-numberfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="number" id="'+id+'" name="'+id+'" value="'+str(value)+'"/></div></div>'
 
 
-def _htmlControls():
-  return '<div class="form-actions mf-actions"><button class="btn btn-primary">Save</button></div>'
+def _htmlControls(name):
+  return '<div class="form-actions mf-actions"><button id="mf-save-'+name+'" class="mf-btn btn btn-primary">Save</button><button id=mf-clear-'+name+'" class="mf-btn btn btn-primary">Clear</button></div>'
 
 
 def parseDateTime(s):

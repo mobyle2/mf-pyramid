@@ -1,14 +1,14 @@
 This is a new development, mainly for own training, and not for use yet.
 
-admin provides annotations on a Ming object (@admin) to analyse objects and create actions and forms on objects automatically.
+admin provides annotations on a Ming object maybe will use mongokit (@mf_decorator) to analyse objects and create actions and forms on objects automatically.
 
-Goal is to generate an admin dashboard for each object (show/edit/delete per object and list of objects)
+Goal is to generate an admin dashboard for each object (show/edit/delete per object and list of objects).
 
 renderer is in charge of generating HTML per attribute type.
 
 more customization will also be available to force type of the attribute (Checkbox etc...)
 
-Pyramid routes and templates will be set automatically
+Pyramid routes and templates will be set automatically to access objects via REST.
 
 TODO:
   see bugs/features in github
@@ -31,7 +31,7 @@ For dashboard, to add User and Group, insert in Pyramid init :
 
 Dashboard.add_dashboard([User,Group],config)
 
-Warning: this should be added after your routes declaration because it insertts generic routes to match objets:
+Warning: this should be added after your routes declaration because it inserts generic routes to match objets:
 
 /users/ (GET/PUT)
 /users/id (POST,DELETE)
@@ -48,7 +48,7 @@ def my(self):
   return filter
 
 If this function is not defined, then all elements are available via GET method.
-
+Filter is a mongo filter
 
 
 Acknowledgements:

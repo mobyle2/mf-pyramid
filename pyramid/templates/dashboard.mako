@@ -42,8 +42,18 @@
      loadObject(object);
    });
 
-   $(".mf-form").submit(function() {
-     mfsubmit("${prefix}");
+
+   $('.mf-btn').click(function(event) {
+    // Submit or clear form
+     if(event.target.id.indexOf("mf-save") == 0) {
+       mfsubmit("${prefix}");
+     }
+     if(event.target.id.indexOf("mf-clear") == 0) {
+       clear_form_elements("#show-"+curObject);
+     }
+   });
+
+   $(".mf-form").submit(function(event) {
      return false;
    });
 
