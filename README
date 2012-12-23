@@ -13,7 +13,6 @@ Pyramid routes and templates will be set automatically to access objects via RES
 TODO:
   see bugs/features in github
   - finish mf_add to real add the object in mongo
-  - add delete
   - add edit
 
 LICENSE: LGPL
