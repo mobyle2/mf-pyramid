@@ -1,5 +1,6 @@
 from pyramid.view import view_config
 from pyramid.response import Response
+from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden
 from mf.annotation import Annotation
 from mf.renderer import FormRenderer
 #from mf.dashboard import Dashboard
@@ -7,6 +8,9 @@ from mf.renderer import FormRenderer
 import json
 from bson import json_util
 from bson.objectid import ObjectId
+
+MF_LIST = 'list'
+MF_MANAGE = 'manage'
 
 def pluralize(name):
   '''Pluralize a name
@@ -16,12 +20,12 @@ def pluralize(name):
   '''
   return name.lower()+"s"
 
-def mf_filter(objname):
+def mf_filter(objname, control):
     '''Return a mongo filter on object
     '''
     objklass = None
     for klass in Annotation.klasses():
-      if pluralize(klass.__name__) == objname:
+      if pluralize(klass.__name__) == pluralize(objname):
         objklass = klass
         break
     if objklass is None:
@@ -31,7 +35,7 @@ def mf_filter(objname):
       attr = getattr(objklass(),'my')
     filter = {}
     if attr is not None and callable(attr):
-        filter = klass().attr()
+        filter = attr(control)
     return filter
 
 #@view_config(name='mf_list', route_name='mf_list', renderer='json', request_method='GET')
@@ -45,7 +49,9 @@ def mf_list(request):
     :return: json - List of objects
     '''
     objname = request.matchdict['objname']
-    filter = mf_filter(objname)
+    filter = mf_filter(objname, MF_LIST)
+    if filter is None:
+      raise HTTPForbidden
     objlist = []
     collection = Annotation.db_conn[pluralize(objname)]
     for obj in collection.find(filter):
@@ -58,11 +64,16 @@ def mf_list(request):
 #@view_config(name='mf_show', route_name='mf_show', renderer='json', request_method='GET')
 def mf_show(request):
     objname = request.matchdict['objname']
-    filter = mf_filter(objname)
-    filter["_id"] = ObjectId(request.matchdict['id'])
+    filter = mf_filter(objname, MF_MANAGE)
+    try:
+      filter["_id"] = ObjectId(request.matchdict['id'])
+    except Exception as e:
+      raise HTTPNotFound()
     objlist = []
     collection = Annotation.db_conn[pluralize(objname)]
     obj= collection.find_one(filter)
+    if not obj:
+      raise HTTPNotFound()
     response = { 'object' :  objname, 'status': 'list', objname : obj, 'filter' : filter }
     response = json.dumps(response, default=json_util.default)
     return Response(body=response,content_type = "application/json")

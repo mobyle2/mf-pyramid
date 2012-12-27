@@ -15,7 +15,7 @@
   </table>
 </div>
 % endfor
-
+<hr/>
 % for object in klasses:
 <div id="show-${object.__name__}" class="mf-object offset1">
   ${object().render() | n}
@@ -33,6 +33,11 @@
    $(".mf-list").hide();
    $(".mf-object").hide();
    $(".dashboard-item").click(function(event){
+     $('.nav li').removeClass('active');
+     var $this = $(this).parent();
+     if (!$this.hasClass('active')) {
+       $this.addClass('active');
+     }
      object = event.target.id;
      curObject = object
      loadObjectList(object);

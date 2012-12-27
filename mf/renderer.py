@@ -18,6 +18,8 @@ class AbstractRenderer:
   rootklass = None
   err = False
 
+  is_object_id = False
+
 
   def controls(self):
     '''Return buttons for the form
@@ -32,7 +34,7 @@ class AbstractRenderer:
     self.klass = klass.__name__
     self.err = False
 
-  def render(self,value = None, parent = None, index = None):
+  def render(self,value = None, parent = None):
     '''Return HTML for component
 
     Not implemented
@@ -150,15 +152,13 @@ class FormRenderer(AbstractRenderer):
 
   prefix = ''
 
-  def render(self,klass,fields,index=''):
+  def render(self,klass,fields):
     '''Render the HTML for the form
 
     :param klass: instance object to render
     :type klass: object
     :param fields: optional list of fields to display
     :type fields: list
-    :param index: index for multiple values fields example: [0]
-    :type index: str
     :return: str HTML form
     '''
     html='<form class="mf-form form-horizontal" id="mf-form-'+klass.__class__.__name__+'">'
@@ -176,13 +176,13 @@ class TextRenderer(AbstractRenderer):
   '''
 
 
-  def render(self,value = None, parent = None, index = ''):
+  def render(self,value = None, parent = None):
     parentname = ''
     if value is None or isinstance(value,Field):
       value = ''
     if parent:
       parentname = parent
-    return _htmlTextField(self.klass+parentname+'['+self.name+']'+index,self.name,value,self.err)
+    return _htmlTextField(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
 
 
   def validate(self,value):
@@ -200,13 +200,13 @@ class BooleanRenderer(AbstractRenderer):
   '''
 
 
-  def render(self,value = False, parent = None, index=''):
+  def render(self,value = False, parent = None):
      if value is None or isinstance(value,Field):
        value = False
      parentname = ''
      if parent:
        parentname = parent
-     html = _htmlCheckBox(self.klass+parentname+'['+self.name+']'+index,self.name,value,self.err)
+     html = _htmlCheckBox(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
      return html
 
   def validate(self,value):
@@ -244,13 +244,13 @@ class IntegerRenderer(AbstractRenderer):
   '''
 
 
-  def render(self,value = None, parent = None, index=''):
+  def render(self,value = None, parent = None):
     if value is None or isinstance(value,Field):
       value = 0
     parentname = ''
     if parent:
       parentname = parent
-    return _htmlNumber(self.klass+parentname+'['+self.name+']'+index,self.name,value,self.err)
+    return _htmlNumber(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
 
   def validate(self,value):
     intvalue = 0
@@ -271,13 +271,13 @@ class HiddenRenderer(TextRenderer):
   '''
 
 
-  def render(self,value = None, parent = None, index=''):
+  def render(self,value = None, parent = None):
     if value is None or isinstance(value,Field):
       value = ''
     parentname = ''
     if parent:
       parentname = parent
-    return _htmlHidden(self.klass+parentname+'['+self.name+']'+index,self.name,value)
+    return _htmlHidden(self.klass+parentname+'['+self.name+']',self.name,value)
 
 
 class DateTimeRenderer(AbstractRenderer):
@@ -287,7 +287,7 @@ class DateTimeRenderer(AbstractRenderer):
   # datetime, date, time
   type = 'datetime'
 
-  def render(self,value = None, parent= None, index=''):
+  def render(self,value = None, parent= None):
     parentname = ''
     if parent:
       parentname = parent
@@ -302,7 +302,7 @@ class DateTimeRenderer(AbstractRenderer):
         strvalue = value.strftime("%d/%m/%y")
       elif self.type == 'time':
         strvalue = value.strftime('%H:%M:%s')
-    return _htmlDateTime(self.klass+parentname+'['+self.name+']'+index,self.name,strvalue,self.err, self.type)
+    return _htmlDateTime(self.klass+parentname+'['+self.name+']',self.name,strvalue,self.err, self.type)
 
   def unserialize(self,value):
       try:
@@ -328,11 +328,11 @@ class ArrayRenderer(AbstractRenderer):
     #for obj in attr:
     #  self._renderers.append(klass.renderer(klass,name,attr[obj]))
 
-  def render(self,value=None,parent = None,index=''):
+  def render(self,value=None,parent = None):
     parentname = ''
     if parent:
       parentname = parent
-    html = '<div class="mf-array"><span class="mf-composite-label">'+self.name+' list</span>'
+    html = '<div class="mf-array"><span class="mf-composite-label">'+self.name.title()+' list</span>'
     for i in range(len(value)):
       renderer = self.rootklass.renderer(self.rootklass,self.name,value[i])
       self._renderer =  renderer
@@ -373,18 +373,18 @@ class CompositeRenderer(AbstractRenderer):
       self._renderers.append(klass.renderer(klass,obj,attr[obj]))
   
 
-  def render(self,value = None, parent = None,index=''):
+  def render(self,value = None, parent = None):
     parentname = ''
     if parent:
       parentname = parent
-    html = '<div class="mf-composite" id="'+self.klass+parentname+'['+self.name+']'+index+'"><span class="mf-composite-label">'+self.name+'</span>'
+    html = '<div class="mf-composite" id="'+self.klass+parentname+'['+self.name+']'+'"><span class="mf-composite-label">'+self.name+'</span>'
     for renderer in self._renderers:
       obj = None
       if isinstance(value,dict):
         obj = value[renderer.name]
       elif hasattr(value,renderer.name):
         obj = getattr(value,renderer.name)
-      html += renderer.render(obj,parentname+'['+self.name+']'+index)
+      html += renderer.render(obj,parentname+'['+self.name+']')
     html += '</div>'
     return html
 
@@ -406,13 +406,13 @@ class FloatRenderer(AbstractRenderer):
   '''Renderer for float inputs
   '''
 
-  def render(self,value = None, parent = None, index=''):
+  def render(self,value = None, parent = None):
     if value is None or isinstance(value,Field):
       value = 0.0
     parentname = ''
     if parent:
       parentname = parent
-    return _htmlNumber(self.klass+parentname+'['+self.name+']'+index,self.name,value,self.err)
+    return _htmlNumber(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
 
   def validate(self,value):
     intvalue = 0

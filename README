@@ -15,6 +15,7 @@ TODO:
   - finish mf_add to real add the object in mongo
   - add edit
 
+
 LIMITATIONS: ArrayRenderer does not support arrays of objects, only arrays of basic types
 
 LICENSE: LGPL
@@ -42,9 +43,13 @@ Warning: this should be added after your routes declaration because it inserts g
 
 If user must have only limited access to a query, i.e list only a subset of an object (/users), it is necessary to add to the object a function defined as:
 
-def my(self):
+def my(self, control):
   '''
   Return a mongodb filter on object
+  control is a mf.views.MF_LIST or MF_MANAGE according to expected access on object
+  if method returns None, then no access is allowed
+  if method returns {}, then access is allowed
+  if method returns a mongo filter, it will be applied on request to access object(s)
   ....
   return filter
 

@@ -3,6 +3,7 @@ import mf.annotation
 from mf.annotation import *
 from pyramid.response import Response
 from pyramid.view import view_config
+import mf.views
 
 def home(request):
     return Response('hello World')
@@ -23,6 +24,11 @@ class User:
 
   def html(self, fields = None):
     return self.render(fields)
+
+  def my(self,control):
+    if control == mf.views.MF_LIST:
+      return { 'name' : 'Mike' }
+    return {}
 
 
 if __name__ == "__main__":
