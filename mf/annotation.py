@@ -6,8 +6,8 @@ from datetime import datetime,date,time
 
 from ming import Field,schema
 
-import renderer
-from renderer import *
+#import renderer
+from renderer import FormRenderer,TextRenderer, BooleanRenderer, CompositeRenderer, ArrayRenderer, IntegerRenderer, FloatRenderer, HiddenRenderer, DateTimeRenderer
 
 import logging
 
@@ -155,7 +155,7 @@ def bind_form(self,request):
     for name in self.__class__.__render_fields:
         renderer = self.__class__.__render_fields[name]
 
-        if isinstance(renderer,CompositeRenderer):
+        if isinstance(renderer,CompositeRenderer) or isinstance(renderer,ArrayRenderer):
             err = renderer.bind(request,self,name)
             if err is not None:
               self.__field_errors.extend(err)           

@@ -1,5 +1,6 @@
 #!/bin/bash
 
-export PYTHONPATH=$PYTHONPATH:.:..
+PYTHONPATH=$PYTHONPATH:.:..
+export PYTHONPATH
 
 python app.py

@@ -6,13 +6,16 @@ import re
 import string
 import logging
 
+
+#logging.basicConfig(level=logging.DEBUG)
+
 class AbstractRenderer:
   '''
   Base class for all renderers
   '''
   klass = None
   name = None
-
+  rootklass = None
   err = False
 
 
@@ -25,10 +28,11 @@ class AbstractRenderer:
 
   def __init__(self,klass,name):
     self.name = name
+    self.rootklass = klass
     self.klass = klass.__name__
     self.err = False
 
-  def render(self,value = None, parent = None):
+  def render(self,value = None, parent = None, index = None):
     '''Return HTML for component
 
     Not implemented
@@ -75,7 +79,16 @@ class AbstractRenderer:
     #   return []
     paramvalue = self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]",True)
     if paramvalue is None or paramvalue == '':
-      return []
+      # Search for array items
+      tmpparam = []
+      for index in range(len(request)):
+        if self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]"+'['+str(index)+']'):
+            tmpparam.append(self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]"+'['+str(index)+']',True))
+      if tmpparam:
+        param = tmpparam
+        print "set array to "+str(tmpparam)
+      else:
+        return []
     value = None
     try:
       #value = self.unserialize(request[instance.__class__.__name__+parentname+"["+name+"]"])
@@ -130,13 +143,15 @@ class FormRenderer(AbstractRenderer):
 
   prefix = ''
 
-  def render(self,klass,fields):
+  def render(self,klass,fields,index=''):
     '''Render the HTML for the form
 
     :param klass: instance object to render
     :type klass: object
     :param fields: optional list of fields to display
     :type fields: list
+    :param index: index for multiple values fields example: [0]
+    :type index: str
     :return: str HTML form
     '''
     html='<form class="mf-form form-horizontal" id="mf-form-'+klass.__class__.__name__+'">'
@@ -154,13 +169,13 @@ class TextRenderer(AbstractRenderer):
   '''
 
 
-  def render(self,value = None, parent = None):
+  def render(self,value = None, parent = None, index = ''):
     parentname = ''
     if value is None or isinstance(value,Field):
       value = ''
     if parent:
-      parentname = '['+parent+']'
-    return _htmlTextField(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
+      parentname = parent
+    return _htmlTextField(self.klass+parentname+'['+self.name+']'+index,self.name,value,self.err)
 
 
   def validate(self,value):
@@ -178,13 +193,13 @@ class BooleanRenderer(AbstractRenderer):
   '''
 
 
-  def render(self,value = False, parent = None):
+  def render(self,value = False, parent = None, index=''):
      if value is None or isinstance(value,Field):
        value = False
      parentname = ''
      if parent:
-       parentname = '['+parent+']'
-     html = _htmlCheckBox(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
+       parentname = parent
+     html = _htmlCheckBox(self.klass+parentname+'['+self.name+']'+index,self.name,value,self.err)
      return html
 
   def validate(self,value):
@@ -222,13 +237,13 @@ class IntegerRenderer(AbstractRenderer):
   '''
 
 
-  def render(self,value = None, parent = None):
+  def render(self,value = None, parent = None, index=''):
     if value is None or isinstance(value,Field):
       value = 0
     parentname = ''
     if parent:
-      parentname = '['+parent+']'
-    return _htmlNumber(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
+      parentname = parent
+    return _htmlNumber(self.klass+parentname+'['+self.name+']'+index,self.name,value,self.err)
 
   def validate(self,value):
     intvalue = 0
@@ -249,13 +264,13 @@ class HiddenRenderer(TextRenderer):
   '''
 
 
-  def render(self,value = None, parent = None):
+  def render(self,value = None, parent = None, index=''):
     if value is None or isinstance(value,Field):
       value = ''
     parentname = ''
     if parent:
-      parentname = '['+parent+']'
-    return _htmlHidden(self.klass+parentname+'['+self.name+']',self.name,value)
+      parentname = parent
+    return _htmlHidden(self.klass+parentname+'['+self.name+']'+index,self.name,value)
 
 
 class DateTimeRenderer(AbstractRenderer):
@@ -265,10 +280,10 @@ class DateTimeRenderer(AbstractRenderer):
   # datetime, date, time
   type = 'datetime'
 
-  def render(self,value = None, parent= None):
+  def render(self,value = None, parent= None, index=''):
     parentname = ''
     if parent:
-      parentname = '['+parent+']'
+      parentname = parent
 
     if value is None or isinstance(value,Field):
       strvalue = ''
@@ -280,7 +295,7 @@ class DateTimeRenderer(AbstractRenderer):
         strvalue = value.strftime("%d/%m/%y")
       elif self.type == 'time':
         strvalue = value.strftime('%H:%M:%s')
-    return _htmlDateTime(self.klass+parentname+'['+self.name+']',self.name,strvalue,self.err, self.type)
+    return _htmlDateTime(self.klass+parentname+'['+self.name+']'+index,self.name,strvalue,self.err, self.type)
 
   def unserialize(self,value):
       try:
@@ -298,33 +313,33 @@ class DateTimeRenderer(AbstractRenderer):
 class ArrayRenderer(AbstractRenderer):
   '''Renderer for lists of renderers
   '''
-  #_renderers = []
+  # Renderer to use for array elements, must be of the same type
+  _renderer = None
 
-  #def __init__(self,klass,name,attr):
+  #def __init__(self,klass,name):
     #AbstractRenderer.__init__(self,klass,name)
     #for obj in attr:
     #  self._renderers.append(klass.renderer(klass,name,attr[obj]))
 
-  def render(self,value=None,parent = None):
+  def render(self,value=None,parent = None,index=''):
     parentname = ''
     if parent:
-      parentname = '['+parent+']'
+      parentname = parent
     html = '<div class="mf-array">'
-    for index in range(len(value)):
-      renderer = self.klass.renderer(self.klass,self.name,value[index])
-      #renderer =  self._renderers[index]
-      val = value[index]
-      html += renderer.render(val,self.name,parent)
+    for i in range(len(value)):
+      renderer = self.rootklass.renderer(self.rootklass,self.name,value[i])
+      self._renderer =  renderer
+      val = value[i]
+      html += renderer.render(val,parentname,index+'['+str(i)+']')
     html += '</div>'
     return html
 
   def bind(self,request,instance,name,parent = []):
 
     self.err = False
-    errs = []    
-    for renderer in self._renderers:
-      err = renderer.bind(request,instance,renderer.name,parent)
-      if err:
+    errs = []  
+    err = self._renderer.bind(request,instance,self._renderer.name,parent)
+    if err:
         errs.extend(err)
     return errs
 
@@ -344,18 +359,18 @@ class CompositeRenderer(AbstractRenderer):
       self._renderers.append(klass.renderer(klass,obj,attr[obj]))
   
 
-  def render(self,value = None, parent = None):
+  def render(self,value = None, parent = None,index=''):
     parentname = ''
     if parent:
-      parentname = '['+parent+']'
-    html = '<div class="mf-composite" id="'+self.klass+parentname+'['+self.name+']"><span class="mf-composite-label">'+self.name+'</span>'
+      parentname = parent
+    html = '<div class="mf-composite" id="'+self.klass+parentname+'['+self.name+']'+index+'"><span class="mf-composite-label">'+self.name+'</span>'
     for renderer in self._renderers:
       obj = None
       if isinstance(value,dict):
         obj = value[renderer.name]
       elif hasattr(value,renderer.name):
         obj = getattr(value,renderer.name)
-      html += renderer.render(obj,self.name)
+      html += renderer.render(obj,parentname+'['+self.name+']'+index)
     html += '</div>'
     return html
 
@@ -377,13 +392,13 @@ class FloatRenderer(AbstractRenderer):
   '''Renderer for float inputs
   '''
 
-  def render(self,value = None, parent = None):
+  def render(self,value = None, parent = None, index=''):
     if value is None or isinstance(value,Field):
       value = 0.0
     parentname = ''
     if parent:
-      parentname = '['+parent+']'
-    return _htmlNumber(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
+      parentname = parent
+    return _htmlNumber(self.klass+parentname+'['+self.name+']'+index,self.name,value,self.err)
 
   def validate(self,value):
     intvalue = 0

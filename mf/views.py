@@ -97,7 +97,6 @@ def mf_add(request):
         objklass = klass
         break
     if objklass is None:
-      # TODO add object in mongo
       response = json.dumps({ 'status' : 1, 'error' : [], 'message' : 'Object does not exist' }, default=json_util.default)
       return Response(body = response,content_type = "application/json")
     
@@ -105,6 +104,9 @@ def mf_add(request):
     status = 0
     if err:
       status = 1
+    else:
+      # TODO add object in mongo
+      print "not yet implemented"
     response = json.dumps({ 'status' : status, 'error' : err, 'message' : '' }, default=json_util.default)
     return Response(body = response, content_type = "application/json")
 

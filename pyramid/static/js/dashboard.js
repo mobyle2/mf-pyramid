@@ -165,14 +165,20 @@
          json2form(val,newparent);
        }
      }
-     else { 
-       $('#'+curObject+parent+'\\['+key+'\\]').val(val);
-       if($('#'+curObject+parent+'\\['+key+'\\]').attr('type')=='checkbox')  {
-         if(val == 'True' || val == 1) {
-           $('#'+curObject+parent+'\\['+key+'\\]').attr('checked', true);
-         }
-         else {
-           $('#'+curObject+parent+'\\['+key+'\\]').attr('checked', true);
+     else {
+       if(val instanceof Array) {
+           json2form(val,parent+'\\['+key+'\\]');     
+       }
+       else {
+         console.log("update "+'#'+curObject+parent+'\\['+key+'\\]'+" with val "+val);
+         $('#'+curObject+parent+'\\['+key+'\\]').val(val);
+         if($('#'+curObject+parent+'\\['+key+'\\]').attr('type')=='checkbox')  {
+           if(val == 'True' || val == 1) {
+             $('#'+curObject+parent+'\\['+key+'\\]').attr('checked', true);
+           }
+           else {
+             $('#'+curObject+parent+'\\['+key+'\\]').attr('checked', true);
+           }
          }
        }
      }
@@ -203,5 +209,6 @@
         }
     });
   }
+
 
 
