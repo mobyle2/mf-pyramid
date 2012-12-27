@@ -76,7 +76,7 @@
     clear_form_elements("#show-"+curObject);
     route = '/'+curObject.toLowerCase()+'s/'+id;
     $.getJSON(route, function(data) {
-      json2form(data["user"],"");
+      json2form(data[curObject.toLowerCase()],"");
      });
   }
 

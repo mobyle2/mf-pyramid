@@ -7,6 +7,7 @@ from pyramid.session import UnencryptedCookieSessionFactoryConfig
 from mf.dashboard import Dashboard
 from user import *
 from user import User
+from group import Group
 
 #Use pymongo
 from pymongo import MongoClient
@@ -29,7 +30,9 @@ if __name__ == '__main__':
     db.users.insert(u1)
     u2 = {"name": "Tommy", "admin" : True, "age" : 40, "email" : "nomail", "creation_date" : datetime.utcnow(), "options" : { 'tags': 'cool' , 'categories': '' }, "array" : [ 'three', 'four'] }
     db.users.insert(u2)
-    Dashboard.add_dashboard([User],config)
+    g1 = {"name": "sample", "creation_date" : datetime.utcnow() }
+    db.groups.insert(g1)
+    Dashboard.add_dashboard([User,Group],config)
     app = config.make_wsgi_app()
     server = make_server('0.0.0.0', 6789, app)
     server.serve_forever()
