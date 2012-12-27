@@ -107,23 +107,28 @@ class AbstractRenderer:
         obj = instance
         for p in parent:
           if isinstance(obj,dict):
-            obj = obj[p]
+            if p in obj:
+              obj = obj[p]
+            else:
+              obj[p] = {}
+              obj = obj[p]
           else:
             obj = getattr(obj,p)
         if isinstance(obj,dict) and value:
           obj[name]=value
         else:
-          if isinstance(obj,list):
+          if isinstance(obj,(list,tuple)):
             setattr(obj,name,value)
           else:
             if value:
               setattr(obj,name,value[0])
         
       else:
-        #setattr(instance,name,value)
-        if isinstance(instance,list):
+        if isinstance(getattr(instance,name),(list,tuple)):
+          print name+"it is a list"
           setattr(instance,name,value)
-        else:
+        elif value:
+          print name+"it is not a list"
           setattr(instance,name,value[0])
     return []
 
@@ -323,10 +328,6 @@ class ArrayRenderer(AbstractRenderer):
   # Renderer to use for array elements, must be of the same type
   _renderer = None
 
-  #def __init__(self,klass,name):
-    #AbstractRenderer.__init__(self,klass,name)
-    #for obj in attr:
-    #  self._renderers.append(klass.renderer(klass,name,attr[obj]))
 
   def render(self,value=None,parent = None):
     parentname = ''
@@ -334,7 +335,9 @@ class ArrayRenderer(AbstractRenderer):
       parentname = parent
     html = '<div class="mf-array"><span class="mf-composite-label">'+self.name.title()+' list</span>'
     for i in range(len(value)):
+      logging.debug("set array renderer "+self.name)
       renderer = self.rootklass.renderer(self.rootklass,self.name,value[i])
+      logging.debug("renderer = "+str(renderer))
       self._renderer =  renderer
       val = value[i]
       elt = self.klass+parentname+'['+self.name+']'
@@ -351,7 +354,7 @@ class ArrayRenderer(AbstractRenderer):
   def bind(self,request,instance,name,parent = []):
 
     self.err = False
-    errs = []  
+    errs = []
     err = self._renderer.bind(request,instance,self._renderer.name,parent)
     if err:
         errs.extend(err)
@@ -477,7 +480,8 @@ def parseDateTime(s):
               "YYYY-MM-DD HH:MM:SS.ssssss",
               "YYYY-MM-DD HH:MM:SS+HH:MM",
               "YYYY-MM-DD HH:MM:SS"
-  Where ssssss represents fractional seconds.	 The timezone
+
+  Where ssssss represents fractional seconds. The timezone
   is optional and may be either positive or negative
   hours/minutes east of UTC.
   """

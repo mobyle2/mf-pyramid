@@ -11,6 +11,8 @@ def home(request):
 
 @mf_decorator
 class User:
+  ''' Example class for tests
+  '''
 
   _id = ''
   name = ''
@@ -26,6 +28,13 @@ class User:
     return self.render(fields)
 
   def my(self,control):
+    '''
+    Checks user access to the object
+
+    :param control: type of access
+    :type control: str
+    :return: dict - Mongodb filter to apply on object search
+    '''
     if control == mf.views.MF_LIST:
       return { 'name' : 'Mike' }
     return {}
@@ -41,6 +50,10 @@ if __name__ == "__main__":
   user.options["tags"] = 'tag1'
   user.creation_date = datetime.utcnow()
 
+  #request = [("User[name]","sample"), ("User[email]","test@nomail.com")]
+  request = [("User[array]","test1"), ("User[array]","test2"),  ("User[array]","test3")]
+  user.bind_form(request)
   #print user.metadata.fields
-  print user.html()
+  #print user.html()
+  print user.array
 

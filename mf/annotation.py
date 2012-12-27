@@ -3,7 +3,6 @@ import pprint
 import logging
 import datetime
 from datetime import datetime,date,time
-
 from ming import Field,schema
 
 #import renderer
@@ -100,6 +99,9 @@ def renderer(klass,name,attr):
      elif isinstance(attr,bool):
          logging.debug(name+" is bool")
          return BooleanRenderer(klass,name)
+     elif isinstance(attr,float):
+         logging.debug(name+" is float")
+         return FloatRenderer(klass,name)
      elif isinstance(attr,int):
          logging.debug(name+" is integer")
          return IntegerRenderer(klass,name)
@@ -113,7 +115,9 @@ def renderer(klass,name,attr):
          return renderer
      elif isinstance(attr,list):
          logging.debug(name+" is array")
-         return ArrayRenderer(klass,name)
+         renderer = ArrayRenderer(klass,name)
+         renderer._renderer = renderer.rootklass.renderer(renderer.rootklass,renderer.name,attr[0])
+         return renderer
      elif isinstance(attr,dict):
          logging.debug(name+" is dict")
          return CompositeRenderer(klass,name,attr)
@@ -169,14 +173,14 @@ def bind_form(self,request):
     return self.__field_errors
 
 
-
 def mf_decorator(klass):
+    '''
+    Decorator used with annotations on an object class.
+    It is used with the @mf_decorator declaration.
+    '''
     klass.__field_errors = []
     klass.__render_fields = dict()
     original_methods = klass.__dict__.copy()
-    #for name, method in original_methods.iteritems():
-    #    if method is not None:
-    #      print name+":"+str(method)
     setattr(klass, "bind_form", bind_form)
     setattr(klass, "render", render)
     setattr(klass, "renderer", renderer)

@@ -1,5 +1,9 @@
 
-
+/**
+* Javascritp library used in example dashboard
+*
+*
+**/
 
    var curObject;
 
