@@ -77,22 +77,21 @@ class AbstractRenderer:
         parentname += "["+p+"]"
     #if not request.has_key(instance.__class__.__name__+parentname+"["+name+"]"):
     #   return []
-    paramvalue = self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]",True)
-    if paramvalue is None or paramvalue == '':
-      # Search for array items
-      tmpparam = []
-      for index in range(len(request)):
-        if self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]"+'['+str(index)+']'):
-            tmpparam.append(self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]"+'['+str(index)+']',True))
-      if tmpparam:
-        param = tmpparam
-        print "set array to "+str(tmpparam)
-      else:
-        return []
-    value = None
+    paramlist = []
+    #paramvalue = self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]",True)
+    #if paramvalue is None or paramvalue == '':
+    #  return []
+    # Search for array items
+    while self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]"):
+      paramlist.append(self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]",True))
+
+    #if not paramlist:
+    #  return []
+
+    value = []
     try:
-      #value = self.unserialize(request[instance.__class__.__name__+parentname+"["+name+"]"])
-      value = self.unserialize(paramvalue)
+      for paramvalue in paramlist:
+        value.append(self.unserialize(paramvalue))
     except Exception as e:
       self.err = True
       if parent is not None:
@@ -109,13 +108,21 @@ class AbstractRenderer:
             obj = obj[p]
           else:
             obj = getattr(obj,p)
-        if isinstance(obj,dict):
+        if isinstance(obj,dict) and value:
           obj[name]=value
         else:
-          setattr(obj,name,value)
+          if isinstance(obj,list):
+            setattr(obj,name,value)
+          else:
+            if value:
+              setattr(obj,name,value[0])
         
       else:
-        setattr(instance,name,value)
+        #setattr(instance,name,value)
+        if isinstance(instance,list):
+          setattr(instance,name,value)
+        else:
+          setattr(instance,name,value[0])
     return []
 
 
@@ -325,12 +332,19 @@ class ArrayRenderer(AbstractRenderer):
     parentname = ''
     if parent:
       parentname = parent
-    html = '<div class="mf-array">'
+    html = '<div class="mf-array"><span class="mf-composite-label">'+self.name+' list</span>'
     for i in range(len(value)):
       renderer = self.rootklass.renderer(self.rootklass,self.name,value[i])
       self._renderer =  renderer
       val = value[i]
-      html += renderer.render(val,parentname,index+'['+str(i)+']')
+      elt = self.klass+parentname+'['+self.name+']'
+      elt = elt.replace('[','\\[')
+      elt = elt.replace(']','\\]')
+      html += '<div class="mf-array-elt control-group">'
+      html += renderer.render(val,parentname)
+      html += '<button elt="'+elt+'" class="mf-del mf-btn btn btn-primary controls">Remove</button>'
+      html += '</div>'
+    html += '<button elt="'+elt+'" class="mf-add mf-btn btn btn-primary">Add</button>'
     html += '</div>'
     return html
 

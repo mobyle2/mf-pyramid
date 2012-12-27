@@ -15,6 +15,8 @@ TODO:
   - finish mf_add to real add the object in mongo
   - add edit
 
+LIMITATIONS: ArrayRenderer does not support arrays of objects, only arrays of basic types
+
 LICENSE: LGPL
 
 WARNING: there are considerations with pymongo and ming versions to take into account.

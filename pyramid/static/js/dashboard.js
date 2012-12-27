@@ -167,10 +167,21 @@
      }
      else {
        if(val instanceof Array) {
-           json2form(val,parent+'\\['+key+'\\]');     
+           arrayelts = $('#'+curObject+parent+'\\['+key+'\\]');
+           firstelt = $(arrayelts[0]);
+           template = firstelt.parent().parent().parent().clone();
+           main = firstelt.parent().parent().parent().parent();
+           for(i=0;i<arrayelts.size();i++) {
+             $(arrayelts[i]).parent().parent().parent().remove();
+           }
+           $.each(val, function(elt) {
+             newelt = template.clone();
+             newelt.find('input').val(val[elt]);
+             main.append(newelt);
+           });
+           //json2form(val,parent+'\\['+key+'\\]');     
        }
        else {
-         console.log("update "+'#'+curObject+parent+'\\['+key+'\\]'+" with val "+val);
          $('#'+curObject+parent+'\\['+key+'\\]').val(val);
          if($('#'+curObject+parent+'\\['+key+'\\]').attr('type')=='checkbox')  {
            if(val == 'True' || val == 1) {

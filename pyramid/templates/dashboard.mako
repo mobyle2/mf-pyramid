@@ -43,6 +43,22 @@
      loadObject(object);
    });
 
+   $('.mf-del').live("click", function(event) {
+    obj = $(this).attr('elt');
+    arrayelts = $('#'+obj);
+    if(arrayelts.size()==1) { alert("Cannot delete this element, list must contain at least one (possibly empty) parameter"); }
+    else { $(this).parent().remove();}
+   });
+
+   $('.mf-add').click(function(event) {
+    obj = $(this).attr('elt');
+    arrayelts = $('#'+obj);
+    firstelt = $(arrayelts[0]);
+    template = firstelt.parent().parent().parent().clone();
+    main = firstelt.parent().parent().parent().parent();
+    template.find('input').val('');
+    main.append(template);
+   });
 
    $('.mf-btn').click(function(event) {
     // Submit or clear form
