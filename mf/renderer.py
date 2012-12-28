@@ -42,6 +42,15 @@ class AbstractRenderer:
 
     raise Exception("Not implemented")
 
+
+  def render_search(self,value = None):
+    '''Return HTML for search component
+
+    Not implemented
+    '''
+
+    raise Exception("Not implemented")
+
   def unserialize(self,value):
     '''Return a value from input string
 
@@ -151,6 +160,32 @@ class AbstractRenderer:
         return str(value)
     return None
 
+class SearchFormRenderer(AbstractRenderer):
+  ''' Render a search form with fields
+  '''
+
+  prefix = ''
+
+  def render(self,klass,fields):
+    '''Render the HTML for the search form
+
+    :param klass: instance object to render
+    :type klass: object
+    :param fields: optional list of fields to display
+    :type fields: list
+    :return: str HTML form
+    '''
+    html='<h2>Search</h2><form class="mf-form form-horizontal" id="mf-search-form-'+klass.__class__.__name__+'">'
+    for name in fields:
+        value = getattr(klass,name)
+        logging.debug("Render "+name+" for class "+klass.__class__.__name__)
+        renderer = klass.get_renderer(name)
+        html += renderer.render_search(value)
+    html += '<div class="form-actions mf-actions"><button id="mf-search-'+name+'" class="mf-btn btn btn-primary">Search</button></div>'
+    html += '</form>'
+    return html
+
+
 class FormRenderer(AbstractRenderer):
   ''' Render a form with fields
   '''
@@ -180,6 +215,8 @@ class TextRenderer(AbstractRenderer):
   '''Renderer for Text inputs
   '''
 
+  def render_search(self, value = None):
+    return _htmlTextField(self.klass+'['+self.name+']',self.name,'')    
 
   def render(self,value = None, parent = None):
     parentname = ''
@@ -204,6 +241,8 @@ class BooleanRenderer(AbstractRenderer):
   '''Renderer for booleans
   '''
 
+  def render_search(self, value = None):
+    return _htmlCheckBox(self.klass+'['+self.name+']',self.name,False) 
 
   def render(self,value = False, parent = None):
      if value is None or isinstance(value,Field):
@@ -248,6 +287,8 @@ class IntegerRenderer(AbstractRenderer):
   '''Renderer for integer inputs
   '''
 
+  def render_search(self, value = None):
+    return _htmlNumber(self.klass+'['+self.name+']',self.name,'') 
 
   def render(self,value = None, parent = None):
     if value is None or isinstance(value,Field):
@@ -275,6 +316,8 @@ class HiddenRenderer(TextRenderer):
   '''Renderer for hidden inputs such as ObjectIds
   '''
 
+  def render_search(self, value = None):
+    return '' 
 
   def render(self,value = None, parent = None):
     if value is None or isinstance(value,Field):
@@ -309,6 +352,9 @@ class DateTimeRenderer(AbstractRenderer):
         strvalue = value.strftime('%H:%M:%s')
     return _htmlDateTime(self.klass+parentname+'['+self.name+']',self.name,strvalue,self.err, self.type)
 
+  def render_search(self, value = None):
+    return _htmlDateTime(self.klass+'['+self.name+']',self.name,'','',self.type) 
+
   def unserialize(self,value):
       try:
         if type == 'datetime':
@@ -328,6 +374,12 @@ class ArrayRenderer(AbstractRenderer):
   # Renderer to use for array elements, must be of the same type
   _renderer = None
 
+  def render_search(self, value = None):
+    if len(value)>0:
+      renderer = self.rootklass.renderer(self.rootklass,self.name,value[0])
+      return renderer.render_search(value[0])
+    else:
+      return _htmlTextField(self.klass+'['+self.name+']',self.name,'') 
 
   def render(self,value=None,parent = None):
     parentname = ''
@@ -369,6 +421,9 @@ class CompositeRenderer(AbstractRenderer):
 
 
   _renderers = []
+
+  def render_search(self, value = None):
+    return ''
 
   def __init__(self,klass,name,attr):
     AbstractRenderer.__init__(self,klass,name)
@@ -416,6 +471,9 @@ class FloatRenderer(AbstractRenderer):
     if parent:
       parentname = parent
     return _htmlNumber(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
+
+  def render_search(self, value = None):
+    return _htmlNumber(self.klass+'['+self.name+']',self.name,'') 
 
   def validate(self,value):
     intvalue = 0

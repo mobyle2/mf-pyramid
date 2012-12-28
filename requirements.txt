@@ -1,2 +1,3 @@
 pymongo
 pyramid
+pyramid_debugtooolbar

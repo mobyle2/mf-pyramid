@@ -91,7 +91,9 @@
     clear_form_elements("#show-"+curObject);
     $(".mf-list").hide();
     $(".mf-object").hide();
+    $(".mf-search").hide();
     $("#show-"+curObject).show();
+    $("#search-"+curObject).show();
     route = '/'+id.toLowerCase()+'s/';
     $.getJSON(route, function(data) {
       var thead = '<thead><tr>';

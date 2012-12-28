@@ -6,7 +6,7 @@ from datetime import datetime,date,time
 from ming import Field,schema
 
 #import renderer
-from renderer import FormRenderer,TextRenderer, BooleanRenderer, CompositeRenderer, ArrayRenderer, IntegerRenderer, FloatRenderer, HiddenRenderer, DateTimeRenderer
+from renderer import SearchFormRenderer, FormRenderer,TextRenderer, BooleanRenderer, CompositeRenderer, ArrayRenderer, IntegerRenderer, FloatRenderer, HiddenRenderer, DateTimeRenderer
 
 import logging
 
@@ -141,6 +141,19 @@ def render(self,fields = None):
     form = FormRenderer(self.__class__,None)
     return form.render(self,fields)
 
+def render_search(self, fields = None):
+    """
+    Render in HTML a search form an object
+
+    param: fields List of fields to show, limited to first level of document
+    type: list
+    rparam: HTML form
+    rtype: str
+    """
+    if not fields:
+      fields = sorted(self.__class__.__render_fields)
+    form = SearchFormRenderer(self.__class__,None)
+    return form.render(self,fields)
 
 def get_renderer(self,name):
     """
@@ -183,6 +196,7 @@ def mf_decorator(klass):
     original_methods = klass.__dict__.copy()
     setattr(klass, "bind_form", bind_form)
     setattr(klass, "render", render)
+    setattr(klass, "render_search", render_search)
     setattr(klass, "renderer", renderer)
     setattr(klass, "get_renderer", get_renderer)
     setattr(klass, "field_renderer", field_renderer)

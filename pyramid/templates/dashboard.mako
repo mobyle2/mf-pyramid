@@ -17,8 +17,13 @@
 % endfor
 <hr/>
 % for object in klasses:
+<div class="row">
 <div id="show-${object.__name__}" class="mf-object offset1">
   ${object().render() | n}
+</div>
+<div id="search-${object.__name__}" class="mf-search offset1">
+  ${object().render_search() | n}
+</div>
 </div>
 % endfor
 
@@ -32,6 +37,7 @@
 
    $(".mf-list").hide();
    $(".mf-object").hide();
+   $(".mf-search").hide();
    $(".dashboard-item").click(function(event){
      $('.nav li').removeClass('active');
      var $this = $(this).parent();
