@@ -38,6 +38,14 @@ def mf_filter(objname, control):
         filter = attr(control)
     return filter
 
+def mf_search(request):
+    '''Returns a JSON list of objects matching criteria on object
+
+    :type request: IMultiDict
+    :return: json - List of objects
+    '''
+    raise HTTPNotFound()
+
 #@view_config(name='mf_list', route_name='mf_list', renderer='json', request_method='GET')
 def mf_list(request):
     '''Returns a JSON list of the object defined in the route
@@ -56,7 +64,7 @@ def mf_list(request):
     collection = Annotation.db_conn[pluralize(objname)]
     for obj in collection.find(filter):
       objlist.append(obj)
-    response = { 'object' :  objname, 'status': 'list', objname : objlist }
+    #response = { 'object' :  objname, 'status': 'list', objname : objlist }
     objlist = json.dumps(objlist, default=json_util.default)
     return Response(body=objlist,content_type = "application/json")
 
