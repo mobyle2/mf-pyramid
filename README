@@ -17,6 +17,8 @@ TODO:
   - object references not yet managed
   - _id managed as a string for the moment
 
+  - search : add view to search with filter
+
 LIMITATIONS: ArrayRenderer does not support arrays of objects, only arrays of basic types
 
 LICENSE: LGPL
