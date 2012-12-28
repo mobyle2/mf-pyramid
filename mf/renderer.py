@@ -216,7 +216,7 @@ class TextRenderer(AbstractRenderer):
   '''
 
   def render_search(self, value = None):
-    return _htmlTextField(self.klass+'['+self.name+']',self.name,'')    
+    return _htmlTextField('Search'+self.klass+'['+self.name+']',self.name,'')    
 
   def render(self,value = None, parent = None):
     parentname = ''
@@ -242,7 +242,7 @@ class BooleanRenderer(AbstractRenderer):
   '''
 
   def render_search(self, value = None):
-    return _htmlCheckBox(self.klass+'['+self.name+']',self.name,False) 
+    return _htmlCheckBox('Search'+self.klass+'['+self.name+']',self.name,False) 
 
   def render(self,value = False, parent = None):
      if value is None or isinstance(value,Field):
@@ -288,7 +288,7 @@ class IntegerRenderer(AbstractRenderer):
   '''
 
   def render_search(self, value = None):
-    return _htmlNumber(self.klass+'['+self.name+']',self.name,'') 
+    return _htmlNumber('Search'+self.klass+'['+self.name+']',self.name,'') 
 
   def render(self,value = None, parent = None):
     if value is None or isinstance(value,Field):
@@ -353,7 +353,7 @@ class DateTimeRenderer(AbstractRenderer):
     return _htmlDateTime(self.klass+parentname+'['+self.name+']',self.name,strvalue,self.err, self.type)
 
   def render_search(self, value = None):
-    return _htmlDateTime(self.klass+'['+self.name+']',self.name,'','',self.type) 
+    return _htmlDateTime('Search'+self.klass+'['+self.name+']',self.name,'','',self.type) 
 
   def unserialize(self,value):
       try:
@@ -379,7 +379,7 @@ class ArrayRenderer(AbstractRenderer):
       renderer = self.rootklass.renderer(self.rootklass,self.name,value[0])
       return renderer.render_search(value[0])
     else:
-      return _htmlTextField(self.klass+'['+self.name+']',self.name,'') 
+      return _htmlTextField('Search'+self.klass+'['+self.name+']',self.name,'') 
 
   def render(self,value=None,parent = None):
     parentname = ''
@@ -473,7 +473,7 @@ class FloatRenderer(AbstractRenderer):
     return _htmlNumber(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
 
   def render_search(self, value = None):
-    return _htmlNumber(self.klass+'['+self.name+']',self.name,'') 
+    return _htmlNumber('Search'+self.klass+'['+self.name+']',self.name,'') 
 
   def validate(self,value):
     intvalue = 0
