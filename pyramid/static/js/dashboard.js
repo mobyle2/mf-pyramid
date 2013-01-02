@@ -32,11 +32,26 @@
 
   }
 
+  /**
+  * Set checkboxes values to True or False according to checked status.
+  * Not very performant for the moment as it resets all checkboxes values.
+  */
+  function updateCheckboxValues() {
+     checks = $('input[type=checkbox]').not(':checked');
+     $.each(checks,function() {
+       $(this).val('False');
+     });
+     checks = $('input:checked');
+     $.each(checks,function() {
+       $(this).val('True');
+     });
+  }
 
   /**
   * Search
   */
   function mfsearch(prefix) {
+     updateCheckboxValues();
      $.ajax({type:"POST", data: $("#mf-search-form-"+curObject).serialize(), url: prefix+"/"+curObject.toLowerCase()+"s/",
             success: function(msg){
                if(msg["status"]==1) {
@@ -59,6 +74,7 @@
   * Submit the form
   */
   function mfsubmit(prefix) {
+     updateCheckboxValues();
      id = $("#"+curObject+"\\[_id\\]").val();
      method = "POST";
      if(id ==null || id == '') { method = "PUT"; id = "" }
