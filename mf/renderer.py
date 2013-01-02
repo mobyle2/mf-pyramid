@@ -177,10 +177,11 @@ class SearchFormRenderer(AbstractRenderer):
     '''
     html='<h2>Search</h2><form class="mf-form form-horizontal" id="mf-search-form-'+klass.__class__.__name__+'">'
     for name in fields:
-        value = getattr(klass,name)
-        logging.debug("Render "+name+" for class "+klass.__class__.__name__)
-        renderer = klass.get_renderer(name)
-        html += renderer.render_search(value)
+        if name != '_id':
+          value = getattr(klass,name)
+          logging.debug("Render "+name+" for class "+klass.__class__.__name__)
+          renderer = klass.get_renderer(name)
+          html += renderer.render_search(value)
     html += '<div class="form-actions mf-actions"><button id="mf-search-'+klass.__class__.__name__+'" class="mf-btn btn btn-primary">Search</button></div>'
     html += '</form>'
     return html
@@ -491,6 +492,25 @@ class FloatRenderer(AbstractRenderer):
       raise Exception("value is not correct type")
 
 
+class ReferenceRenderer:
+  '''
+  Renderer for an object reference
+  '''
+
+  def render(self,value = None, parent = None):
+    raise Exception("Not implemented")
+
+  def render_search(self,value = None):
+    raise Exception("Not implemented")
+    
+  def unserialize(self,value):
+    raise Exception("Not implemented")
+
+  def validate(self,attr):
+    raise Exception("Not implemented")
+
+  def bind(self,request,instance,name,parent = []):
+    raise Exception("Not implemented")
 
 def _htmlTextField(id,name,value,error = False):
   errorClass = ''
