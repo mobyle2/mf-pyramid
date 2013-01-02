@@ -2,7 +2,7 @@ from pyramid.view import view_config
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden
 from mf.annotation import Annotation
-from mf.renderer import FormRenderer
+from mf.renderer import FormRenderer, CompositeRenderer, FloatRenderer, IntegerRenderer, BooleanRenderer
 #from mf.dashboard import Dashboard
 
 import json
@@ -44,7 +44,44 @@ def mf_search(request):
     :type request: IMultiDict
     :return: json - List of objects
     '''
-    raise HTTPNotFound()
+    objklass = None
+    objname = request.matchdict['objname']
+    for klass in Annotation.klasses():
+      if pluralize(klass.__name__) == pluralize(objname):
+        objklass = klass
+        break
+    if objklass is None:
+      response = json.dumps({ 'status' : 1, 'error' : [], 'message' : 'Object does not exist' }, default=json_util.default)
+      return Response(body = response,content_type = "application/json")
+    filter = mf_filter(objname, MF_LIST)
+    if filter is None:
+      raise HTTPForbidden
+
+    for field in objklass.__render_fields:
+      try:
+        param = request.params.getone('Search'+objname.title()+'['+field+']')
+      except Exception:
+        # This is fine
+        param = None
+      if param and param!='':
+        renderer = objklass().get_renderer(field)
+        if renderer and not isinstance(renderer,CompositeRenderer):
+          filter[field] = param
+          if isinstance(renderer, IntegerRenderer):
+            filter[field] = int(param)
+          if isinstance(renderer, FloatRenderer):
+            filter[field] = float(param)
+          if isinstance(renderer, BooleanRenderer):
+            if param in ['True', '1']:
+              filter[field] = True
+            else:
+              filter[field] = False
+    objlist = []
+    collection = Annotation.db_conn[pluralize(objname)]
+    for obj in collection.find(filter):
+      objlist.append(obj)
+    objlist = json.dumps(objlist, default=json_util.default)
+    return Response(body=objlist,content_type = "application/json")
 
 #@view_config(name='mf_list', route_name='mf_list', renderer='json', request_method='GET')
 def mf_list(request):

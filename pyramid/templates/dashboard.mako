@@ -83,6 +83,9 @@
        mfdelete("${prefix}");
        clear_form_elements("#show-"+curObject);
      }
+     if(event.target.id.indexOf("mf-search") == 0) {
+       mfsearch("${prefix}");
+     }
    });
 
    $(".mf-form").submit(function(event) {

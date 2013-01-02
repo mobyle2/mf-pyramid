@@ -181,7 +181,7 @@ class SearchFormRenderer(AbstractRenderer):
         logging.debug("Render "+name+" for class "+klass.__class__.__name__)
         renderer = klass.get_renderer(name)
         html += renderer.render_search(value)
-    html += '<div class="form-actions mf-actions"><button id="mf-search-'+name+'" class="mf-btn btn btn-primary">Search</button></div>'
+    html += '<div class="form-actions mf-actions"><button id="mf-search-'+klass.__class__.__name__+'" class="mf-btn btn btn-primary">Search</button></div>'
     html += '</form>'
     return html
 
@@ -428,7 +428,8 @@ class CompositeRenderer(AbstractRenderer):
   def __init__(self,klass,name,attr):
     AbstractRenderer.__init__(self,klass,name)
     for obj  in attr:
-      self._renderers.append(klass.renderer(klass,obj,attr[obj]))
+      srenderer = klass.renderer(klass,obj,attr[obj])
+      self._renderers.append(srenderer)
   
 
   def render(self,value = None, parent = None):

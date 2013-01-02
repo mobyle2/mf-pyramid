@@ -32,6 +32,29 @@
 
   }
 
+
+  /**
+  * Search
+  */
+  function mfsearch(prefix) {
+     $.ajax({type:"POST", data: $("#mf-search-form-"+curObject).serialize(), url: prefix+"/"+curObject.toLowerCase()+"s/",
+            success: function(msg){
+               if(msg["status"]==1) {
+                   $("#mf-flash").attr('class','alert alert-error');
+                   $("#mf-flash").text("An error occured with the search");
+               }
+               else {
+                   $("#mf-flash").attr('class','alert alert-success');
+                   updateObjectList(msg);
+               }
+            },
+            error: function(){
+                alert('An error occured during transaction');
+            }
+        });
+
+  }
+
   /**
   * Submit the form
   */
@@ -96,13 +119,21 @@
     $("#search-"+curObject).show();
     route = '/'+id.toLowerCase()+'s/';
     $.getJSON(route, function(data) {
+     updateObjectList(data);
+     });
+   }
+
+
+   /**
+   * Update list of object from json list
+   */
+   function updateObjectList(data) {
       var thead = '<thead><tr>';
       var tbody = '<tr>';
 
       var keys = new Array();
       var types = {};
       $.each(data, function(obj) {
-        //tbody += '<tr id="'+data[obj]["_id"]["$oid"]+'" class="mf-list-object '+id+'">';
         $.each(data[obj], function(key, val) {
           if( (!jQuery.isPlainObject(val)) || val['$date']!=null) {
             var type = $('#'+curObject+'\\['+key+'\\]').attr('type');
@@ -110,17 +141,15 @@
               keys.push(key)
               types[key] = type
             }
-            //tbody += "<td>"+val+"</td>";
           }
         });
-        //tbody += "</tr>";
 
       });
       // Table header
       $.each(keys, function(key) { thead += "<th>"+keys[key]+"</th>"; });
       // Now for each object get values from key
       $.each(data, function(obj) {
-        tbody += '<tr id="'+data[obj]["_id"]["$oid"]+'" class="mf-list-object '+id+'">';
+        tbody += '<tr id="'+data[obj]["_id"]["$oid"]+'" class="mf-list-object '+curObject+'">';
         $.each(keys, function(key) {
            var val = data[obj][keys[key]];
            // Bson does not permit python time or date conversion, so we store them as string.
@@ -143,9 +172,8 @@
 
       thead += '</tr></thead>';
       tbody += '</tbody>';
-      $("#table-"+id).html(thead+tbody);
-      $("#list-"+id).show();
-     });
+      $("#table-"+curObject).html(thead+tbody);
+      $("#list-"+curObject).show();
    }
 
 
