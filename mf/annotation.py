@@ -166,7 +166,8 @@ def bind_form(self,request):
     Binds a request dictionnary to the object
 
     :param request: request.params.items() in the form [ (key1,value1), (key1,value2), (key2,value1), ...]
-    :type request: array
+    :type request: list
+    :return: list of fields in error
     """
     self.__field_errors = []
     for name in self.__class__.__render_fields:
@@ -194,9 +195,12 @@ def mf_decorator(klass):
     klass.__field_errors = []
     klass.__render_fields = dict()
     original_methods = klass.__dict__.copy()
-    setattr(klass, "bind_form", bind_form)
-    setattr(klass, "render", render)
-    setattr(klass, "render_search", render_search)
+    if not hasattr(klass,'bind_form'):
+      setattr(klass, "bind_form", bind_form)
+    if not hasattr(klass,'render'):
+      setattr(klass, "render", render)
+    if not hasattr(klass,'render_search'):
+      setattr(klass, "render_search", render_search)
     setattr(klass, "renderer", renderer)
     setattr(klass, "get_renderer", get_renderer)
     setattr(klass, "field_renderer", field_renderer)

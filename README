@@ -46,18 +46,52 @@ Warning: this should be added after your routes declaration because it inserts g
 
 If user must have only limited access to a query, i.e list only a subset of an object (/users), it is necessary to add to the object a function defined as:
 
-def my(self, control):
-  '''
-  Return a mongodb filter on object
-  control is a mf.views.MF_LIST or MF_MANAGE according to expected access on object
-  if method returns None, then no access is allowed
-  if method returns {}, then access is allowed
-  if method returns a mongo filter, it will be applied on request to access object(s)
-  ....
-  return filter
+    def my(self, control):
+      '''
+      Return a mongodb filter on object
+      control is a mf.views.MF_LIST or MF_MANAGE according to expected access on object
+      if method returns None, then no access is allowed
+      if method returns {}, then access is allowed
+      if method returns a mongo filter, it will be applied on request to access object(s)
+      ....
+      return filter
 
 If this function is not defined, then all elements are available via GET method.
 Filter is a mongo filter
+
+
+Other functions may be implemented in objects to override default behaviour:
+
+    def render(self,fields = None):
+      """
+      Render in HTML form an object
+
+      param: fields List of fields to show
+      type: list
+      rparam: HTML form
+      rtype: str
+      """
+
+    def render_search(self, fields = None):
+      """
+      Render in HTML a search form an object
+
+      param: fields List of fields to show, limited to first level of document
+      type: list
+      rparam: HTML form
+      rtype: str
+      """
+
+    def bind_form(self,request):
+      """
+      Binds a request dictionnary to the object
+
+      :param request: request.params.items() in the form [ (key1,value1), (key1,value2), (key2,value1), ...]
+      :type request: list
+      :return: list of fields in error
+      """
+
+If any is defined in object, then object method is used, else default implementation is used.
 
 
 Acknowledgements:
