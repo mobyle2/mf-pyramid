@@ -139,6 +139,7 @@ def mf_delete(request):
     filter = mf_filter(objname)
     filter["_id"] = ObjectId(request.matchdict['id'])
     objlist = []
+
     collection = Annotation.db_conn[pluralize(objname)]
     obj = collection.remove(filter)
     response = json.dumps({ 'status' : 0, 'error' : [], 'message' : 'Object deleted' }, default=json_util.default)

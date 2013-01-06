@@ -12,8 +12,9 @@ Pyramid routes and templates will be set automatically to access objects via RES
 
 TODO:
   see bugs/features in github
-  - finish mf_add to real add the object in mongo
-  - add edit
+  - finish mf_add to real add the object in mongo (call save)
+  - add edit (get object from id, call bind_form, call save)
+  - delete (set id of object from request and call delete method if exists, else, delete directly).
   - object references not yet managed
   - _id managed as a string for the moment
 
