@@ -45,6 +45,12 @@ Warning: this should be added after your routes declaration because it inserts g
 /groups/id
 ...
 
+Minimal expected interface is:(as in mongokit)
+save()
+delete()
+find()
+find_one()
+
 If user must have only limited access to a query, i.e list only a subset of an object (/users), it is necessary to add to the object a function defined as:
 
     def my(self, control):

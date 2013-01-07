@@ -203,6 +203,9 @@ class FormRenderer(AbstractRenderer):
     :return: str HTML form
     '''
     html='<form class="mf-form form-horizontal" id="mf-form-'+klass.__class__.__name__+'">'
+    if "_id" not in fields:
+      logging.debug("Add default _id")
+      html += HiddenRenderer(klass,"_id")
     for name in fields:
         value = getattr(klass,name)
         logging.debug("Render "+name+" for class "+klass.__class__.__name__)
