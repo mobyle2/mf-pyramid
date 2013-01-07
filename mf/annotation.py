@@ -23,8 +23,16 @@ class Annotation:
   # Add static list of klass
   __klasses = []
 
-  # static mongodb connection
-  db_conn = None
+  # use a schema variable like in mongokit ? specify it
+  schema_variable = None
+
+  @staticmethod
+  def use_schema_variable(var):
+    Annotation.schema_variable = var
+
+  @staticmethod
+  def use_schema_variable():
+    return Annotation.schema_variable
 
   @staticmethod
   def addKlass(klass):
@@ -173,10 +181,17 @@ def mf_decorator(klass):
     setattr(klass, "renderer", renderer)
     setattr(klass, "get_renderer", get_renderer)
     attributes = dir(klass)
-    for name in attributes:
+    if Annotation.use_schema_variable() is not None:
+      schema_variable =  getattr(klass,Annotation.use_schema_variable())
+      for name in schema_variable:
+        attr = schema_variable[name]
+        klass.__render_fields[name] = klass.renderer(klass,name,attr)
+    else:
+      for name in attributes:
         attr = getattr(klass,name)
         if not callable(attr) and not name.startswith('__'):
-            klass.__render_fields[name] = klass.renderer(klass,name,attr)
+          klass.__render_fields[name] = klass.renderer(klass,name,attr)
 
     return klass
+
 

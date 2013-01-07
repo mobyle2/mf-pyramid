@@ -8,10 +8,28 @@ class Dashboard:
   ''' Manage administration dashboard for pyramid
   '''
 
+  config = { 'implementation' : 'MongoKit', 'permission' : None }
+
+
+  @staticmethod
+  def set_config(config):
+    '''Global config for dashboard.
+     - implementation: MongoKit = default, None
+     - permission: Pyramid permission for /admin views, no permission by default
+
+    :param config: configuration dictionary
+    :type config: dict
+    '''
+    Dashboard.config = config
+
+  @staticmethod
+  def get_config():
+    return Dashboard.config
 
   @staticmethod
   def set_connection(conn):
     '''Sets the db connection to mongo
+
     :param conn: MongoDB connection objects
     :type conn: Connection
     '''
@@ -44,5 +62,8 @@ class Dashboard:
       config.add_view(mf_edit, route_name='mf_object', renderer='json', request_method='POST')
       config.add_view(mf_delete, route_name='mf_object', renderer='json', request_method='DELETE')
       config.add_view(mf_add, route_name='mf_objects', renderer='json', request_method='PUT')
-      config.add_view(mf_admin, route_name='mf_admin', renderer='dashboard.mako')
+      if Dashboard.config['permission'] is not None:
+        config.add_view(mf_admin, route_name='mf_admin', renderer='dashboard.mako', permission = Dashboard.config['permission'])
+      else:
+        config.add_view(mf_admin, route_name='mf_admin', renderer='dashboard.mako')
 
