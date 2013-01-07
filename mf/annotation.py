@@ -3,7 +3,8 @@ import pprint
 import logging
 import datetime
 from datetime import datetime,date,time
-from ming import Field,schema
+import types
+
 
 #import renderer
 from renderer import SearchFormRenderer, FormRenderer,TextRenderer, BooleanRenderer, CompositeRenderer, ArrayRenderer, IntegerRenderer, FloatRenderer, HiddenRenderer, DateTimeRenderer
@@ -48,38 +49,6 @@ class Annotation:
     for item in Annotation.__klasses:
         print item
 
-@staticmethod
-def field_renderer(klass,name,attr_type):
-     """
-     Gets a renderer for Field type attributes
-
-     :returns: AbstractRenderer -- Renderer for the attribute
-     """
-     if attr_type == str or attr_type is None:
-         logging.debug(name+" is Field string ")
-         return TextRenderer(klass,name)
-     elif attr_type == schema.ObjectId:
-         logging.debug(name+" is Field ObjectId")
-         return HiddenRenderer(klass,name)
-     elif attr_type == bool:
-         logging.debug(name+" is Field bool")
-         return BooleanRenderer(klass,name)
-     elif attr_type == int:
-         logging.debug(name+" is Field integer")
-         return IntegerRenderer(klass,name)
-     elif attr_type == datetime or attr_type == date or attr_type == time:
-         logging.debug(name+" is Field datetime")
-         renderer =  DateTimeRenderer(klass,name)
-         renderer.type = attr_type.__name__
-         return renderer
-     elif isinstance(attr_type,dict):
-         logging.debug(name+" is Field dict")
-         return CompositeRenderer(klass,name,attr_type)
-     elif isinstance(attr_type,list):
-         logging.debug(name+" is Field array")
-         return ArrayRenderer(klass,name)
-     else:
-         raise Exception(str(attr_type)+" is not a managed type")
 
 @staticmethod
 def renderer(klass,name,attr):
@@ -121,9 +90,9 @@ def renderer(klass,name,attr):
      elif isinstance(attr,dict):
          logging.debug(name+" is dict")
          return CompositeRenderer(klass,name,attr)
-     elif isinstance(attr,Field):
-         field = klass.field_renderer(klass,name,attr.type)
-         return field
+     elif type(attr) is types.ClassType:
+         logging.debug(name+" is dbref")
+         return ReferenceRenderer(klass,name,attr)
      else:
          raise Exception(name+", "+attr.__class__.__name__+" is not a managed type")
 
@@ -203,7 +172,6 @@ def mf_decorator(klass):
       setattr(klass, "render_search", render_search)
     setattr(klass, "renderer", renderer)
     setattr(klass, "get_renderer", get_renderer)
-    setattr(klass, "field_renderer", field_renderer)
     attributes = dir(klass)
     for name in attributes:
         attr = getattr(klass,name)

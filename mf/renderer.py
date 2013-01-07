@@ -34,7 +34,7 @@ class AbstractRenderer:
     self.klass = klass.__name__
     self.err = False
 
-  def render(self,value = None, parent = None):
+  def render(self,value = None, parents = []):
     '''Return HTML for component
 
     Not implemented
@@ -219,12 +219,13 @@ class TextRenderer(AbstractRenderer):
   def render_search(self, value = None):
     return _htmlTextField('Search'+self.klass+'['+self.name+']',self.name,'')    
 
-  def render(self,value = None, parent = None):
+  def render(self,value = None, parents = []):
     parentname = ''
     if value is None or isinstance(value,Field):
       value = ''
-    if parent:
-      parentname = parent
+    if parents:
+      for parent in parents:
+        parentname += '['+parent+']'
     return _htmlTextField(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
 
 
@@ -245,12 +246,13 @@ class BooleanRenderer(AbstractRenderer):
   def render_search(self, value = None):
     return _htmlCheckBox('Search'+self.klass+'['+self.name+']',self.name,False) 
 
-  def render(self,value = False, parent = None):
+  def render(self,value = False, parents = []):
      if value is None or isinstance(value,Field):
        value = False
      parentname = ''
-     if parent:
-       parentname = parent
+     if parents:
+      for parent in parents:
+        parentname += '['+parent+']'
      html = _htmlCheckBox(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
      return html
 
@@ -291,12 +293,13 @@ class IntegerRenderer(AbstractRenderer):
   def render_search(self, value = None):
     return _htmlNumber('Search'+self.klass+'['+self.name+']',self.name,'') 
 
-  def render(self,value = None, parent = None):
+  def render(self,value = None, parents = []):
     if value is None or isinstance(value,Field):
       value = 0
     parentname = ''
-    if parent:
-      parentname = parent
+    if parents:
+      for parent in parents:
+        parentname += '['+parent+']'
     return _htmlNumber(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
 
   def validate(self,value):
@@ -320,12 +323,13 @@ class HiddenRenderer(TextRenderer):
   def render_search(self, value = None):
     return '' 
 
-  def render(self,value = None, parent = None):
+  def render(self,value = None, parents = []):
     if value is None or isinstance(value,Field):
       value = ''
     parentname = ''
-    if parent:
-      parentname = parent
+    if parents:
+      for parent in parents:
+        parentname += '['+parent+']'
     return _htmlHidden(self.klass+parentname+'['+self.name+']',self.name,value)
 
 
@@ -336,10 +340,11 @@ class DateTimeRenderer(AbstractRenderer):
   # datetime, date, time
   type = 'datetime'
 
-  def render(self,value = None, parent= None):
+  def render(self,value = None, parents = []):
     parentname = ''
-    if parent:
-      parentname = parent
+    if parents:
+      for parent in parents:
+        parentname += '['+parent+']'
 
     if value is None or isinstance(value,Field):
       strvalue = ''
@@ -382,10 +387,11 @@ class ArrayRenderer(AbstractRenderer):
     else:
       return _htmlTextField('Search'+self.klass+'['+self.name+']',self.name,'') 
 
-  def render(self,value=None,parent = None):
+  def render(self,value=None, parents = []):
     parentname = ''
-    if parent:
-      parentname = parent
+    if parents:
+      for parent in parents:
+        parentname += '['+parent+']'
     html = '<div class="mf-array"><span class="mf-composite-label">'+self.name.title()+' list</span>'
     for i in range(len(value)):
       logging.debug("set array renderer "+self.name)
@@ -433,10 +439,11 @@ class CompositeRenderer(AbstractRenderer):
       self._renderers.append(srenderer)
   
 
-  def render(self,value = None, parent = None):
+  def render(self,value = None, parents = []):
     parentname = ''
-    if parent:
-      parentname = parent
+    if parents:
+      for parent in parents:
+        parentname += '['+parent+']'
     html = '<div class="mf-composite" id="'+self.klass+parentname+'['+self.name+']'+'"><span class="mf-composite-label">'+self.name+'</span>'
     for renderer in self._renderers:
       obj = None
@@ -444,7 +451,8 @@ class CompositeRenderer(AbstractRenderer):
         obj = value[renderer.name]
       elif hasattr(value,renderer.name):
         obj = getattr(value,renderer.name)
-      html += renderer.render(obj,parentname+'['+self.name+']')
+      newparent = parents.append(self.name)
+      html += renderer.render(obj,newparent)
     html += '</div>'
     return html
 
@@ -466,12 +474,13 @@ class FloatRenderer(AbstractRenderer):
   '''Renderer for float inputs
   '''
 
-  def render(self,value = None, parent = None):
+  def render(self,value = None, parents = []):
     if value is None or isinstance(value,Field):
       value = 0.0
     parentname = ''
-    if parent:
-      parentname = parent
+    if parents:
+      for parent in parents:
+        parentname += '['+parent+']'
     return _htmlNumber(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
 
   def render_search(self, value = None):
@@ -497,7 +506,7 @@ class ReferenceRenderer:
   Renderer for an object reference
   '''
 
-  def render(self,value = None, parent = None):
+  def render(self,value = None, parents = []):
     raise Exception("Not implemented")
 
   def render_search(self,value = None):
