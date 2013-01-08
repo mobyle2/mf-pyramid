@@ -15,16 +15,12 @@ class TestDashboard(unittest.TestCase):
 
   def setup(self):
     Dashboard.__klasses = []
-    #c = pymongo.Connection()
-    #self.db = c.mftest
-    #self.db.users.remove({})
     collection = Annotation.get_db("User")
     for user in collection:
       user.delete()
 
   def test_add_to_dashboard(self):
     Dashboard.add_dashboard([User])
-    #Annotation.dump()
     assert(User in Annotation.klasses())
 
   def test_instantiate_from_klasses(self):
