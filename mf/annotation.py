@@ -11,6 +11,8 @@ from renderer import SearchFormRenderer, FormRenderer,TextRenderer, BooleanRende
 
 import logging
 
+from mongokit.database import Database
+
 #logging.basicConfig(level=logging.DEBUG)
 
 
@@ -23,11 +25,35 @@ class Annotation:
   # Add static list of klass
   __klasses = []
 
-  # use a schema variable like in mongokit ? specify it
-  schema_variable = None
+  # db connection
+  db_conn = None
 
   @staticmethod
-  def use_schema_variable(var):
+  def get_db(key):
+      ''' Get db connection for object name
+
+      :param key: Object class name
+      :type key: str
+      :return: Object - MongoKit connection for object
+      '''
+      if key in Annotation.db_conn._registered_documents:
+          document = Annotation.db_conn._registered_documents[key]
+          try:
+              return getattr(Annotation.db_conn[document.__database__][document.__collection__], key)
+          except AttributeError:
+              raise AttributeError("%s: __collection__ attribute not found. "
+                  "You cannot specify the `__database__` attribute without "
+                  "the `__collection__` attribute" % key)
+      else:
+          if key not in Annotation.db_conn._databases:
+              Annotation.db_conn._databases[key] = Database(Annotation.db_conn, key)
+          return Annotation.db_conn._databases[key]
+
+  # use a schema variable like in mongokit ? specify it
+  schema_variable = 'structure'
+
+  @staticmethod
+  def set_schema_variable(var):
     Annotation.schema_variable = var
 
   @staticmethod
@@ -70,19 +96,19 @@ def renderer(klass,name,attr):
      rparam: renderer for the attribute
      rtype: AbstractRenderer
      """
-     if isinstance(attr,str) or attr == None or isinstance(attr,basestring):
+     if isinstance(attr,str) or attr == None or isinstance(attr,basestring) or attr == basestring:
          logging.debug(name+" is string")
          return TextRenderer(klass,name)
-     elif isinstance(attr,bool):
+     elif isinstance(attr,bool) or attr == bool:
          logging.debug(name+" is bool")
          return BooleanRenderer(klass,name)
-     elif isinstance(attr,float):
+     elif isinstance(attr,float) or attr == float:
          logging.debug(name+" is float")
          return FloatRenderer(klass,name)
-     elif isinstance(attr,int):
+     elif isinstance(attr,int) or attr == int:
          logging.debug(name+" is integer")
          return IntegerRenderer(klass,name)
-     elif isinstance(attr,datetime) or type(attr) == date or type(attr)==time:
+     elif isinstance(attr,datetime) or type(attr) == date or type(attr)==time or attr == datetime:
          logging.debug(name+" is "+attr.__class__.__name__)
          renderer =  DateTimeRenderer(klass,name)
          if type(attr) == date: 
@@ -157,7 +183,7 @@ def bind_form(self,request):
         else:
           #if self.__class__.__name__+"["+name+"]" in request:
           logging.debug("Search "+self.__class__.__name__+"["+name+"] in "+str(request))
-          if renderer.get_param(request,self.__class__.__name__+"["+name+"]"):
+          if renderer.get_param(request,self.__class__.__name__+"["+name+"]") or isinstance(renderer,BooleanRenderer):
             err = renderer.bind(request,self,name)
             if err is not None:
               self.__field_errors.extend(err)       

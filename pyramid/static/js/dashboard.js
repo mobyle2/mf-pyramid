@@ -103,7 +103,7 @@
                    $("#mf-flash").text(curObject+" successfully added");
                  }
                }
-
+               loadObjectList(curObject,false);
             },
             error: function(){
                 alert('An error occured during transaction');
@@ -123,16 +123,24 @@
      });
   }
 
+  function loadObjectList(id) {
+    loadObjectList(id,true);
+  }
+
   /**
   * Loads a list of objects and create a sortable table
   */
-  function loadObjectList(id) {
-    clear_form_elements("#show-"+curObject);
+  function loadObjectList(id,clean) {
+    if(clean) {
+      clear_form_elements("#show-"+curObject);
+    }
     $(".mf-list").hide();
-    $(".mf-object").hide();
-    $(".mf-search").hide();
-    $("#show-"+curObject).show();
-    $("#search-"+curObject).show();
+    //$(".mf-object").hide();
+    $(".accordion").hide();
+    //$(".mf-search").hide();
+    $("#accordion"+curObject).show();
+    //$("#show-"+curObject).show();
+    //$("#search-"+curObject).show();
     route = '/'+id.toLowerCase()+'s/';
     $.getJSON(route, function(data) {
      updateObjectList(data);
@@ -201,7 +209,18 @@
      if(jQuery.isPlainObject(val)) {
        if(val['$date']!=null){
          var objdate = new Date(val['$date']);
-         var objdatestr = objdate.toString()
+         //var objdatestr = objdate.toString()
+         var month = objdate.getMonth()+1;
+         if (month<10) { month = '0'+month; }
+         var day = objdate.getDate();
+         if (day<10) { day = '0'+day; }
+         var hours = objdate.getHours();
+         if (hours<10) { hours = '0'+hours; }
+         var minutes = objdate.getMinutes();
+         if (minutes<10) { minutes = '0'+minutes; }
+         var seconds = objdate.getSeconds();
+         if (seconds<10) { seconds = '0'+seconds; }
+         var objdatestr = objdate.getFullYear()+'/'+month+'/'+day+' '+hours+':'+minutes+':'+seconds
          var type = $('#'+curObject+parent+'\\['+key+'\\]').attr('type');
          if (type == 'date') { objdatestr = objdate.toDateString(); }
          if (type == 'time') { objdatestr = objdate.toTimeString(); }
@@ -217,28 +236,26 @@
      }
      else {
        if(val instanceof Array) {
-           arrayelts = $('#'+curObject+parent+'\\['+key+'\\]');
-           firstelt = $(arrayelts[0]);
-           template = firstelt.parent().parent().parent().clone();
-           main = firstelt.parent().parent().parent().parent();
-           for(i=0;i<arrayelts.size();i++) {
-             $(arrayelts[i]).parent().parent().parent().remove();
-           }
+           arrayelts = $('#Template'+curObject+parent+'\\['+key+'\\]');
+           template = $(arrayelts[0]).children();
+          
+           clonediv = $('#Clone'+curObject+parent+'\\['+key+'\\]');
+           clonediv.children().remove();
            $.each(val, function(elt) {
              newelt = template.clone();
              newelt.find('input').val(val[elt]);
-             main.append(newelt);
+             clonediv.append(newelt);
            });
-           //json2form(val,parent+'\\['+key+'\\]');     
+
        }
        else {
          $('#'+curObject+parent+'\\['+key+'\\]').val(val);
          if($('#'+curObject+parent+'\\['+key+'\\]').attr('type')=='checkbox')  {
-           if(val == 'True' || val == 1) {
+           if(val == 'true' || val == 'True' || val == 1) {
              $('#'+curObject+parent+'\\['+key+'\\]').attr('checked', true);
            }
            else {
-             $('#'+curObject+parent+'\\['+key+'\\]').attr('checked', true);
+             $('#'+curObject+parent+'\\['+key+'\\]').attr('checked', false);
            }
          }
        }
@@ -251,6 +268,7 @@
   * Clear the form elements
   */
   function clear_form_elements(ele) {
+    $(".mf-template-clone").children().remove();
     $("div").removeClass("error");
     $("#mf-flash").attr('class','');
     $("#mf-flash").text("");

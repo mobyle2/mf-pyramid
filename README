@@ -1,6 +1,6 @@
 This is a new development, mainly for own training, and not for use yet.
 
-admin provides annotations on a Ming object maybe will use mongokit (@mf_decorator) to analyse objects and create actions and forms on objects automatically.
+It provides annotations on a MongoKit object (@mf_decorator) to analyse objects and create actions and forms on objects automatically.
 
 Goal is to generate an admin dashboard for each object (show/edit/delete per object and list of objects).
 
@@ -13,25 +13,17 @@ Pyramid routes and templates will be set automatically to access objects via RES
 TODO:
   see bugs/features in github
   - finish mf_add to real add the object in mongo (call save)
-  - add edit (get object from id, call bind_form, call save)
-  - delete (set id of object from request and call delete method if exists, else, delete directly).
   - object references not yet managed
-  - _id managed as a string for the moment
-
-  - search : add view to search with filter
 
 LIMITATIONS: ArrayRenderer does not support arrays of objects, only arrays of basic types
 
 LICENSE: LGPL
 
-WARNING: there are considerations with pymongo and ming versions to take into account.
-Code is currently related to ming 3.0, not binded to latest pymongo.
-
 USAGE:
 
-User must have *all* acl permissions on *mf.dashboard.Dashboard* to access the dashboard view via /admin as well as to the add/edit/delete operations on objects
+Pyramid acl permissions for dashboard access can be set via config, however, there is no acl on get/post/put/delete REST operations. Control is done via the *my*  method (see below).
 
-Add mf_decorator above your Ming classes
+Add mf_decorator above your MongoKit classes
 
 For dashboard, to add User and Group, insert in Pyramid init :
 
@@ -48,8 +40,8 @@ Warning: this should be added after your routes declaration because it inserts g
 Minimal expected interface is:(as in mongokit)
 save()
 delete()
-find()
-find_one()
+find() via connection
+find_one() via connection
 
 If user must have only limited access to a query, i.e list only a subset of an object (/users), it is necessary to add to the object a function defined as:
 

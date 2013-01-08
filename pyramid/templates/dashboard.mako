@@ -18,12 +18,22 @@
 <hr/>
 % for object in klasses:
 <div class="row">
-<div id="show-${object.__name__}" class="mf-object offset1">
+
+<div class="accordion offset1" id="accordion${object.__name__}">
+<div class="accordion-group">
+<div class="accordion-heading"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion${object.__name__}" href="#show-${object.__name__}"><h2>${object.__name__}</h2></a></div>
+<div id="show-${object.__name__}" class="mf-object offset1 accordion-body collapse in">
   ${object().render() | n}
 </div>
+<div class="accordion-heading"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion${object.__name__}" href="#search-${object.__name__}"><h2><i class="icon-search"></i> Search</h2></a></div>
 <div id="search-${object.__name__}" class="mf-search offset1">
   ${object().render_search() | n}
 </div>
+
+</div>
+</div>
+
+
 </div>
 % endfor
 
@@ -36,8 +46,10 @@
    var curObject;
 
    $(".mf-list").hide();
-   $(".mf-object").hide();
-   $(".mf-search").hide();
+   //$(".mf-object").hide();
+   $(".accordion").hide();
+   //$(".mf-search").hide();
+   $(".mf-template").hide();
    $(".dashboard-item").click(function(event){
      $('.nav li').removeClass('active');
      var $this = $(this).parent();
@@ -63,12 +75,18 @@
 
    $('.mf-add').click(function(event) {
     obj = $(this).attr('elt');
-    arrayelts = $('#'+obj);
-    firstelt = $(arrayelts[0]);
-    template = firstelt.parent().parent().parent().clone();
-    main = firstelt.parent().parent().parent().parent();
-    template.find('input').val('');
-    main.append(template);
+
+    obj = obj.replace('[','\\[');
+    obj = obj.replace(']','\\]');
+    arrayelts = $('#Template'+obj);
+    template = $(arrayelts[0]).children();
+          
+    clonediv = $('#Clone'+obj);
+    newelt = template.clone();
+    newelt.find('input').val('');
+    clonediv.append(newelt);
+
+
    });
 
    $('.mf-btn').click(function(event) {

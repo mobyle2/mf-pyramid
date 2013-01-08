@@ -93,8 +93,11 @@ class AbstractRenderer:
     #if paramvalue is None or paramvalue == '':
     #  return []
     # Search for array items
-    while self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]"):
-      paramlist.append(self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]",True))
+    
+    while self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]") is not None:
+      param = self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]",True)
+      if str(param) != '':
+        paramlist.append(param)
 
     #if not paramlist:
     #  return []
@@ -111,7 +114,12 @@ class AbstractRenderer:
          error += p+"."
       error+= name
       return [error]
-    if value is not None:
+
+    # Unckecked boxes are not set, e.g. no value available. Default to False.
+    if not value and isinstance(self,BooleanRenderer):
+      value = [False]
+
+    if value:
       if parent:
         obj = instance
         for p in parent:
@@ -122,23 +130,42 @@ class AbstractRenderer:
               obj[p] = {}
               obj = obj[p]
           else:
-            obj = getattr(obj,p)
+            if hasattr(obj,p):
+              obj = getattr(obj,p)
+            else:
+              obj = obj[p]
         if isinstance(obj,dict) and value:
-          obj[name]=value
+          obj[name]=value[0]
         else:
           if isinstance(obj,(list,tuple)):
-            setattr(obj,name,value)
+            if hasattr(obj,name):
+              setattr(obj,name,value)
+            else:
+              obj[name]=value
           else:
             if value:
-              setattr(obj,name,value[0])
+              if hasattr(obj,name):
+                setattr(obj,name,value[0])
+              else:
+                obj[name]=value[0]
         
       else:
-        if isinstance(getattr(instance,name),(list,tuple)):
-          print name+"it is a list"
-          setattr(instance,name,value)
+        instanceobj = None
+        if hasattr(instance,name):
+          instanceobj = getattr(instance,name)
+        else:
+          if name in instance:
+            instanceobj = instance[name]
+        if instanceobj is not None and isinstance(instanceobj,(list,tuple)):
+          if hasattr(instance,name):
+              setattr(instance,name,value)
+          else:
+              instance[name]=value
         elif value:
-          print name+"it is not a list"
-          setattr(instance,name,value[0])
+          if hasattr(instance,name):
+              setattr(instance,name,value[0])
+          else:
+              instance[name]=value[0]
     return []
 
 
@@ -152,6 +179,7 @@ class AbstractRenderer:
     :type name: str
     :return: str - Value from the form
     '''
+
     for index in range(len(request)):
       key,value = request[index]
       if key == name:
@@ -175,10 +203,14 @@ class SearchFormRenderer(AbstractRenderer):
     :type fields: list
     :return: str HTML form
     '''
-    html='<h2>Search</h2><form class="mf-form form-horizontal" id="mf-search-form-'+klass.__class__.__name__+'">'
+    html='<form class="mf-form form-horizontal" id="mf-search-form-'+klass.__class__.__name__+'">'
     for name in fields:
         if name != '_id':
-          value = getattr(klass,name)
+          if hasattr(klass,name):
+            value = getattr(klass,name)
+
+          else:
+           value = klass[name]
           logging.debug("Render "+name+" for class "+klass.__class__.__name__)
           renderer = klass.get_renderer(name)
           html += renderer.render_search(value)
@@ -205,9 +237,12 @@ class FormRenderer(AbstractRenderer):
     html='<form class="mf-form form-horizontal" id="mf-form-'+klass.__class__.__name__+'">'
     if "_id" not in fields:
       logging.debug("Add default _id")
-      html += HiddenRenderer(klass,"_id")
+      html += HiddenRenderer(klass.__class__,"_id").render('')
     for name in fields:
-        value = getattr(klass,name)
+        if not hasattr(klass,name):
+          value = klass[name]
+        else:
+          value = getattr(klass,name)
         logging.debug("Render "+name+" for class "+klass.__class__.__name__)
         html += klass.get_renderer(name).render(value)
     html += self.controls()
@@ -275,6 +310,7 @@ class BooleanRenderer(AbstractRenderer):
   def unserialize(self,value):
     if self.validate(value):
       if isinstance(value,bool):
+        print "IS BOOL"
         return value
       if isinstance(value,int):
         if value == 0:
@@ -282,9 +318,9 @@ class BooleanRenderer(AbstractRenderer):
         elif value == 1:
           return True
       else:
-        if str(value).lower == 'false':
+        if str(value).lower() == 'false':
           return False
-        elif str(value).lower == 'true':
+        elif str(value).lower() == 'true':
           return True
     else:
       raise Exception("value is not correct type")
@@ -349,14 +385,14 @@ class DateTimeRenderer(AbstractRenderer):
       for parent in parents:
         parentname += '['+parent+']'
 
-    if value is None or isinstance(value,Field):
+    if value is None:
       strvalue = ''
     else:
       strvalue = ''
       if self.type == 'datetime':
-        strvalue = value.strftime('%y/%m/%d %H:%M:%s')
+        strvalue = value.strftime('%Y/%m/%d %H:%M:%S')
       elif self.type == 'date':
-        strvalue = value.strftime("%d/%m/%y")
+        strvalue = value.strftime("%d/%m/%Y")
       elif self.type == 'time':
         strvalue = value.strftime('%H:%M:%s')
     return _htmlDateTime(self.klass+parentname+'['+self.name+']',self.name,strvalue,self.err, self.type)
@@ -366,12 +402,11 @@ class DateTimeRenderer(AbstractRenderer):
 
   def unserialize(self,value):
       try:
-        if type == 'datetime':
-          #return parseDateTime(value)
-	  return datetime.strptime(value,'%y/%m/%d %H:%M:%s')
-        elif type == 'date':
-          return datetime.date.strptime(value,"%d/%m/%y")
-        elif type == 'time':
+        if self.type == 'datetime':
+	  return datetime.strptime(value,'%Y/%m/%d %H:%M:%S')
+        elif self.type == 'date':
+          return datetime.date.strptime(value,"%d/%m/%Y")
+        elif self.type == 'time':
           return datetime.time.strptime(value,"%H:%M:%S")
       except Exception as e:
         raise Exception('badly formatted date')  
@@ -396,19 +431,31 @@ class ArrayRenderer(AbstractRenderer):
       for parent in parents:
         parentname += '['+parent+']'
     html = '<div class="mf-array"><span class="mf-composite-label">'+self.name.title()+' list</span>'
+
+    elt = self.klass+parentname+'['+self.name+']'
+    #elt = elt.replace('[','\\[')
+    #elt = elt.replace(']','\\]')
+    #if len(value) == 0:
+    html += '<div class="mf-template" id="Template'+self.klass+parentname+'['+self.name+']'+'">'
+    html += '<div class="mf-array-elt control-group">'
+    newparent = parents.append(self.name)
+    html += self._renderer.render(None,newparent)
+    html += '<button elt="'+self.klass+parentname+'['+self.name+']'+'" class="mf-del mf-btn btn btn-primary controls">Remove</button>'
+    html += '</div>'
+    html += '</div>'
+    html += '<div id="Clone'+self.klass+parentname+'['+self.name+']'+'" class="mf-template-clone">'
     for i in range(len(value)):
       logging.debug("set array renderer "+self.name)
       renderer = self.rootklass.renderer(self.rootklass,self.name,value[i])
       logging.debug("renderer = "+str(renderer))
-      self._renderer =  renderer
+      if not self._renderer:
+        self._renderer =  renderer
       val = value[i]
-      elt = self.klass+parentname+'['+self.name+']'
-      elt = elt.replace('[','\\[')
-      elt = elt.replace(']','\\]')
       html += '<div class="mf-array-elt control-group">'
-      html += renderer.render(val,parentname)
+      html += renderer.render(val,newparent)
       html += '<button elt="'+elt+'" class="mf-del mf-btn btn btn-primary controls">Remove</button>'
       html += '</div>'
+    html += '</div>'
     html += '<button elt="'+elt+'" class="mf-add mf-btn btn btn-primary">Add</button>'
     html += '</div>'
     return html
@@ -454,7 +501,10 @@ class CompositeRenderer(AbstractRenderer):
         obj = value[renderer.name]
       elif hasattr(value,renderer.name):
         obj = getattr(value,renderer.name)
-      newparent = parents.append(self.name)
+      if parents:
+        newparent = parents.append(self.name)
+      else:
+        newparent = [self.name]
       html += renderer.render(obj,newparent)
     html += '</div>'
     return html
@@ -464,7 +514,10 @@ class CompositeRenderer(AbstractRenderer):
     parent.extend([name])
     errs = []
     for renderer in self._renderers:
-      obj = getattr(instance,name)
+      if hasattr(instance,name):
+        obj = getattr(instance,name)
+      else:
+        obj = instance[name]
       err = renderer.bind(request,instance,renderer.name,parent)
       if err:
         errs.extend(err)

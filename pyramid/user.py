@@ -4,25 +4,31 @@ from mf.annotation import *
 from pyramid.response import Response
 from pyramid.view import view_config
 import mf.views
+from mongokit import Document, Connection
 
 def home(request):
     return Response('hello World')
 
 
+
 @mf_decorator
-class User:
+class User(Document):
   ''' Example class for tests
   '''
+  __collection__ = 'users'
+  __database__ = 'test'
 
-  _id = ''
-  name = ''
-  email = ''
-  age = 0
-  admin = False
-  options = { 'tags': '' , 'categories': '' }
-  creation_date = datetime.utcnow()
-  today = date.today()
-  array = [ 'one', 'two']
+  structure = { 'name': basestring, 'email': basestring, 'age': int, 'admin': bool,
+  'options' : { 'tags': basestring , 'categories': basestring }, 'creation_date' : datetime, 'today': basestring, 'array' : [basestring] 
+  }
+  #name = ''
+  #email = ''
+  #age = 0
+  #admin = False
+  #options = { 'tags': '' , 'categories': '' }
+  #creation_date = datetime.utcnow()
+  #today = date.today()
+  #array = [ 'one', 'two']
 
   def html(self, fields = None):
     return self.render(fields)
@@ -41,19 +47,16 @@ class User:
 
 
 if __name__ == "__main__":
-  user = User()
-  user.name = "osallou"
-  user.email = "osallou@irisa.fr"
-  user.mongo = "test"
-  user.age = 28
-  user.admin = True
-  user.options["tags"] = 'tag1'
-  user.creation_date = datetime.utcnow()
+  connection = Connection()
+  connection.register([User])
+  print str(connection.User.find())
+  for user in connection.User.find():
+    print user[ 'name']
 
   #request = [("User[name]","sample"), ("User[email]","test@nomail.com")]
-  request = [("User[array]","test1"), ("User[array]","test2"),  ("User[array]","test3")]
-  user.bind_form(request)
+  #request = [("User[array]","test1"), ("User[array]","test2"),  ("User[array]","test3")]
+  #user.bind_form(request)
   #print user.metadata.fields
   #print user.html()
-  print user.array
+  #print user.array
 

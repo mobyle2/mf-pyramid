@@ -11,6 +11,8 @@ from group import Group
 
 #Use pymongo
 from pymongo import MongoClient
+from mongokit import Document, Connection
+
 
 if __name__ == '__main__':
     my_session_factory = UnencryptedCookieSessionFactoryConfig('itsaseekreet')
@@ -21,13 +23,14 @@ if __name__ == '__main__':
     config.add_route('home', '/')
     config.add_route('about', '/about')
     config.add_view(home, route_name='home')
-    connection = MongoClient()
-    db = connection.test
-    Dashboard.set_connection(db)
+    mgconnection = MongoClient()
+    db = mgconnection.test
+    #Dashboard.set_connection(db)
+
     # Clear database
     db.drop_collection('users')
     db.drop_collection('groups')
-    u1 = {"name": "Mike", "age" : 30, "email" : "nomail", "creation_date" : datetime.utcnow(), "options" : { 'tags': '' , 'categories': '' }, "today": date.today().strftime("%d/%m/%y") }
+    u1 = {"name": "Mike", "admin" : False, "age" : 30, "email" : "nomail", "creation_date" : datetime.utcnow(), "options" : { 'tags': '' , 'categories': '' }, "today": date.today().strftime("%d/%m/%y"), "array" : [] }
     db.users.insert(u1)
     u2 = {"name": "Tommy", "admin" : True, "age" : 40, "email" : "nomail", "creation_date" : datetime.utcnow(), "options" : { 'tags': 'cool' , 'categories': '' }, "array" : [ 'three', 'four'] }
     db.users.insert(u2)
@@ -35,7 +38,14 @@ if __name__ == '__main__':
     db.users.insert(u3)
     g1 = {"name": "sample", "creation_date" : datetime.utcnow() }
     db.groups.insert(g1)
+
+
+    connection = Connection()
+    connection.register([User,Group])
+    Dashboard.set_connection(connection)
+
     Dashboard.add_dashboard([User,Group],config)
+
     app = config.make_wsgi_app()
     server = make_server('0.0.0.0', 6789, app)
     server.serve_forever()
