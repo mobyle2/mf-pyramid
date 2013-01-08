@@ -1,16 +1,18 @@
-This is a new development, mainly for own training, and not for use yet.
+# Introduction
 
-It provides annotations on a MongoKit object (@mf_decorator) to analyse objects and create actions and forms on objects automatically.
+This library provides annotations on a MongoKit object (@mf_decorator) to analyse objects and create actions and forms on objects automatically.
 
 Goal is to generate an admin dashboard for each object (show/edit/delete per object and list of objects).
 
-renderer is in charge of generating HTML per attribute type.
+Renderer is in charge of generating HTML per attribute type.
 
-more customization will also be available to force type of the attribute (Checkbox etc...)
+More customization will also be available to force type of the attribute (Checkbox etc...) in later releases.
 
-Pyramid routes and templates will be set automatically to access objects via REST.
+Pyramid routes and templates will be set automatically to access objects via REST (though optional). Dashboard is accessible via /admin route.
+Dashboard is not automatically installed, it is only for help and can (should?) be customized.
+Copy the pyramid directory content in your pyramid application according to your setup.
 
-TODO:
+# TODO:
   see bugs/features in github
   - finish mf_add to real add the object in mongo (call save)
   - object references not yet managed
@@ -21,13 +23,18 @@ LICENSE: LGPL
 
 USAGE:
 
+A sample pyramid application is available in pyramid directory, simply run app.sh
+
 Pyramid acl permissions for dashboard access can be set via config, however, there is no acl on get/post/put/delete REST operations. Control is done via the *my*  method (see below).
 
-Add mf_decorator above your MongoKit classes
+Add mf_decorator above your MongoKit classes (see pyramid/user.py for example).
 
 For dashboard, to add User and Group, insert in Pyramid init :
 
-Dashboard.add_dashboard([User,Group],config)
+    connection = Connection()
+    connection.register([User,Group])
+    Dashboard.set_connection(connection)
+    Dashboard.add_dashboard([User,Group],config)
 
 Warning: this should be added after your routes declaration because it inserts generic routes to match objets:
 
