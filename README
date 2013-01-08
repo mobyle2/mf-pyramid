@@ -12,7 +12,8 @@ Pyramid routes and templates will be set automatically to access objects via RES
 Dashboard is not automatically installed, it is only for help and can (should?) be customized.
 Copy the pyramid directory content in your pyramid application according to your setup.
 
-# TODO:
+# TODO
+
   see bugs/features in github
   - finish mf_add to real add the object in mongo (call save)
   - object references not yet managed
