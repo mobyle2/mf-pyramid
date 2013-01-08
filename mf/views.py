@@ -63,8 +63,10 @@ def mf_search(request):
       except Exception:
         # This is fine
         param = None
-      if param and param!='':
-        renderer = objklass().get_renderer(field)
+      renderer = objklass().get_renderer(field)
+      if isinstance(renderer,BooleanRenderer) and param is None:
+        param = False
+      if param is not None and param!='':
         if renderer and not isinstance(renderer,CompositeRenderer):
           filter[field] = param
           if isinstance(renderer, IntegerRenderer):
@@ -174,7 +176,6 @@ def mf_edit(request):
       status = 1
     if status == 0:
       try:
-        print "#### "+str(obj)
         obj.save()
       except Exception as e:
         logging.error("Error while saving object "+str(e))
