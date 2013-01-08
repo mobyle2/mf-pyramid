@@ -93,15 +93,15 @@ class AbstractRenderer:
     #if paramvalue is None or paramvalue == '':
     #  return []
     # Search for array items
-    
+    print "## bind "+instance.__class__.__name__+parentname+"["+name+"]"+" with "+str(self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]"))
     while self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]") is not None:
+      
       param = self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]",True)
       if str(param) != '':
         paramlist.append(param)
 
     #if not paramlist:
     #  return []
-
     value = []
     try:
       for paramvalue in paramlist:
@@ -118,7 +118,7 @@ class AbstractRenderer:
     # Unckecked boxes are not set, e.g. no value available. Default to False.
     if not value and isinstance(self,BooleanRenderer):
       value = [False]
-
+    
     if value:
       if parent:
         obj = instance

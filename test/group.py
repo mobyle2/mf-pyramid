@@ -1,28 +1,19 @@
 import mf.annotation
 #from admin.admin import Admin
 from mf.annotation import *
-from ming import Field,schema
-from ming.datastore import DataStore
-from ming import Session, create_datastore
+from pyramid.response import Response
+from pyramid.view import view_config
+from mongokit import Document, Connection
 
-bind = create_datastore("%s%s"%('mongodb://localhost:27017','test'))
-session = Session(bind)
 
 @mf_decorator
-class Group:
+class Group(Document):
 
-  class __mongometa__:
-      session = session
-      name = 'groups'
+  __collection__ = 'groups'
+  __database__ = 'test'
 
-  _id = Field(schema.ObjectId) 
-  name = Field(str)
+  #_id = ''
+  #name = ''
+  #creation_date = datetime.utcnow()
+  structure = { 'name' : basestring, 'creation_date' : datetime}
 
-  def html(self, fields = None):
-    return self.render(fields)
-
-
-if __name__ == "__main__":
-  group = Group()
-  group.name = "mygroup"
-  group.save

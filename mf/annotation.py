@@ -177,14 +177,14 @@ def bind_form(self,request):
         renderer = self.__class__.__render_fields[name]
 
         if isinstance(renderer,CompositeRenderer) or isinstance(renderer,ArrayRenderer):
-            err = renderer.bind(request,self,name)
+            err = renderer.bind(request,self,name,[])
             if err is not None:
               self.__field_errors.extend(err)           
         else:
           #if self.__class__.__name__+"["+name+"]" in request:
           logging.debug("Search "+self.__class__.__name__+"["+name+"] in "+str(request))
           if renderer.get_param(request,self.__class__.__name__+"["+name+"]") or isinstance(renderer,BooleanRenderer):
-            err = renderer.bind(request,self,name)
+            err = renderer.bind(request,self,name,[])
             if err is not None:
               self.__field_errors.extend(err)       
     return self.__field_errors
