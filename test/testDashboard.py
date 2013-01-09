@@ -5,6 +5,7 @@ import group
 from group import Group
 import mf.dashboard
 from mf.dashboard import Dashboard
+from mf.db_conn import DbConn
 from mf.annotation import Annotation
 import pymongo
 from mongokit import Document, Connection
@@ -19,7 +20,7 @@ class TestDashboard(unittest.TestCase):
 
   def setup(self):
     Dashboard.__klasses = []
-    collection = Annotation.get_db("User")
+    collection = DbConn.get_db("User")
     for user in collection:
       user.delete()
 
@@ -71,7 +72,7 @@ class TestDashboard(unittest.TestCase):
     user = connection.User()
     user.bind_form(request)
     user.save()
-    collection = Annotation.get_db("User")
+    collection = DbConn.get_db("User")
     filter = {}
     filter["_id"] = user["_id"]
     obj= collection.find_one(filter)
