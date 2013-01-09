@@ -1,4 +1,4 @@
 pymongo
 pyramid
-pyramid_debugtooolbar
+pyramid_debugtoolbar
 mongokit
