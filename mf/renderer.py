@@ -258,7 +258,7 @@ class TextRenderer(AbstractRenderer):
 
   def render(self,value = None, parents = []):
     parentname = ''
-    if value is None or isinstance(value,Field):
+    if value is None:
       value = ''
     if parents:
       for parent in parents:
@@ -284,7 +284,7 @@ class BooleanRenderer(AbstractRenderer):
     return _htmlCheckBox('Search'+self.klass+'['+self.name+']',self.name,False) 
 
   def render(self,value = False, parents = []):
-     if value is None or isinstance(value,Field):
+     if value is None:
        value = False
      parentname = ''
      if parents:
@@ -332,7 +332,7 @@ class IntegerRenderer(AbstractRenderer):
     return _htmlNumber('Search'+self.klass+'['+self.name+']',self.name,'') 
 
   def render(self,value = None, parents = []):
-    if value is None or isinstance(value,Field):
+    if value is None:
       value = 0
     parentname = ''
     if parents:
@@ -362,7 +362,7 @@ class HiddenRenderer(TextRenderer):
     return '' 
 
   def render(self,value = None, parents = []):
-    if value is None or isinstance(value,Field):
+    if value is None:
       value = ''
     parentname = ''
     if parents:
@@ -530,7 +530,7 @@ class FloatRenderer(AbstractRenderer):
   '''
 
   def render(self,value = None, parents = []):
-    if value is None or isinstance(value,Field):
+    if value is None:
       value = 0.0
     parentname = ''
     if parents:

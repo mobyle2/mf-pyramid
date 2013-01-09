@@ -30,11 +30,11 @@ class TestDashboard(unittest.TestCase):
 
   def test_render_new_user(self):
     Dashboard.add_dashboard([User])
-    myuser = Annotation.klasses()[0]()
+    myuser = User()
     try:
       html = myuser.html()
-    except Exception:
-      self.fail("Error while generating html")
+    except Exception as e:
+      self.fail("Error while generating html: "+str(e))
 
 
   def test_bind_user(self):
