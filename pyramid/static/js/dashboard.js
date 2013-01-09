@@ -159,7 +159,7 @@
       var types = {};
       $.each(data, function(obj) {
         $.each(data[obj], function(key, val) {
-          if( val!=null && ((!jQuery.isPlainObject(val)) || val['$date']!=null )) {
+          if( key!='id' && val!=null && ((!jQuery.isPlainObject(val)) || val['$date']!=null )) {
             var type = $('#'+curObject+'\\['+key+'\\]').attr('type');
             if ( $.inArray(key, keys) < 0) {
               keys.push(key)

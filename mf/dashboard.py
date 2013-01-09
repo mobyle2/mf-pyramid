@@ -1,6 +1,6 @@
 
 import annotation
-from annotation import Annotation
+from db_conn import DbConn
 from renderer import FormRenderer
 from views import *
 
@@ -33,7 +33,7 @@ class Dashboard:
     :param conn: MongoDB connection objects
     :type conn: Connection
     '''
-    Annotation.db_conn = conn
+    DbConn.db_conn = conn
 
   @staticmethod
   def add_dashboard(klasses, config = None, prefix = ''):

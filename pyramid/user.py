@@ -45,14 +45,15 @@ class User(Document):
 if __name__ == "__main__":
   connection = Connection()
   connection.register([User])
-  print str(connection.User.find())
-  for user in connection.User.find():
-    print user[ 'name']
+  #print str(connection.User.find())
+  #for user in connection.User.find():
+  #  print user[ 'name']
+  print User.render_fields
 
   #request = [("User[name]","sample"), ("User[email]","test@nomail.com")]
   #request = [("User[array]","test1"), ("User[array]","test2"),  ("User[array]","test3")]
   #user.bind_form(request)
   #print user.metadata.fields
-  print user.html()
+  #print user.html()
   #print user.array
 

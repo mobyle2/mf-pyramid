@@ -9,6 +9,8 @@ import json
 from bson import json_util
 from bson.objectid import ObjectId
 
+from mf.db_conn import DbConn
+
 MF_LIST = 'list'
 MF_MANAGE = 'manage'
 
@@ -57,7 +59,7 @@ def mf_search(request):
     if filter is None:
       raise HTTPForbidden
 
-    for field in objklass.__render_fields:
+    for field in objklass.render_fields:
       try:
         param = request.params.getone('Search'+objname.title()+'['+field+']')
       except Exception:
@@ -80,7 +82,7 @@ def mf_search(request):
               filter[field] = False
     objlist = []
     logging.debug("Search with "+str(filter))
-    collection = Annotation.get_db(objklass.__name__).find(filter)
+    collection = DbConn.get_db(objklass.__name__).find(filter)
 
     for obj in collection:
       objlist.append(obj)
@@ -110,7 +112,7 @@ def mf_list(request):
     #collection = Annotation.db_conn[pluralize(objname)]
     #for obj in collection.find(filter):
     #  objlist.append(obj)
-    objects = Annotation.get_db(objklass.__name__).find(filter)
+    objects = DbConn.get_db(objklass.__name__).find(filter)
     for obj in objects:
       objlist.append(obj)
     objlist = json.dumps(objlist, default=json_util.default)
@@ -139,7 +141,7 @@ def mf_show(request):
       if pluralize(klass.__name__) == pluralize(objname):
         objklass = klass
         break
-    collection = Annotation.get_db(objklass.__name__)
+    collection = DbConn.get_db(objklass.__name__)
     obj= collection.find_one(filter)
     if not obj:
       raise HTTPNotFound()
@@ -165,7 +167,7 @@ def mf_edit(request):
       if pluralize(klass.__name__) == pluralize(objname):
         objklass = klass
         break
-    collection = Annotation.get_db(objklass.__name__)
+    collection = DbConn.get_db(objklass.__name__)
 
     status = 0
     obj= collection.find_one(filter)
@@ -204,7 +206,7 @@ def mf_delete(request):
       if pluralize(klass.__name__) == pluralize(objname):
         objklass = klass
         break
-    collection = Annotation.get_db(objklass.__name__)
+    collection = DbConn.get_db(objklass.__name__)
 
     #collection = Annotation.db_conn[pluralize(objname)]
     #obj = collection.remove(filter)

@@ -4,7 +4,8 @@ import time
 import re
 import string
 import logging
-
+from db_conn import DbConn
+from bson.objectid import ObjectId
 
 #logging.basicConfig(level=logging.DEBUG)
 
@@ -19,6 +20,7 @@ class AbstractRenderer:
 
   is_object_id = False
 
+  render_fields = dict()
 
   def controls(self):
     '''Return buttons for the form
@@ -27,11 +29,17 @@ class AbstractRenderer:
     '''
     return _htmlControls(self.klass)
 
-  def __init__(self,klass,name):
+  def __init__(self,klass,name,parent=''):
     self.name = name
     self.rootklass = klass
     self.klass = klass.__name__
     self.err = False
+    fieldname = name
+    if parent:
+      fieldname = parent+"."+name
+    if self.name != "_id":
+      self.rootklass.render_fields[fieldname] = self
+
 
   def render(self,value = None, parents = []):
     '''Return HTML for component
@@ -92,7 +100,7 @@ class AbstractRenderer:
     #if paramvalue is None or paramvalue == '':
     #  return []
     # Search for array items
-    print "## bind "+instance.__class__.__name__+parentname+"["+name+"]"+" with "+str(self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]"))
+    logging.debug("## bind "+instance.__class__.__name__+parentname+"["+name+"]"+" with "+str(self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]")))
     while self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]") is not None:
       
       param = self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]",True)
@@ -106,6 +114,7 @@ class AbstractRenderer:
       for paramvalue in paramlist:
         value.append(self.unserialize(paramvalue))
     except Exception as e:
+      logging.error("Unserialize error "+str(e))
       self.err = True
       if parent is not None:
        error = ''
@@ -117,6 +126,7 @@ class AbstractRenderer:
     # Unckecked boxes are not set, e.g. no value available. Default to False.
     if not value and isinstance(self,BooleanRenderer):
       value = [False]
+      
     
     if value:
       if parent:
@@ -203,7 +213,11 @@ class SearchFormRenderer(AbstractRenderer):
     :return: str HTML form
     '''
     html='<form class="mf-form form-horizontal" id="mf-search-form-'+klass.__class__.__name__+'">'
+
     for name in fields:
+        # First level fields only
+        if name is None or "." in name:
+          continue
         if name != '_id':
           if hasattr(klass,name):
             value = getattr(klass,name)
@@ -238,6 +252,9 @@ class FormRenderer(AbstractRenderer):
       logging.debug("Add default _id")
       html += HiddenRenderer(klass.__class__,"_id").render('')
     for name in fields:
+        # First level fields only
+        if name is None or "." in name:
+          continue
         if not hasattr(klass,name):
           value = klass[name]
         else:
@@ -417,6 +434,7 @@ class ArrayRenderer(AbstractRenderer):
   # Renderer to use for array elements, must be of the same type
   _renderer = None
 
+
   def render_search(self, value = None):
     if len(value)>0:
       renderer = self.rootklass.renderer(self.rootklass,self.name,value[0])
@@ -481,10 +499,13 @@ class CompositeRenderer(AbstractRenderer):
   def render_search(self, value = None):
     return ''
 
-  def __init__(self,klass,name,attr):
-    AbstractRenderer.__init__(self,klass,name)
+  def __init__(self,klass,name,attr,parent = ''):
+    AbstractRenderer.__init__(self,klass,name,parent)
     for obj  in attr:
-      srenderer = klass.renderer(klass,obj,attr[obj])
+      parentname = self.name
+      if parent:
+        parentname = parent+"."+self.name
+      srenderer = klass.renderer(klass,obj,attr[obj],parentname)
       self._renderers.append(srenderer)
   
 
@@ -564,10 +585,12 @@ class ReferenceRenderer(AbstractRenderer):
   _reference = None
   _renderer = None
 
-  def __init__(self,klass,name,attr):
-    AbstractRenderer.__init__(self,klass,name)
+  collection = None
+
+  def __init__(self,klass,name,attr,parent=''):
     self._reference = attr.__name__
-    self._renderer = TextRenderer(klass,name)
+    self._renderer = TextRenderer(klass,name,parent)
+    AbstractRenderer.__init__(self,klass,name,parent)
 
 
   def render(self,value = None, parents = []):
@@ -589,15 +612,22 @@ class ReferenceRenderer(AbstractRenderer):
 
     
   def unserialize(self,value):
-    return self._renderer.unserialize(value)
+    collection = DbConn.get_db(self._reference)
+    obj= collection.find_one({ "_id" : ObjectId(str(value)) })
+    logging.error("match obj "+str(obj)+" with id "+str(value))
+    if not obj:
+      return None
+    return obj
+
 
 
   def validate(self,attr):
-    return self._renderer.validate(attr)
+    return True
 
 
-  def bind(self,request,instance,name,parent = []):
-    return self._renderer.bind(request,instance,name,parent)
+  #def bind(self,request,instance,name,parent = []):
+  #  print "##### bind reference"
+  #  return self._renderer.bind(request,instance,name,parent)
 
 
 def _htmlTextField(id,name,value,error = False):
