@@ -1,6 +1,5 @@
 
 from datetime import datetime
-from ming import Field,schema
 import time
 import re
 import string
