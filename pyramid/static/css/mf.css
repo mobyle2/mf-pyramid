@@ -8,7 +8,24 @@ hr {
     background:     -ms-linear-gradient(left, hsla(0,0%,0%,0) 0%, hsla(0,0%,0%,.75) 50%, hsla(0,0%,0%,0) 100%);
     background:      -o-linear-gradient(left, hsla(0,0%,0%,0) 0%, hsla(0,0%,0%,.75) 50%, hsla(0,0%,0%,0) 100%);
     background:         linear-gradient(left, hsla(0,0%,0%,0) 0%, hsla(0,0%,0%,.75) 50%, hsla(0,0%,0%,0) 100%);
-}​
+}
+
+.mf-dbref {
+  min-width: 206px;
+  margin-left: 0px;
+  padding: 4px 6px;
+  line-height: 20px;
+  height: 20px;
+  font-size: 14px;
+  color: #555555;
+  border-radius: 4px 4px 4px 4px;
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0..75) inset;
+  display: inline-block;
+  margin-bottom: 0;
+  vertical-align: middle;
+}
 
 .mf-error {
   border-color: red  ! important;

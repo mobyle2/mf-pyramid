@@ -159,7 +159,7 @@
       var types = {};
       $.each(data, function(obj) {
         $.each(data[obj], function(key, val) {
-          if( (!jQuery.isPlainObject(val)) || val['$date']!=null) {
+          if( val!=null && ((!jQuery.isPlainObject(val)) || val['$date']!=null )) {
             var type = $('#'+curObject+'\\['+key+'\\]').attr('type');
             if ( $.inArray(key, keys) < 0) {
               keys.push(key)
@@ -229,6 +229,12 @@
        else if(val['$oid']!=null){
          $('#'+curObject+parent+'\\['+key+'\\]').val(val['$oid']);
        }
+       else if(val['_id']!=null && val['_id']['$oid']!=null){
+         // Db object reference
+         $('#'+curObject+parent+'\\['+key+'\\]').val(val['_id']['$oid']);
+         $('#DbRef'+curObject+parent+'\\['+key+'\\]').text(val['_id']['$oid']);
+         searchDbRef(curObject+parent+'\\['+key+'\\]');
+       }       
        else {
          var newparent = parent + '\\['+key+'\\]';
          json2form(val,newparent);
@@ -241,10 +247,16 @@
           
            clonediv = $('#Clone'+curObject+parent+'\\['+key+'\\]');
            clonediv.children().remove();
+
            $.each(val, function(elt) {
-             newelt = template.clone();
-             newelt.find('input').val(val[elt]);
+             newelt = template.clone(true,true);
+             oldid = newelt.find('input:not(.mf-dbref)').attr("id");
+             newelt.find('input:not(.mf-dbref)').attr("id",oldid+count);
+             newelt.find('.mf-dbref').attr("data-dbref",oldid+count);          
+             newelt.find('input:not(.mf-dbref)').val(val[elt]);
              clonediv.append(newelt);
+             searchDbRef(oldid+count);
+             count++;
            });
 
        }
@@ -265,6 +277,24 @@
    }
 
   /**
+  * Search the name of an object from its id and update object container.
+  * get id, search in database and update name in dbref container.
+  */
+  function searchDbRef(container){
+
+      id = $('#'+container).val();
+      obj = $('#DbRef'+container).attr("data-object");
+      if(obj==null) { return; }
+      route = '/'+obj.toLowerCase()+'s/'+id;
+      $.getJSON(route, function(data) {
+        if(data[obj.toLowerCase()]['name']!=null) {
+          $('#DbRef'+container).val(data[obj.toLowerCase()]['name']);
+        }
+      });
+  }
+
+
+  /**
   * Clear the form elements
   */
   function clear_form_elements(ele) {
@@ -272,6 +302,28 @@
     $("div").removeClass("error");
     $("#mf-flash").attr('class','');
     $("#mf-flash").text("");
+    $(ele).find(':input').each(function() {
+        switch(this.type) {
+            case 'password':
+            case 'select-multiple':
+            case 'select-one':
+            case 'text':
+            case 'textarea':
+            case 'hidden':
+                $(this).attr('class','');
+                $(this).val('');
+                break;
+            case 'checkbox':
+            case 'radio':
+                this.checked = false;
+        }
+    });
+  }
+
+  /**
+  * Clear the search form elements
+  */
+  function clear_search_form_elements(ele) {
     $(ele).find(':input').each(function() {
         switch(this.type) {
             case 'password':
@@ -289,5 +341,37 @@
     });
   }
 
+  /**
+  * Get object list and set objList with obj name/obj id
+  */
+  function getObjects(query,param,objname,process) {
+    autocompleteelt = param;
+    autocompleteelt = autocompleteelt.replace('[','\\[');
+    autocompleteelt = autocompleteelt.replace(']','\\]');
+    route = '/'+objname.toLowerCase()+'s/';
+    return $.ajax({type:"POST", data: 'Search'+objname+"[name]="+query, url: route,
+            success: function(msg){
+               if(msg["status"]==1) {
+                   $("#mf-flash").attr('class','alert alert-error');
+                   $("#mf-flash").text("An error occured with the search");
+               }
+               else {
+                   $("#mf-flash").attr('class','alert alert-success');
+                   objList = {};
+                   nameList = [];
+                   $.each(msg, function(obj) {
+                     objList[msg[obj]["name"]] = msg[obj]["_id"]["$oid"];
+                     nameList.push(msg[obj]["name"]);
+                   });
+               return process(nameList);
+               }
+            },
+            error: function(){
+                alert('An error occured during transaction');
+            }
+     });
+
+
+  }
 
 

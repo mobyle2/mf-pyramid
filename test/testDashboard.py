@@ -1,14 +1,18 @@
 import unittest
 import user
 from user import User
+import group
+from group import Group
 import mf.dashboard
 from mf.dashboard import Dashboard
 from mf.annotation import Annotation
 import pymongo
 from mongokit import Document, Connection
+from datetime import datetime
+import logging
 
 connection = Connection()
-connection.register([User])
+connection.register([User,Group])
 Dashboard.set_connection(connection)
 
 class TestDashboard(unittest.TestCase):
@@ -74,3 +78,15 @@ class TestDashboard(unittest.TestCase):
     assert(obj["name"] == "sample")
     assert(obj["email"] == "test@nomail.com")
 
+  def test_dbref(self):
+    Dashboard.add_dashboard([User,Group])
+    group = connection.Group()
+    group["name"] = "sampleGroup"
+    group["creation_date"] = datetime.utcnow()
+    group.save()
+    user = connection.User()
+    user["name"] = "sampleUser"
+    user["email"] = "test@nomail.com"
+    user["group"] = group
+    user.save()
+    assert(user["group"]["_id"] == group["_id"])

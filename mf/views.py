@@ -68,7 +68,7 @@ def mf_search(request):
         param = False
       if param is not None and param!='':
         if renderer and not isinstance(renderer,CompositeRenderer):
-          filter[field] = param
+          filter[field] = { "$regex" : param }
           if isinstance(renderer, IntegerRenderer):
             filter[field] = int(param)
           if isinstance(renderer, FloatRenderer):
@@ -79,6 +79,7 @@ def mf_search(request):
             else:
               filter[field] = False
     objlist = []
+    logging.debug("Search with "+str(filter))
     collection = Annotation.get_db(objklass.__name__).find(filter)
 
     for obj in collection:

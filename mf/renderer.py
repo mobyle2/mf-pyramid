@@ -213,7 +213,7 @@ class SearchFormRenderer(AbstractRenderer):
           logging.debug("Render "+name+" for class "+klass.__class__.__name__)
           renderer = klass.get_renderer(name)
           html += renderer.render_search(value)
-    html += '<div class="form-actions mf-actions"><button id="mf-search-'+klass.__class__.__name__+'" class="mf-btn btn btn-primary">Search</button></div>'
+    html += '<div class="form-actions mf-actions"><button id="mf-search-'+klass.__class__.__name__+'" class="mf-btn btn btn-primary">Search</button><button class="mf-btn btn btn-primary" id="mf-search-clear-'+klass.__class__.__name__+'">Clear form</button></div>'
     html += '</form>'
     return html
 
@@ -243,7 +243,7 @@ class FormRenderer(AbstractRenderer):
         else:
           value = getattr(klass,name)
         logging.debug("Render "+name+" for class "+klass.__class__.__name__)
-        html += klass.get_renderer(name).render(value)
+        html += klass.get_renderer(name).render(value,[])
     html += self.controls()
     html += '</form>'
     return html
@@ -556,31 +556,61 @@ class FloatRenderer(AbstractRenderer):
       raise Exception("value is not correct type")
 
 
-class ReferenceRenderer:
+class ReferenceRenderer(AbstractRenderer):
   '''
   Renderer for an object reference
   '''
 
+  _reference = None
+  _renderer = None
+
+  def __init__(self,klass,name,attr):
+    AbstractRenderer.__init__(self,klass,name)
+    self._reference = attr.__name__
+    self._renderer = TextRenderer(klass,name)
+
+
   def render(self,value = None, parents = []):
-    raise Exception("Not implemented")
+    parentname = ''
+    if parents:
+      for parent in parents:
+        parentname += '['+parent+']'
+    html = '<div class="mf-reference" id="Ref'+self.klass+parentname+'['+self.name+']'+'">'
+    html += _htmlAutoComplete(self.klass+parentname+'['+self.name+']',self.name,value,self._reference)
+    html += '</div>'
+    return html
+
 
   def render_search(self,value = None):
-    raise Exception("Not implemented")
+    html = '<div class="mf-reference" id="Ref'+self.klass+'['+self.name+']'+'">'
+    html += _htmlAutoComplete(self.klass+'['+self.name+']',self.name,'',self._reference)
+    html += '</div>'
+    return html
+
     
   def unserialize(self,value):
-    raise Exception("Not implemented")
+    return self._renderer.unserialize(value)
+
 
   def validate(self,attr):
-    raise Exception("Not implemented")
+    return self._renderer.validate(attr)
+
 
   def bind(self,request,instance,name,parent = []):
-    raise Exception("Not implemented")
+    return self._renderer.bind(request,instance,name,parent)
+
 
 def _htmlTextField(id,name,value,error = False):
   errorClass = ''
   if error:
     errorClass = 'error'
   return '<div class="mf-field mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="text" id="'+id+'" name="'+id+'"   value="'+(str(value or ''))+'"/></div></div>'
+
+def _htmlAutoComplete(id,name,value,klass,error = False):
+  errorClass = ''
+  if error:
+    errorClass = 'error'
+  return '<div class="mf-field mf-autocomplete control-group '+errorClass+'"><label class="control-label" for="DbRef'+id+'">'+name.title()+'</label><div class="controls"><input type="hidden" id="'+id+'" name="'+id+'"   value="'+(str(value or ''))+'"/><input type="text" data-object="'+klass+'" data-dbref="'+id+'" id="DbRef'+id+'" class="mf-dbref"></div></div>'
 
 def _htmlDateTime(id,name,value,error = False, type = 'datetime'):
   errorClass = ''

@@ -5,6 +5,7 @@ from pyramid.response import Response
 from pyramid.view import view_config
 import mf.views
 from mongokit import Document, Connection
+from group import Group
 
 def home(request):
     return Response('hello World')
@@ -19,16 +20,11 @@ class User(Document):
   __database__ = 'test'
 
   structure = { 'name': basestring, 'email': basestring, 'age': int, 'admin': bool,
-  'options' : { 'tags': basestring , 'categories': basestring }, 'creation_date' : datetime, 'today': basestring, 'array' : [basestring] 
+  'options' : { 'tags': basestring , 'categories': basestring }, 'creation_date' : datetime, 'today': basestring, 'array' : [basestring] , 'group' : Group
   }
-  #name = ''
-  #email = ''
-  #age = 0
-  #admin = False
-  #options = { 'tags': '' , 'categories': '' }
-  #creation_date = datetime.utcnow()
-  #today = date.today()
-  #array = [ 'one', 'two']
+
+  use_autorefs = True
+
 
   def html(self, fields = None):
     return self.render(fields)
@@ -57,6 +53,6 @@ if __name__ == "__main__":
   #request = [("User[array]","test1"), ("User[array]","test2"),  ("User[array]","test3")]
   #user.bind_form(request)
   #print user.metadata.fields
-  #print user.html()
+  print user.html()
   #print user.array
 

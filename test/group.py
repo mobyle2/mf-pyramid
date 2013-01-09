@@ -12,8 +12,5 @@ class Group(Document):
   __collection__ = 'groups'
   __database__ = 'test'
 
-  #_id = ''
-  #name = ''
-  #creation_date = datetime.utcnow()
   structure = { 'name' : basestring, 'creation_date' : datetime}
 

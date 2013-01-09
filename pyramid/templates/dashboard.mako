@@ -45,6 +45,14 @@
 
    var curObject;
 
+   var count=0;
+
+   var objList = {};
+
+   var autocompleteelt = null;
+
+$(document).ready(function() {
+
    $(".mf-list").hide();
    //$(".mf-object").hide();
    $(".accordion").hide();
@@ -61,16 +69,23 @@
      loadObjectList(object);
    });
 
-   $(".mf-list-object").live("click", function(event) {
+   $(document).on("click", ".mf-list-object", function(event) {
      object = $(event.target).parent().attr("id");
      loadObject(object);
    });
 
-   $('.mf-del').live("click", function(event) {
+
+   $(document).on("click", ".mf-del", function(event) {
     obj = $(this).attr('elt');
     arrayelts = $('#'+obj);
     if(arrayelts.size()==1) { alert("Cannot delete this element, list must contain at least one (possibly empty) parameter"); }
     else { $(this).parent().remove();}
+   });
+
+   $('.mf-dbref').typeahead({
+      source: function (query, process) { return getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dataset.object,process);},
+      updater: function (item) { $("#"+autocompleteelt).val(objList[item]);return item;},
+      minLength: 3 
    });
 
    $('.mf-add').click(function(event) {
@@ -78,14 +93,18 @@
 
     obj = obj.replace('[','\\[');
     obj = obj.replace(']','\\]');
+
     arrayelts = $('#Template'+obj);
     template = $(arrayelts[0]).children();
           
     clonediv = $('#Clone'+obj);
-    newelt = template.clone();
-    newelt.find('input').val('');
+    newelt = template.clone(true,true);
+    oldid = newelt.find('input:not(.mf-dbref)').attr("id");
+    newelt.find('input:not(.mf-dbref)').attr("id",oldid+count);
+    newelt.find('.mf-dbref').attr("data-dbref",oldid+count);
+    count++; 
+    newelt.find('input:not(.mf-dbref)').val('');
     clonediv.append(newelt);
-
 
    });
 
@@ -104,11 +123,14 @@
      if(event.target.id.indexOf("mf-search") == 0) {
        mfsearch("${prefix}");
      }
+     if(event.target.id.indexOf("mf-search-clear") == 0) {
+       clear_form_elements("#mf-search-form-"+curObject);
+     }
    });
 
    $(".mf-form").submit(function(event) {
      return false;
    });
 
-
+});
 </script>

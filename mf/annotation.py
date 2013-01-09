@@ -4,10 +4,11 @@ import logging
 import datetime
 from datetime import datetime,date,time
 import types
+import inspect
 
 
 #import renderer
-from renderer import SearchFormRenderer, FormRenderer,TextRenderer, BooleanRenderer, CompositeRenderer, ArrayRenderer, IntegerRenderer, FloatRenderer, HiddenRenderer, DateTimeRenderer
+from renderer import SearchFormRenderer, FormRenderer,TextRenderer, BooleanRenderer, CompositeRenderer, ArrayRenderer, IntegerRenderer, FloatRenderer, HiddenRenderer, DateTimeRenderer, ReferenceRenderer
 
 import logging
 
@@ -124,7 +125,7 @@ def renderer(klass,name,attr):
      elif isinstance(attr,dict):
          logging.debug(name+" is dict")
          return CompositeRenderer(klass,name,attr)
-     elif type(attr) is types.ClassType:
+     elif inspect.isclass(attr):
          logging.debug(name+" is dbref")
          return ReferenceRenderer(klass,name,attr)
      else:
