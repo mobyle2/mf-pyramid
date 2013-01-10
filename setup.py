@@ -8,6 +8,6 @@ setup(name='MongoForm',
       author='Olivier Sallou',
       author_email='olivier.sallou@irisa.fr',
       license='LGPL',
-      url='https://github.com/osallou/mf-pyramid'
+      url='https://github.com/osallou/mf-pyramid',
       py_modules=['mf'],
      )
