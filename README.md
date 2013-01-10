@@ -18,9 +18,11 @@ Copy the pyramid directory content in your pyramid application according to your
 
 LIMITATIONS: ArrayRenderer does not support arrays of objects, only arrays of basic types
 
-LICENSE: LGPL
+# LICENSE
 
-USAGE:
+LGPL
+
+# USAGE
 
 A sample pyramid application is available in pyramid directory, simply run app.sh
 
