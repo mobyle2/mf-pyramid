@@ -91,3 +91,21 @@ class TestDashboard(unittest.TestCase):
     user["group"] = group
     user.save()
     assert(user["group"]["_id"] == group["_id"])
+
+  def test_bind_with_dbref(self):
+    Dashboard.add_dashboard([User])
+    group = connection.Group()
+    group["name"] = "sampleGroup"
+    group["creation_date"] = datetime.utcnow()
+    group.save()
+    request = [("User[group]",str(group["_id"]))]
+    user = connection.User()
+    user["name"] = "sampleUser"
+    user["email"] = "test@nomail.com"
+    user.save()
+    user.bind_form(request)
+    user.save()
+    assert(user["group"]["_id"] == group["_id"])
+
+
+    
