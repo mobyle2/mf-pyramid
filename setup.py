@@ -2,11 +2,12 @@
 
 from distutils.core import setup
 
-setup(name='MingForm',
-      version='1.0',
-      description='Ming Form and Pyramid Administration Dashboard',
+setup(name='MongoForm',
+      version='0.1',
+      description='Mongo Form and Pyramid Administration Dashboard',
       author='Olivier Sallou',
       author_email='olivier.sallou@irisa.fr',
       license='LGPL',
+      url='https://github.com/osallou/mf-pyramid'
       py_modules=['mf'],
      )
