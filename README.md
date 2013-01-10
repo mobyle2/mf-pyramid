@@ -15,7 +15,6 @@ Copy the pyramid directory content in your pyramid application according to your
 # TODO
 
   see bugs/features in github
-  - finish mf_add to real add the object in mongo (call save)
 
 LIMITATIONS: ArrayRenderer does not support arrays of objects, only arrays of basic types
 

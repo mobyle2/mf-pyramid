@@ -226,7 +226,8 @@ def mf_add(request):
     if objklass is None:
       response = json.dumps({ 'status' : 1, 'error' : [], 'message' : 'Object does not exist' }, default=json_util.default)
       return Response(body = response,content_type = "application/json")
-    obj = objklass()
+    collection = DbConn.get_db(objklass.__name__)
+    obj = collection()
     err = obj.bind_form(request.params.items())
     status = 0
     if err:
