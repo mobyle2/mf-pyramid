@@ -2,12 +2,13 @@
 
 from distutils.core import setup
 
-setup(name='MongoForm',
+setup(name='mf',
       version='0.1.1',
-      description='MongoKit forms and Pyramid Administration Dashboard',
+      description='MongoKit forms generation and Pyramid Administration Dashboard',
       author='Olivier Sallou',
       author_email='olivier.sallou@irisa.fr',
       license='LGPL',
       url='https://github.com/osallou/mf-pyramid',
-      py_modules=['mf'],
+      packages=['mf'],
+      install_requires=["mongokit >= 0.8.2"]
      )

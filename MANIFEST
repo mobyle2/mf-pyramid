@@ -1,2 +1,9 @@
+README.md
 setup.py
+mf/__init__.py
+mf/annotation.py
+mf/dashboard.py
+mf/db_conn.py
+mf/renderer.py
+mf/views.py
 test/testDashboard.py
