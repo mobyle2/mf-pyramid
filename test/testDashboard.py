@@ -88,9 +88,9 @@ class TestDashboard(unittest.TestCase):
     user = connection.User()
     user["name"] = "sampleUser"
     user["email"] = "test@nomail.com"
-    user["group"] = group
+    user["groups"] = [ group ]
     user.save()
-    assert(user["group"]["_id"] == group["_id"])
+    assert(group["_id"] == user["groups"][0]["_id"])
 
   def test_bind_with_dbref(self):
     Dashboard.add_dashboard([User])
@@ -98,14 +98,14 @@ class TestDashboard(unittest.TestCase):
     group["name"] = "sampleGroup"
     group["creation_date"] = datetime.utcnow()
     group.save()
-    request = [("User[group]",str(group["_id"]))]
+    request = [("User[groups]",str(group["_id"]))]
     user = connection.User()
     user["name"] = "sampleUser"
     user["email"] = "test@nomail.com"
     user.save()
     user.bind_form(request)
     user.save()
-    assert(user["group"]["_id"] == group["_id"])
+    assert(group["_id"] == user["groups"][0]["_id"])
 
 
     
