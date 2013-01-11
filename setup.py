@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(name='MongoForm',
       version='0.1',
-      description='Mongo Form and Pyramid Administration Dashboard',
+      description='MongoKit forms and Pyramid Administration Dashboard',
       author='Olivier Sallou',
       author_email='olivier.sallou@irisa.fr',
       license='LGPL',
