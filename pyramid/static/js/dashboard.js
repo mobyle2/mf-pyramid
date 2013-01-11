@@ -250,10 +250,36 @@
 
            $.each(val, function(elt) {
              newelt = template.clone(true,true);
-             oldid = newelt.find('input:not(.mf-dbref)').attr("id");
-             newelt.find('input:not(.mf-dbref)').attr("id",oldid+count);
-             newelt.find('.mf-dbref').attr("data-dbref",oldid+count);          
-             newelt.find('input:not(.mf-dbref)').val(val[elt]);
+             
+            inputs = newelt.find('input:not(.mf-dbref)');
+            $.each(inputs, function(input) {
+              ielt = $(inputs[input])
+              oldid = ielt.attr("id");
+              ielt.attr("id",oldid+count);
+              ielt.attr("name",oldid+count);
+              if(jQuery.isPlainObject(val[elt])) {
+                 $.each(val[elt], function(key,value) {
+                   console.log('oldid: '+oldid);
+                   reg1=new RegExp(key,"g");
+                   console.log('match with key? '+key+", "+oldid.match(reg1));
+                   if(oldid.match(reg1)) {
+                     console.log('matched multi with '+val[elt][key]);
+                     ielt.val(val[elt][key]);
+                   }
+                 });
+              }
+              else {
+                ielt.val(val[elt]);
+              }
+              $('#DbRef'+oldid).attr("id",oldid+count);
+              $('#DbRef'+oldid).attr("name",oldid+count);
+            });
+             
+             
+             //oldid = newelt.find('input:not(.mf-dbref)').attr("id");
+             //newelt.find('input:not(.mf-dbref)').attr("id",oldid+count);
+             //newelt.find('.mf-dbref').attr("data-dbref",oldid+count);          
+             //newelt.find('input:not(.mf-dbref)').val(val[elt]);
              clonediv.append(newelt);
              searchDbRef(oldid+count);
              count++;

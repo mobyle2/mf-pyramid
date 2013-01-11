@@ -99,11 +99,21 @@ $(document).ready(function() {
           
     clonediv = $('#Clone'+obj);
     newelt = template.clone(true,true);
-    oldid = newelt.find('input:not(.mf-dbref)').attr("id");
-    newelt.find('input:not(.mf-dbref)').attr("id",oldid+count);
-    newelt.find('.mf-dbref').attr("data-dbref",oldid+count);
+    inputs = newelt.find('input:not(.mf-dbref)');
+    $.each(inputs, function(input) {
+        elt = $(inputs[input])
+        oldid = elt.attr("id");
+        elt.attr("id",oldid+count);
+        elt.attr("name",oldid+count);
+        elt.val();
+        $('#DbRef'+oldid).attr("id",oldid+count);
+        $('#DbRef'+oldid).attr("name",oldid+count);
+    });
+    //oldid = newelt.find('input:not(.mf-dbref)').attr("id");
+    //newelt.find('input:not(.mf-dbref)').attr("id",oldid+count);
+    //newelt.find('.mf-dbref').attr("data-dbref",oldid+count);
     count++; 
-    newelt.find('input:not(.mf-dbref)').val('');
+    //newelt.find('input:not(.mf-dbref)').val('');
     clonediv.append(newelt);
 
    });

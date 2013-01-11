@@ -108,4 +108,13 @@ class TestDashboard(unittest.TestCase):
     assert(group["_id"] == user["groups"][0]["_id"])
 
 
+  def test_bind_multi_array(self):
+    Dashboard.add_dashboard([User])
+    request = [("User[multi][name]","name2"),("User[multi][role]","role1"),("User[multi][name]","name1"),("User[multi][role]","role2")]
+    user = User()
+    user.bind_form(sorted(request))
+    print str(user)
+    assert(len(user["multi"]) == 2)      
+    assert(user["multi"][0]["role"] == "role1")
+
     

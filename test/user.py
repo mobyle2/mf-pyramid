@@ -20,7 +20,8 @@ class User(Document):
   __database__ = 'test'
 
   structure = { 'name': basestring, 'email': basestring, 'age': int, 'admin': bool,
-  'options' : { 'tags': basestring , 'categories': basestring }, 'creation_date' : datetime, 'today': basestring, 'array' : [basestring] , 'groups' : [ Group ]
+  'options' : { 'tags': basestring , 'categories': basestring }, 'creation_date' : datetime, 'today': basestring, 'array' : [basestring] , 'groups' : [ Group ],
+  'multi' : [ { 'name' : basestring, 'role' : basestring } ]
   }
 
   use_autorefs = True

@@ -51,6 +51,7 @@ hr {
   border-width: 1px;
   padding: 5px;
   display: inline-block;
+  margin-top: 10px;
 }
 
 .mf-array {

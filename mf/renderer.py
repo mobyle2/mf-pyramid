@@ -6,6 +6,7 @@ import string
 import logging
 from db_conn import DbConn
 from bson.objectid import ObjectId
+import re
 
 #logging.basicConfig(level=logging.DEBUG)
 
@@ -21,6 +22,8 @@ class AbstractRenderer:
   is_object_id = False
 
   render_fields = dict()
+  
+  bind_only_one = False
 
   def controls(self):
     '''Return buttons for the form
@@ -34,6 +37,11 @@ class AbstractRenderer:
     self.rootklass = klass
     self.klass = klass.__name__
     self.err = False
+    
+    self.bind_only_one = False
+    self.count = 0
+    self.reset = False
+    
     fieldname = name
     if parent:
       fieldname = parent+"."+name
@@ -106,7 +114,8 @@ class AbstractRenderer:
       param = self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]",True)
       if str(param) != '':
         paramlist.append(param)
-
+      if self.bind_only_one and str(param) != '':
+        break;
     #if not paramlist:
     #  return []
     value = []
@@ -124,9 +133,11 @@ class AbstractRenderer:
       return [error]
 
     # Unckecked boxes are not set, e.g. no value available. Default to False.
-    if not value and isinstance(self,BooleanRenderer):
-      value = [False]
-      
+    if not value:
+      if isinstance(self,BooleanRenderer):
+        value = [False]
+      else:
+        return None
     
     if value:
       if parent:
@@ -150,14 +161,24 @@ class AbstractRenderer:
             if hasattr(obj,name):
               setattr(obj,name,value)
             else:
-              obj[name]=value
+              # An array that contains Composite objects, fill only one element
+              if self.bind_only_one:
+                if self.reset :
+                  del obj[:]
+                  #obj = []
+                  self.reset = False
+                if len(obj)>self.count:
+                  obj[self.count][name] = value[0]
+                else:
+                  obj.append({ name : value[0] })
+              else:
+                obj[name]=value
           else:
             if value:
               if hasattr(obj,name):
                 setattr(obj,name,value[0])
               else:
-                obj[name]=value[0]
-        
+                obj[name]=value[0] 
       else:
         instanceobj = None
         if hasattr(instance,name):
@@ -188,10 +209,12 @@ class AbstractRenderer:
     :type name: str
     :return: str - Value from the form
     '''
-
     for index in range(len(request)):
       key,value = request[index]
-      if key == name:
+      rname = name.replace('[','\[')
+      rname = rname.replace(']','\]')
+      if re.compile(rname+'(\[\d+\])?').search(key):
+      #if key == name:
         if delete:
           request.pop(index)
         return str(value)
@@ -213,7 +236,6 @@ class SearchFormRenderer(AbstractRenderer):
     :return: str HTML form
     '''
     html='<form class="mf-form form-horizontal" id="mf-search-form-'+klass.__class__.__name__+'">'
-
     for name in fields:
         # First level fields only
         if name is None or "." in name:
@@ -248,6 +270,7 @@ class FormRenderer(AbstractRenderer):
     :return: str HTML form
     '''
     html='<form class="mf-form form-horizontal" id="mf-form-'+klass.__class__.__name__+'">'
+
     if "_id" not in fields:
       logging.debug("Add default _id")
       html += HiddenRenderer(klass.__class__,"_id").render('')
@@ -460,7 +483,7 @@ class ArrayRenderer(AbstractRenderer):
   '''Renderer for lists of renderers
   '''
   # Renderer to use for array elements, must be of the same type
-  _renderer = None
+  #_renderer = None
 
 
   def render_search(self, value = None):
@@ -506,10 +529,12 @@ class ArrayRenderer(AbstractRenderer):
     return html
 
   def bind(self,request,instance,name,parent = []):
-
     self.err = False
     errs = []
-    err = self._renderer.bind(request,instance,self._renderer.name,parent)
+    if isinstance(self._renderer,CompositeRenderer):
+      err = self._renderer.bind_all(request,instance,self._renderer.name,parent)
+    else:
+      err = self._renderer.bind(request,instance,self._renderer.name,parent)
     if err:
         errs.extend(err)
     return errs
@@ -521,14 +546,12 @@ class CompositeRenderer(AbstractRenderer):
   '''Renderer for compisite inputs (objects within objects)
   '''
 
-
-  _renderers = []
-
   def render_search(self, value = None):
     return ''
 
   def __init__(self,klass,name,attr,parent = ''):
     AbstractRenderer.__init__(self,klass,name,parent)
+    self._renderers = []
     for obj  in attr:
       parentname = self.name
       if parent:
@@ -579,7 +602,53 @@ class CompositeRenderer(AbstractRenderer):
         obj = getattr(instance,name)
       else:
         obj = instance[name]
+      if self.bind_only_one:
+        renderer.bind_only_one = True
       err = renderer.bind(request,instance,renderer.name,parent)
+      if err:
+        errs.extend(err)
+    return errs
+
+
+  def bind_all(self,request,instance,name,parent = []):
+    '''
+    In case of array containing Composite, one need to extract each composite one by one
+    '''
+    self.err = False
+    parent.extend([name])
+    errs = []
+    fieldname = ''
+    if parent:
+      for p in parent:
+        fieldname += p+"."
+    
+    #for renderer in self._renderers:
+    reset = True
+    for field in self._renderers:
+      renderer = self.rootklass().get_renderer(fieldname+field)
+      if reset:
+        renderer.reset = True
+        reset = False
+      else:
+        renderer.reset = False
+        
+      if hasattr(instance,name):
+        obj = getattr(instance,name)
+      else:
+        obj = instance[name]
+        
+      renderer.bind_only_one = True
+      
+      try:
+        err = []
+        
+        while err is not None:
+          err = renderer.bind(request,instance,renderer.name,parent)
+          renderer.count += 1
+      except Exception:
+        logging.debug('no more element to match')
+      renderer.count = 0
+      renderer.bind_only_one = False
       if err:
         errs.extend(err)
     return errs
@@ -623,9 +692,6 @@ class ReferenceRenderer(AbstractRenderer):
   Renderer for an object reference
   '''
 
-  _reference = None
-  _renderer = None
-
   collection = None
 
   def __init__(self,klass,name,attr,parent=''):
@@ -667,7 +733,7 @@ class ReferenceRenderer(AbstractRenderer):
 
 
   #def bind(self,request,instance,name,parent = []):
-  #  print "##### bind reference"
+  #  print "##### reference"
   #  return self._renderer.bind(request,instance,name,parent)
 
 

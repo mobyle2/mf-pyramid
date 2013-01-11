@@ -172,7 +172,7 @@ def mf_edit(request):
     status = 0
     obj= collection.find_one(filter)
     if obj:
-      err = obj.bind_form(request.params.items())
+      err = obj.bind_form(sorted(request.params.items()))
     else:
       status = 1
     if err:
@@ -228,7 +228,7 @@ def mf_add(request):
       return Response(body = response,content_type = "application/json")
     collection = DbConn.get_db(objklass.__name__)
     obj = collection()
-    err = obj.bind_form(request.params.items())
+    err = obj.bind_form(sorted(request.params.items()))
     status = 0
     if err:
       status = 1
