@@ -259,11 +259,8 @@
               ielt.attr("name",oldid+count);
               if(jQuery.isPlainObject(val[elt])) {
                  $.each(val[elt], function(key,value) {
-                   console.log('oldid: '+oldid);
                    reg1=new RegExp(key,"g");
-                   console.log('match with key? '+key+", "+oldid.match(reg1));
                    if(oldid.match(reg1)) {
-                     console.log('matched multi with '+val[elt][key]);
                      ielt.val(val[elt][key]);
                    }
                  });
@@ -271,8 +268,11 @@
               else {
                 ielt.val(val[elt]);
               }
-              $('#DbRef'+oldid).attr("id",oldid+count);
-              $('#DbRef'+oldid).attr("name",oldid+count);
+              newdbref = newelt.find("#DbRef"+dbrefobj);
+              newdbref.attr("data-dbref",oldid+count);
+        	  newdbref.attr("id",oldid+count);
+              //$('#DbRef'+oldid).attr("data-dbref",oldid+count);
+              //$('#DbRef'+oldid).attr("id",oldid+count);
             });
              
              

@@ -87,6 +87,13 @@ $(document).ready(function() {
       updater: function (item) { $("#"+autocompleteelt).val(objList[item]);return item;},
       minLength: 3 
    });
+/*
+   $(document).on("typeahead",".mf-dbref", function(){
+      source: function (query, process) { return getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dataset.object,process);},
+      updater: function (item) { $("#"+autocompleteelt).val(objList[item]);return item;},
+      minLength: 3 
+   });
+*/
 
    $('.mf-add').click(function(event) {
     var obj = $(this).attr('elt');
@@ -106,8 +113,11 @@ $(document).ready(function() {
         elt.attr("id",oldid+count);
         elt.attr("name",oldid+count);
         elt.val();
-        $('#DbRef'+oldid).attr("id",oldid+count);
-        $('#DbRef'+oldid).attr("name",oldid+count);
+        dbrefobj = oldid.replace(/\[/g,'\\[');
+    	dbrefobj = dbrefobj.replace(/\]/g,'\\]');
+    	newdbref = newelt.find("#DbRef"+dbrefobj);
+        newdbref.attr("data-dbref",oldid+count);
+        newdbref.attr("id",oldid+count);
     });
     //oldid = newelt.find('input:not(.mf-dbref)').attr("id");
     //newelt.find('input:not(.mf-dbref)').attr("id",oldid+count);
