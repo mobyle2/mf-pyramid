@@ -336,7 +336,8 @@
             case 'text':
             case 'textarea':
             case 'hidden':
-                $(this).attr('class','');
+                //$(this).attr('class','');
+                $(this).removeClass("error");
                 $(this).val('');
                 break;
             case 'checkbox':
