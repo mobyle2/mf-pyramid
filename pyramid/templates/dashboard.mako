@@ -87,13 +87,7 @@ $(document).ready(function() {
       updater: function (item) { $("#"+autocompleteelt).val(objList[item]);return item;},
       minLength: 3 
    });
-/*
-   $(document).on("typeahead",".mf-dbref", function(){
-      source: function (query, process) { return getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dataset.object,process);},
-      updater: function (item) { $("#"+autocompleteelt).val(objList[item]);return item;},
-      minLength: 3 
-   });
-*/
+
 
    $('.mf-add').click(function(event) {
     var obj = $(this).attr('elt');
@@ -125,6 +119,12 @@ $(document).ready(function() {
     count++; 
     //newelt.find('input:not(.mf-dbref)').val('');
     clonediv.append(newelt);
+    console.log( newelt.find('.mf-dbref'));
+    newelt.find('.mf-dbref').typeahead({
+          source: function (query, process) { return getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dataset.object,process);},
+          updater: function (item) { $("#"+autocompleteelt).val(objList[item]);return item;},
+         minLength: 3 
+        });
 
    });
 

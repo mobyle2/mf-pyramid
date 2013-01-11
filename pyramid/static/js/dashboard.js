@@ -281,6 +281,11 @@
              //newelt.find('.mf-dbref').attr("data-dbref",oldid+count);          
              //newelt.find('input:not(.mf-dbref)').val(val[elt]);
              clonediv.append(newelt);
+             newelt.find('.mf-dbref').typeahead({
+                source: function (query, process) { return getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dataset.object,process);},
+                updater: function (item) { $("#"+autocompleteelt).val(objList[item]);return item;},
+                minLength: 3 
+        	  });
              searchDbRef(oldid+count);
              count++;
            });
