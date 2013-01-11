@@ -76,7 +76,7 @@ $(document).ready(function() {
 
 
    $(document).on("click", ".mf-del", function(event) {
-    obj = $(this).attr('elt');
+    var obj = $(this).attr('elt');
     arrayelts = $('#'+obj);
     if(arrayelts.size()==1) { alert("Cannot delete this element, list must contain at least one (possibly empty) parameter"); }
     else { $(this).parent().remove();}
@@ -89,7 +89,7 @@ $(document).ready(function() {
    });
 
    $('.mf-add').click(function(event) {
-    obj = $(this).attr('elt');
+    var obj = $(this).attr('elt');
 
     obj = obj.replace('[','\\[');
     obj = obj.replace(']','\\]');

@@ -283,7 +283,8 @@
   function searchDbRef(container){
 
       id = $('#'+container).val();
-      obj = $('#DbRef'+container).attr("data-object");
+      var obj = $('#DbRef'+container).attr("data-object");
+      alert(obj);
       if(obj==null) { return; }
       route = '/'+obj.toLowerCase()+'s/'+id;
       $.getJSON(route, function(data) {

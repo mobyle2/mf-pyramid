@@ -506,16 +506,22 @@ class CompositeRenderer(AbstractRenderer):
       if parent:
         parentname = parent+"."+self.name
       srenderer = klass.renderer(klass,obj,attr[obj],parentname)
-      self._renderers.append(srenderer)
+      #self._renderers.append(srenderer)
+      self._renderers.append(obj)
   
 
   def render(self,value = None, parents = []):
     parentname = ''
+    fieldname = ''
     if parents:
       for parent in parents:
         parentname += '['+parent+']'
+        fieldname += parent+"."
+    fieldname += self.name
     html = '<div class="mf-composite" id="'+self.klass+parentname+'['+self.name+']'+'"><span class="mf-composite-label">'+self.name+'</span>'
-    for renderer in self._renderers:
+    #for renderer in self._renderers:
+    for field in self._renderers:
+      renderer = self.rootklass().get_renderer(fieldname+"."+field)
       obj = None
       if isinstance(value,dict):
         obj = value[renderer.name]
@@ -533,7 +539,14 @@ class CompositeRenderer(AbstractRenderer):
     self.err = False
     parent.extend([name])
     errs = []
-    for renderer in self._renderers:
+    fieldname = ''
+    if parent:
+      for p in parent:
+        fieldname += p+"."
+
+    #for renderer in self._renderers:
+    for field in self._renderers:
+      renderer = self.rootklass().get_renderer(fieldname+field)
       if hasattr(instance,name):
         obj = getattr(instance,name)
       else:
@@ -614,7 +627,7 @@ class ReferenceRenderer(AbstractRenderer):
   def unserialize(self,value):
     collection = DbConn.get_db(self._reference)
     obj= collection.find_one({ "_id" : ObjectId(str(value)) })
-    logging.error("match obj "+str(obj)+" with id "+str(value))
+    logging.debug("match obj "+str(obj)+" with id "+str(value))
     if not obj:
       return None
     return obj

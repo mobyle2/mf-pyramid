@@ -119,7 +119,7 @@ def render(self,fields = None):
     """
     if not fields:
       fields = sorted(self.__class__.render_fields)
-    logging.error(self.__class__.render_fields)
+    logging.debug(self.__class__.render_fields)
     form = FormRenderer(self.__class__,None)
     return form.render(self,fields)
 
@@ -142,6 +142,13 @@ def get_renderer(self,name):
     Gets the renderer for an object attribute
     """
     return self.__class__.render_fields[name]
+
+def set_renderer(self,name,renderer):
+    """
+    Sets the renderer for an object attribute
+    """
+    self.__class__.render_fields[name] = renderer
+
 
 def bind_form(self,request):
     """
@@ -188,6 +195,8 @@ def mf_decorator(klass):
       setattr(klass, "render_search", render_search)
     setattr(klass, "renderer", renderer)
     setattr(klass, "get_renderer", get_renderer)
+    setattr(klass, "set_renderer", set_renderer)
+
     attributes = dir(klass)
     if Annotation.use_schema_variable() is not None:
       schema_variable =  getattr(klass,Annotation.use_schema_variable())
