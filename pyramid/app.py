@@ -86,6 +86,9 @@ if __name__ == '__main__':
 
     Dashboard.add_dashboard([User,Group],config)
 
+    renderer = mf.renderer.TextChoiceRenderer(User,'email','')
+    renderer.limit([ 'nomail', 'othermail@mail.fr', 'sample@nomail' ])
+
     app = config.make_wsgi_app()
     server = make_server('0.0.0.0', 6789, app)
     server.serve_forever()

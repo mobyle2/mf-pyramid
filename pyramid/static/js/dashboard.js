@@ -284,7 +284,6 @@
 
       id = $('#'+container).val();
       var obj = $('#DbRef'+container).attr("data-object");
-      alert(obj);
       if(obj==null) { return; }
       route = '/'+obj.toLowerCase()+'s/'+id;
       $.getJSON(route, function(data) {

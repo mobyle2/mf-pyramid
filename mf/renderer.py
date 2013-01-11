@@ -292,6 +292,34 @@ class TextRenderer(AbstractRenderer):
     else:
       raise Exception("value is not correct type")
 
+class TextChoiceRenderer(TextRenderer):
+  ''' Text renderer with dropdown list of choice
+  '''
+  choices = None
+
+  def limit(self,choice_list=None):
+    '''Set the values for this list
+    
+    :param choice_list: List of values to display in form
+    :type choice_list: list
+    '''
+    if choice_list:
+      self.choices = choice_list
+
+  def validate(self,value):
+    return value in self.choices
+
+  def render_search(self, value = None):
+    return _htmlChoiceTextField('Search'+self.klass+'['+self.name+']',self.name,'',self.choices)    
+
+  def render(self,value = None, parents = []):
+    parentname = ''
+    if value is None:
+      value = ''
+    if parents:
+      for parent in parents:
+        parentname += '['+parent+']'
+    return _htmlChoiceTextField(self.klass+parentname+'['+self.name+']',self.name,value,self.choices,self.err)  
 
 class BooleanRenderer(AbstractRenderer):
   '''Renderer for booleans
@@ -642,6 +670,20 @@ class ReferenceRenderer(AbstractRenderer):
   #  print "##### bind reference"
   #  return self._renderer.bind(request,instance,name,parent)
 
+
+def _htmlChoiceTextField(id,name,value,choice_list,error = False):
+  errorClass = ''
+  if error:
+    errorClass = 'error'
+  html = '<div class="mf-field mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><select id="'+id+'" name="'+id+'">'
+  for choice in choice_list:
+    if choice == value:
+      selected = 'selected'
+    else:
+      selected = ''
+    html += '<option value="'+choice+'"  '+selected+'>'+choice+'</option>'
+  html += '</select></div></div>'
+  return html
 
 def _htmlTextField(id,name,value,error = False):
   errorClass = ''
