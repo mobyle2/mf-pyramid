@@ -39,11 +39,11 @@ For dashboard, to add User and Group, insert in Pyramid init :
 
 Warning: this should be added after your routes declaration because it inserts generic routes to match objets:
 
-/users/ (GET/PUT)
-/users/id (POST,DELETE)
-/groups/
-/groups/id
-...
+    /users/ (GET/PUT)
+    /users/id (POST,DELETE)
+    /groups/
+    /groups/id
+    ...
 
 Minimal expected interface is:(as in mongokit)
 save()
