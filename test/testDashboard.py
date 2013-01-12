@@ -110,7 +110,7 @@ class TestDashboard(unittest.TestCase):
 
   def test_bind_multi_array(self):
     Dashboard.add_dashboard([User])
-    request = [("User[multi][name]","name2"),("User[multi][role]","role1"),("User[multi][name]","name1"),("User[multi][role]","role2")]
+    request = [("User[multi][name][1]","name2"),("User[multi][role][0]","role1"),("User[multi][name][0]","name1"),("User[multi][role][1]","role2")]
     user = User()
     user.bind_form(sorted(request))
     print str(user)

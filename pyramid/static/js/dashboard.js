@@ -297,15 +297,15 @@
             $.each(inputs, function(input) {
               ielt = $(inputs[input])
               oldid = ielt.attr("id");
-              ielt.attr("id",oldid+count);
-              ielt.attr("name",oldid+count);
+              ielt.attr("id",oldid+'['+count+']');
+              ielt.attr("name",oldid+'['+count+']');
               if(jQuery.isPlainObject(val[elt])) {
                  $.each(val[elt], function(key,value) {
                    reg1=new RegExp(key,"g");
                    if(oldid.match(reg1)) {
                      if(jQuery.isPlainObject(val[elt][key])) {
                        // Object, not simple type
-                       objref= oldid+count;
+                       objref= oldid+'['+count+']';
                        objref = objref.replace(/\[/g,'\\[');
                        objref = objref.replace(/\]/g,'\\]');
                        // May need to search through different elements, but elements are not yet set in document
@@ -324,8 +324,8 @@
               dbrefobj = oldid.replace(/\[/g,'\\[');
     		  dbrefobj = dbrefobj.replace(/\]/g,'\\]');
               newdbref = newelt.find("#DbRef"+dbrefobj);
-              newdbref.attr("data-dbref",oldid+count);
-        	  newdbref.attr("id","DbRef"+oldid+count);
+              newdbref.attr("data-dbref",oldid+'['+count+']');
+        	  newdbref.attr("id","DbRef"+oldid+'['+count+']');
               //$('#DbRef'+oldid).attr("data-dbref",oldid+count);
               //$('#DbRef'+oldid).attr("id",oldid+count);
             });
