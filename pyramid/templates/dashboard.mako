@@ -82,6 +82,7 @@ $(document).ready(function() {
     else { $(this).parent().remove();}
    });
 
+
    $('.mf-dbref').typeahead({
       source: function (query, process) { return getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dataset.object,process);},
       updater: function (item) { $("#"+autocompleteelt).val(objList[item]);return item;},
@@ -89,17 +90,28 @@ $(document).ready(function() {
    });
 
 
+/*
+   $('body').typeahead({
+      selector: '[.mfdbref]',
+      source: function (query, process) { return getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dataset.object,process);},
+      updater: function (item) { $("#"+autocompleteelt).val(objList[item]);return item;},
+      minLength: 3 
+   });
+*/
+   
+
+
    $('.mf-add').click(function(event) {
     var obj = $(this).attr('elt');
 
-    obj = obj.replace('[','\\[');
-    obj = obj.replace(']','\\]');
+    obj = obj.replace(/\[/g,'\\[');
+    obj = obj.replace(/\]/g,'\\]');
 
     arrayelts = $('#Template'+obj);
     template = $(arrayelts[0]).children();
           
     clonediv = $('#Clone'+obj);
-    newelt = template.clone(true,true);
+    newelt = template.clone();
     inputs = newelt.find('input:not(.mf-dbref)');
     $.each(inputs, function(input) {
         elt = $(inputs[input])
@@ -111,7 +123,7 @@ $(document).ready(function() {
     	dbrefobj = dbrefobj.replace(/\]/g,'\\]');
     	newdbref = newelt.find("#DbRef"+dbrefobj);
         newdbref.attr("data-dbref",oldid+count);
-        newdbref.attr("id",oldid+count);
+        newdbref.attr("id","DbRef"+oldid+count);
     });
     //oldid = newelt.find('input:not(.mf-dbref)').attr("id");
     //newelt.find('input:not(.mf-dbref)').attr("id",oldid+count);
@@ -119,13 +131,13 @@ $(document).ready(function() {
     count++; 
     //newelt.find('input:not(.mf-dbref)').val('');
     clonediv.append(newelt);
-    console.log( newelt.find('.mf-dbref'));
+    
     newelt.find('.mf-dbref').typeahead({
           source: function (query, process) { return getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dataset.object,process);},
           updater: function (item) { $("#"+autocompleteelt).val(objList[item]);return item;},
          minLength: 3 
         });
-
+   
    });
 
    $('.mf-btn').click(function(event) {

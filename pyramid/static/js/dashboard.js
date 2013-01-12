@@ -200,6 +200,44 @@
       $("#list-"+curObject).show();
    }
 
+   /**
+   * Set value from object type
+   */
+   function setSpecificObjectValue(elt, val) {
+       if(val['$date']!=null){
+         var objdate = new Date(val['$date']);
+         //var objdatestr = objdate.toString()
+         var month = objdate.getMonth()+1;
+         if (month<10) { month = '0'+month; }
+         var day = objdate.getDate();
+         if (day<10) { day = '0'+day; }
+         var hours = objdate.getHours();
+         if (hours<10) { hours = '0'+hours; }
+         var minutes = objdate.getMinutes();
+         if (minutes<10) { minutes = '0'+minutes; }
+         var seconds = objdate.getSeconds();
+         if (seconds<10) { seconds = '0'+seconds; }
+         var objdatestr = objdate.getFullYear()+'/'+month+'/'+day+' '+hours+':'+minutes+':'+seconds
+         var type = $('#'+elt).attr('type');
+         if (type == 'date') { objdatestr = objdate.toDateString(); }
+         if (type == 'time') { objdatestr = objdate.toTimeString(); }
+         $('#'+elt).val(objdatestr);
+       }
+       else if(val['$oid']!=null){
+         $('#'+elt).val(val['$oid']);
+       }
+       else if(val['_id']!=null && val['_id']['$oid']!=null){
+         // Db object reference
+         $('#'+elt).val(val['_id']['$oid']);
+         $('#DbRef'+elt).text(val['_id']['$oid']);
+         searchDbRef(elt);
+       }     
+       else {
+         // Not a specific type
+         return false;
+       }
+       return true;
+   }
 
    /**
    * Map a json result to a form
@@ -207,6 +245,8 @@
    function json2form(data,parent) {
      $.each(data, function(key, val) {
      if(jQuery.isPlainObject(val)) {
+       if( ! setSpecificObjectValue(curObject+parent+'\\['+key+'\\]',val)) {
+       /*
        if(val['$date']!=null){
          var objdate = new Date(val['$date']);
          //var objdatestr = objdate.toString()
@@ -236,6 +276,7 @@
          searchDbRef(curObject+parent+'\\['+key+'\\]');
        }       
        else {
+       */
          var newparent = parent + '\\['+key+'\\]';
          json2form(val,newparent);
        }
@@ -249,9 +290,10 @@
            clonediv.children().remove();
 
            $.each(val, function(elt) {
-             newelt = template.clone(true,true);
+             newelt = template.clone();
              
             inputs = newelt.find('input:not(.mf-dbref)');
+            objlist = {};
             $.each(inputs, function(input) {
               ielt = $(inputs[input])
               oldid = ielt.attr("id");
@@ -261,16 +303,29 @@
                  $.each(val[elt], function(key,value) {
                    reg1=new RegExp(key,"g");
                    if(oldid.match(reg1)) {
-                     ielt.val(val[elt][key]);
+                     if(jQuery.isPlainObject(val[elt][key])) {
+                       // Object, not simple type
+                       objref= oldid+count;
+                       objref = objref.replace(/\[/g,'\\[');
+                       objref = objref.replace(/\]/g,'\\]');
+                       // May need to search through different elements, but elements are not yet set in document
+                       // Store key/values in a list and apply them when template is put in document
+                       objlist[objref] = val[elt][key];
+                     }
+                     else {
+                       ielt.val(val[elt][key]);
+                     }
                    }
                  });
               }
               else {
                 ielt.val(val[elt]);
               }
+              dbrefobj = oldid.replace(/\[/g,'\\[');
+    		  dbrefobj = dbrefobj.replace(/\]/g,'\\]');
               newdbref = newelt.find("#DbRef"+dbrefobj);
               newdbref.attr("data-dbref",oldid+count);
-        	  newdbref.attr("id",oldid+count);
+        	  newdbref.attr("id","DbRef"+oldid+count);
               //$('#DbRef'+oldid).attr("data-dbref",oldid+count);
               //$('#DbRef'+oldid).attr("id",oldid+count);
             });
@@ -281,12 +336,16 @@
              //newelt.find('.mf-dbref').attr("data-dbref",oldid+count);          
              //newelt.find('input:not(.mf-dbref)').val(val[elt]);
              clonediv.append(newelt);
+             $.each(objlist, function(key,value) {
+               setSpecificObjectValue(key,value);
+             });
+             objlist = {}
              newelt.find('.mf-dbref').typeahead({
                 source: function (query, process) { return getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dataset.object,process);},
                 updater: function (item) { $("#"+autocompleteelt).val(objList[item]);return item;},
                 minLength: 3 
         	  });
-             searchDbRef(oldid+count);
+             //searchDbRef(oldid+count);
              count++;
            });
 
@@ -378,8 +437,10 @@
   */
   function getObjects(query,param,objname,process) {
     autocompleteelt = param;
-    autocompleteelt = autocompleteelt.replace('[','\\[');
-    autocompleteelt = autocompleteelt.replace(']','\\]');
+
+    autocompleteelt = autocompleteelt.replace(/\[/g,'\\[');
+    autocompleteelt = autocompleteelt.replace(/\]/g,'\\]');
+
     route = '/'+objname.toLowerCase()+'s/';
     return $.ajax({type:"POST", data: 'Search'+objname+"[name]="+query, url: route,
             success: function(msg){
