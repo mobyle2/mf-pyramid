@@ -770,7 +770,7 @@ def _htmlDateTime(id,name,value,error = False, type = 'datetime'):
   return '<div class="mf-field mf-datetime control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="'+type+'" id="'+id+'" name="'+id+'"   value="'+(str(value or ''))+'"/></div></div>'
 
 def _htmlHidden(id,name,value):
-  return '<div class="mf-field mf-textfield control-group"><div class="controls"><input type="hidden" id="'+id+'" name="'+id+'"   value="'+(str(value or ''))+'"/></div></div>'
+  return '<div class="mf-field mf-textfield control-group"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="text" id="'+id+'" name="'+id+'"   value="'+(str(value or ''))+'"  disabled/></div></div>'
 
 def _htmlCheckBox(id,name,value,error = False):
   errorClass = ''
