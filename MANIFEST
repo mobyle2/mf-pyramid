@@ -6,4 +6,5 @@ mf/dashboard.py
 mf/db_conn.py
 mf/renderer.py
 mf/views.py
+test/test.py
 test/testDashboard.py
