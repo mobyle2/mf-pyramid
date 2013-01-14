@@ -231,7 +231,11 @@
          $('#'+elt).val(val['_id']['$oid']);
          $('#DbRef'+elt).text(val['_id']['$oid']);
          searchDbRef(elt);
-       }     
+       }
+       else if($('#'+elt).attr('data-type') == 'dbref') {
+             // SimpleReferenceRenderer
+                  searchDbRef(elt);
+       }    
        else {
          // Not a specific type
          return false;
@@ -319,7 +323,12 @@
                  });
               }
               else {
-                ielt.val(val[elt]);
+                 ielt.val(val[elt]);
+                 // If it is a SimpleRenderer, then value is a string, but has dbref
+                 // Postpone elements are above case with isPlainObject
+                 if(ielt.attr('data-type') == 'dbref' && ielt.val()!=null && ielt.val()!='') {
+                     objlist[oldid+'['+count+']'] = val[elt];
+                 }
               }
               dbrefobj = oldid.replace(/\[/g,'\\[');
     		  dbrefobj = dbrefobj.replace(/\]/g,'\\]');
@@ -351,13 +360,17 @@
 
        }
        else {
-         $('#'+curObject+parent+'\\['+key+'\\]').val(val);
-         if($('#'+curObject+parent+'\\['+key+'\\]').attr('type')=='checkbox')  {
+         elt = $('#'+curObject+parent+'\\['+key+'\\]');
+         elt.val(val);
+         if(elt.attr('data-type') == 'dbref' && elt.val()!=null && elt.val()!='') {
+           searchDbRef(curObject+parent+'\\['+key+'\\]');
+         }
+         if(elt.attr('type')=='checkbox')  {
            if(val == 'true' || val == 'True' || val == 1) {
-             $('#'+curObject+parent+'\\['+key+'\\]').attr('checked', true);
+             elt.attr('checked', true);
            }
            else {
-             $('#'+curObject+parent+'\\['+key+'\\]').attr('checked', false);
+             elt.attr('checked', false);
            }
          }
        }

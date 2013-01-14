@@ -21,7 +21,7 @@ class User(Document):
 
   structure = { 'name': basestring, 'email': basestring, 'age': int, 'admin': bool,
   'options' : { 'tags': basestring , 'categories': basestring }, 'creation_date' : datetime, 'today': basestring, 'array' : [basestring] , 'group' : Group,
-  'multi' : [ { 'name' : Group, 'role' : basestring } ]
+  'multi' : [ { 'name' : Group, 'role' : basestring } ], 'groupid' : str
   }
 
   use_autorefs = True

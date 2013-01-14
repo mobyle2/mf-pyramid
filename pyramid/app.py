@@ -89,6 +89,8 @@ if __name__ == '__main__':
     renderer = mf.renderer.TextChoiceRenderer(User,'email','')
     renderer.limit([ 'nomail', 'othermail@mail.fr', 'sample@nomail' ])
 
+    groupid_renderer = mf.renderer.SimpleReferenceRenderer(User,'groupid',Group)
+
     app = config.make_wsgi_app()
     server = make_server('0.0.0.0', 6789, app)
     server.serve_forever()

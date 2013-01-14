@@ -686,7 +686,6 @@ class FloatRenderer(AbstractRenderer):
     else:
       raise Exception("value is not correct type")
 
-
 class ReferenceRenderer(AbstractRenderer):
   '''
   Renderer for an object reference
@@ -736,6 +735,19 @@ class ReferenceRenderer(AbstractRenderer):
   #  print "##### reference"
   #  return self._renderer.bind(request,instance,name,parent)
 
+class SimpleReferenceRenderer(ReferenceRenderer):
+  '''
+  Renderer for on object reference but using object ids (str) instead
+   of DbRef
+  '''
+  def unserialize(self,value):
+    # Check that object exists
+    collection = DbConn.get_db(self._reference)
+    obj= collection.find_one({ "_id" : ObjectId(str(value)) })
+    logging.debug("match obj "+str(obj)+" with id "+str(value))
+    if not obj:
+      return None
+    return str(value)
 
 def _htmlChoiceTextField(id,name,value,choice_list,error = False):
   errorClass = ''
@@ -761,7 +773,7 @@ def _htmlAutoComplete(id,name,value,klass,error = False):
   errorClass = ''
   if error:
     errorClass = 'error'
-  return '<div class="mf-field mf-autocomplete control-group '+errorClass+'"><label class="control-label" for="DbRef'+id+'">'+name.title()+'</label><div class="controls"><input type="hidden" id="'+id+'" name="'+id+'"   value="'+(str(value or ''))+'"/><input type="text" data-object="'+klass+'" data-dbref="'+id+'" id="DbRef'+id+'" class="mf-dbref"></div></div>'
+  return '<div class="mf-field mf-autocomplete control-group '+errorClass+'"><label class="control-label" for="DbRef'+id+'">'+name.title()+'</label><div class="controls"><input data-type="dbref" type="hidden" id="'+id+'" name="'+id+'"   value="'+(str(value or ''))+'"/><input type="text" data-object="'+klass+'" data-dbref="'+id+'" id="DbRef'+id+'" class="mf-dbref"></div></div>'
 
 def _htmlDateTime(id,name,value,error = False, type = 'datetime'):
   errorClass = ''
