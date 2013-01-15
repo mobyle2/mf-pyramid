@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# MingForm documentation build configuration file, created by
+# mf-pyramid documentation build configuration file, created by
 # sphinx-quickstart on Mon Dec 17 18:27:36 2012.
 #
 # This file is execfile()d with the current directory set to its containing dir.

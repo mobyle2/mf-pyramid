@@ -1,9 +1,9 @@
-.. MingForm documentation master file, created by
+.. mf-pyramid documentation master file, created by
    sphinx-quickstart on Mon Dec 17 18:27:36 2012.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to MingForm's documentation!
+Welcome to mf-pyramid's documentation!
 ====================================
 
 Contents:
@@ -22,6 +22,16 @@ Contents:
    :special-members:
 
 .. automodule:: mf.dashboard
+   :members:
+   :private-members:
+   :special-members:
+
+.. automodule:: mf.views
+   :members:
+   :private-members:
+   :special-members:
+
+.. automodule:: mf.db_conn
    :members:
    :private-members:
    :special-members:
