@@ -52,7 +52,7 @@ class TestDashboard(unittest.TestCase):
 
   def test_bind_user_array(self):
     Dashboard.add_dashboard([User])
-    request = [("User[array]","test1"), ("User[array]","test2"),  ("User[array]","test3")]
+    request = [("User[array][0]","test1"), ("User[array][1]","test2"),  ("User[array][3]","test3")]
     user = User()
     user.bind_form(request)
     assert(len(user["array"]) == 3)
@@ -98,7 +98,7 @@ class TestDashboard(unittest.TestCase):
     group["name"] = "sampleGroup"
     group["creation_date"] = datetime.utcnow()
     group.save()
-    request = [("User[groups]",str(group["_id"]))]
+    request = [("User[groups][0]",str(group["_id"]))]
     user = connection.User()
     user["name"] = "sampleUser"
     user["email"] = "test@nomail.com"
