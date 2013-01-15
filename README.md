@@ -16,7 +16,12 @@ Copy the pyramid directory content in your pyramid application according to your
 
   see bugs/features in github
 
-LIMITATIONS: ArrayRenderer does not support arrays of complex objects, only arrays of basic types or dicts (but not arrays of arrays)
+# LIMITATIONS:
+
+ArrayRenderer does not support arrays of complex objects, only arrays of basic types or dicts (but not arrays of arrays)
+Collection name for objects must match object class name with lowercase and a 's'. Example:
+class User -> users
+class Group -> groups
 
 # LICENSE
 
