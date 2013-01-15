@@ -2,12 +2,13 @@ from pyramid.view import view_config
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden
 from mf.annotation import Annotation
-from mf.renderer import FormRenderer, CompositeRenderer, FloatRenderer, IntegerRenderer, BooleanRenderer
+from mf.renderer import FormRenderer, CompositeRenderer, FloatRenderer, IntegerRenderer, BooleanRenderer, ReferenceRenderer
 import logging
 
 import json
 from bson import json_util
 from bson.objectid import ObjectId
+from bson.dbref import DBRef
 
 from mf.db_conn import DbConn
 
@@ -70,18 +71,22 @@ def mf_search(request):
         param = False
       if param is not None and param!='':
         if renderer and not isinstance(renderer,CompositeRenderer):
-          filter[field] = { "$regex" : param }
-          if isinstance(renderer, IntegerRenderer):
+
+          if isinstance(renderer, ReferenceRenderer):
+            filter[field+'.$id'] =  ObjectId(param)
+          elif isinstance(renderer, IntegerRenderer):
             filter[field] = int(param)
-          if isinstance(renderer, FloatRenderer):
+          elif isinstance(renderer, FloatRenderer):
             filter[field] = float(param)
-          if isinstance(renderer, BooleanRenderer):
+          elif isinstance(renderer, BooleanRenderer):
             if param in ['True', '1']:
               filter[field] = True
             else:
               filter[field] = False
+          else:
+              filter[field] = { "$regex" : param }
+    logging.error("search "+str(filter))
     objlist = []
-    logging.debug("Search with "+str(filter))
     collection = DbConn.get_db(objklass.__name__).find(filter)
 
     for obj in collection:

@@ -91,7 +91,7 @@
                   });
 
                  $("#mf-flash").attr('class','alert alert-error');
-                 $("#mf-flash").text(curObject+" could not be saved");
+                 $("#mf-flash").text(curObject+" could not be saved: "+msg["error"]);
                }
                else {
                  clear_form_elements("#show-"+curObject);
@@ -333,8 +333,13 @@
               dbrefobj = oldid.replace(/\[/g,'\\[');
     		  dbrefobj = dbrefobj.replace(/\]/g,'\\]');
               newdbref = newelt.find("#DbRef"+dbrefobj);
+              if(newdbref!=null) { 
               newdbref.attr("data-dbref",oldid+'['+count+']');
         	  newdbref.attr("id","DbRef"+oldid+'['+count+']');
+        	  newdbrefclear = newelt.find("#DbRefClear"+dbrefobj);
+              newdbrefclear.attr("data-dbref",oldid+'['+count+']');
+              newdbrefclear.attr("id","DbRefClear"+oldid+'['+count+']');
+              }
               //$('#DbRef'+oldid).attr("data-dbref",oldid+count);
               //$('#DbRef'+oldid).attr("id",oldid+count);
             });
@@ -413,13 +418,24 @@
             case 'text':
             case 'textarea':
             case 'hidden':
+            case 'date':
+            case 'time':
+            case 'datetime':
                 //$(this).attr('class','');
                 $(this).removeClass("error");
+                $(this).removeClass("mf-error");
                 $(this).val('');
                 break;
             case 'checkbox':
             case 'radio':
+                $(this).removeClass("error");
+                $(this).removeClass("mf-error");
                 this.checked = false;
+                break;
+            case 'number':
+                $(this).removeClass("error");
+                $(this).removeClass("mf-error");
+                $(this).val('0');
         }
     });
   }
@@ -435,12 +451,18 @@
             case 'select-one':
             case 'text':
             case 'textarea':
+            case 'date':
+            case 'time':
+            case 'datetime':
                 $(this).attr('class','');
                 $(this).val('');
                 break;
             case 'checkbox':
             case 'radio':
                 this.checked = false;
+                break;
+            case 'number':
+                $(this).val('');
         }
     });
   }

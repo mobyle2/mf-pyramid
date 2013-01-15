@@ -41,6 +41,7 @@ class AbstractRenderer:
     self.bind_only_one = False
     self.count = 0
     self.reset = False
+    self.in_array = False
     
     fieldname = name
     if parent:
@@ -83,6 +84,29 @@ class AbstractRenderer:
     '''
     raise Exception("Not implemented")
 
+  def getObject(self,obj,parent):
+    ''' Get attribute element from object according to its parent
+    
+    :param obj: Object instance
+    :param type: object
+    :param parent: list of parent attributes
+    :type parent: list
+    :return: object attribute
+    '''
+    for p in parent:
+      if isinstance(obj,dict):
+        if p in obj:
+          obj = obj[p]
+        else:
+          obj[p] = {}
+          obj = obj[p]
+      else:
+        if hasattr(obj,p):
+          obj = getattr(obj,p)
+        else:
+          obj = obj[p]
+    return obj
+
   def bind(self,request,instance,name,parent = []):
     '''Bind a request form parameter to the
      object instance attribute
@@ -101,18 +125,18 @@ class AbstractRenderer:
     if parent is not None:
       for p in parent:
         parentname += "["+p+"]"
-    #if not request.has_key(instance.__class__.__name__+parentname+"["+name+"]"):
-    #   return []
+
     paramlist = []
-    #paramvalue = self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]",True)
-    #if paramvalue is None or paramvalue == '':
-    #  return []
+
     # Search for array items
     logging.debug("## bind "+instance.__class__.__name__+parentname+"["+name+"]"+" with "+str(self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]")))
     while self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]") is not None:
       
       param = self.get_param(request,instance.__class__.__name__+parentname+"["+name+"]",True)
-      if str(param) != '':
+      #paramlist.append(param)
+      if not self.in_array:
+        paramlist.append(param)
+      elif self.in_array and str(param) != '':
         paramlist.append(param)
       if self.bind_only_one and str(param) != '':
         break;
@@ -132,6 +156,7 @@ class AbstractRenderer:
       error+= name
       return [error]
 
+
     # Unckecked boxes are not set, e.g. no value available. Default to False.
     if not value:
       if isinstance(self,BooleanRenderer):
@@ -141,19 +166,7 @@ class AbstractRenderer:
     
     if value:
       if parent:
-        obj = instance
-        for p in parent:
-          if isinstance(obj,dict):
-            if p in obj:
-              obj = obj[p]
-            else:
-              obj[p] = {}
-              obj = obj[p]
-          else:
-            if hasattr(obj,p):
-              obj = getattr(obj,p)
-            else:
-              obj = obj[p]
+        obj = self.getObject(instance,parent)
         if isinstance(obj,dict) and value:
           obj[name]=value[0]
         else:
@@ -165,7 +178,6 @@ class AbstractRenderer:
               if self.bind_only_one:
                 if self.reset :
                   del obj[:]
-                  #obj = []
                   self.reset = False
                 if len(obj)>self.count:
                   obj[self.count][name] = value[0]
@@ -213,7 +225,10 @@ class AbstractRenderer:
       key,value = request[index]
       rname = name.replace('[','\[')
       rname = rname.replace(']','\]')
-      if re.compile(rname+'(\[\d+\])?').search(key):
+      array_regexp = ''
+      if self.in_array:
+        array_regexp = '\[\d+\]'
+      if re.compile(rname+array_regexp+'$').search(key):
       #if key == name:
         if delete:
           request.pop(index)
@@ -531,6 +546,14 @@ class ArrayRenderer(AbstractRenderer):
   def bind(self,request,instance,name,parent = []):
     self.err = False
     errs = []
+    self._renderer.in_array = True
+    # Clear array
+    if parent:
+      curarray = list(parent).extend(name)
+    else:
+      curarray = [name]
+    array = self.getObject(instance,curarray)
+    del array[:]
     if isinstance(self._renderer,CompositeRenderer):
       err = self._renderer.bind_all(request,instance,self._renderer.name,parent)
     else:
@@ -598,6 +621,8 @@ class CompositeRenderer(AbstractRenderer):
     #for renderer in self._renderers:
     for field in self._renderers:
       renderer = self.rootklass().get_renderer(fieldname+field)
+      if self.in_array:
+        renderer.in_array = True
       if hasattr(instance,name):
         obj = getattr(instance,name)
       else:
@@ -626,6 +651,8 @@ class CompositeRenderer(AbstractRenderer):
     reset = True
     for field in self._renderers:
       renderer = self.rootklass().get_renderer(fieldname+field)
+      if self.in_array:
+        renderer.in_array = True
       if reset:
         renderer.reset = True
         reset = False
@@ -712,12 +739,14 @@ class ReferenceRenderer(AbstractRenderer):
 
   def render_search(self,value = None):
     html = '<div class="mf-reference" id="Ref'+self.klass+'['+self.name+']'+'">'
-    html += _htmlAutoComplete(self.klass+'['+self.name+']',self.name,'',self._reference)
+    html += _htmlAutoComplete('Search'+self.klass+'['+self.name+']',self.name,'',self._reference)
     html += '</div>'
     return html
 
     
   def unserialize(self,value):
+    if(str(value)==''):
+      return None
     collection = DbConn.get_db(self._reference)
     obj= collection.find_one({ "_id" : ObjectId(str(value)) })
     logging.debug("match obj "+str(obj)+" with id "+str(value))
@@ -741,7 +770,9 @@ class SimpleReferenceRenderer(ReferenceRenderer):
    of DbRef
   '''
   def unserialize(self,value):
-    # Check that object exists
+    # Check that object exists or empty string
+    if(str(value)==''):
+      return ''
     collection = DbConn.get_db(self._reference)
     obj= collection.find_one({ "_id" : ObjectId(str(value)) })
     logging.debug("match obj "+str(obj)+" with id "+str(value))
@@ -773,7 +804,7 @@ def _htmlAutoComplete(id,name,value,klass,error = False):
   errorClass = ''
   if error:
     errorClass = 'error'
-  return '<div class="mf-field mf-autocomplete control-group '+errorClass+'"><label class="control-label" for="DbRef'+id+'">'+name.title()+'</label><div class="controls"><input data-type="dbref" type="hidden" id="'+id+'" name="'+id+'"   value="'+(str(value or ''))+'"/><input type="text" data-object="'+klass+'" data-dbref="'+id+'" id="DbRef'+id+'" class="mf-dbref"></div></div>'
+  return '<div class="mf-field mf-autocomplete control-group '+errorClass+'"><label class="control-label" for="DbRef'+id+'">'+name.title()+'</label><div class="controls"><input data-type="dbref" type="hidden" id="'+id+'" name="'+id+'"   value="'+(str(value or ''))+'"/><input type="text" data-object="'+klass+'" data-dbref="'+id+'" id="DbRef'+id+'" class="mf-dbref"><i data-dbref="'+id+'" id="DbRefClear'+id+'" class="mf-clear-object icon-trash"></i></div></div>'
 
 def _htmlDateTime(id,name,value,error = False, type = 'datetime'):
   errorClass = ''

@@ -25,7 +25,6 @@ if __name__ == '__main__':
     config.add_view(home, route_name='home')
     mgconnection = MongoClient()
     db = mgconnection.test
-    #Dashboard.set_connection(db)
 
     # Clear database
     db.drop_collection('users')

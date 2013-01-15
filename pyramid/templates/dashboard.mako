@@ -9,6 +9,12 @@
   % endfor
 </ul>
 <div id="mf-flash" class="mf-flash"></div>
+
+<div id="dashboard" class="mf-dashboard mf-list">
+
+
+</div>
+
 % for object in objects:
 <div id="list-${object}" class="mf-list">
   <table class="mf-table table table-hover" id="table-${object}">
@@ -66,7 +72,16 @@ $(document).ready(function() {
      }
      object = event.target.id;
      curObject = object
-     loadObjectList(object);
+     if(object=="dashboard") {
+       $(".mf-list").hide();
+       $(".accordion").hide();
+       $(".mf-search").hide();
+       $("#dashboard").show();
+    $("#accordion"+curObject).show();
+     }
+     else {
+       loadObjectList(object);
+     }
    });
 
    $(document).on("click", ".mf-list-object", function(event) {
@@ -74,6 +89,13 @@ $(document).ready(function() {
      loadObject(object);
    });
 
+   $(document).on("click", ".mf-clear-object", function(event) {
+     object = $(this).attr("data-dbref");
+     object = object.replace(/\[/g,'\\[');
+     object = object.replace(/\]/g,'\\]');
+     $('#'+object).val('');
+     $('#DbRef'+object).val('');     
+   });
 
    $(document).on("click", ".mf-del", function(event) {
     var obj = $(this).attr('elt');
@@ -116,14 +138,19 @@ $(document).ready(function() {
     $.each(inputs, function(input) {
         elt = $(inputs[input])
         oldid = elt.attr("id");
-        elt.attr("id",oldid+count);
-        elt.attr("name",oldid+count);
+        elt.attr("id",oldid+'['+count+']');
+        elt.attr("name",oldid+'['+count+']');
         elt.val();
         dbrefobj = oldid.replace(/\[/g,'\\[');
     	dbrefobj = dbrefobj.replace(/\]/g,'\\]');
     	newdbref = newelt.find("#DbRef"+dbrefobj);
-        newdbref.attr("data-dbref",oldid+count);
-        newdbref.attr("id","DbRef"+oldid+count);
+        if(newdbref!=null) {
+        newdbref.attr("data-dbref",oldid+'['+count+']');
+        newdbref.attr("id","DbRef"+oldid+'['+count+']');
+        newdbrefclear = newelt.find("#DbRefClear"+dbrefobj);
+        newdbrefclear.attr("data-dbref",oldid+'['+count+']');
+        newdbrefclear.attr("id","DbRef"+oldid+'['+count+']');
+        }
     });
     //oldid = newelt.find('input:not(.mf-dbref)').attr("id");
     //newelt.find('input:not(.mf-dbref)').attr("id",oldid+count);

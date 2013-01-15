@@ -172,7 +172,7 @@ def bind_form(self,request):
         else:
           #if self.__class__.__name__+"["+name+"]" in request:
           logging.debug("Search "+self.__class__.__name__+"["+name+"] in "+str(request))
-          if renderer.get_param(request,self.__class__.__name__+"["+name+"]") or isinstance(renderer,BooleanRenderer):
+          if renderer.get_param(request,self.__class__.__name__+"["+name+"]") is not None or isinstance(renderer,BooleanRenderer):
             err = renderer.bind(request,self,name,[])
             if err is not None:
               self.__field_errors.extend(err)       
