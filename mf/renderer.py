@@ -566,7 +566,7 @@ class ArrayRenderer(AbstractRenderer):
     raise Exception("not yet implemented")
 
 class CompositeRenderer(AbstractRenderer):
-  '''Renderer for compisite inputs (objects within objects)
+  '''Renderer for composite inputs (objects within objects, dicts)
   '''
 
   def render_search(self, value = None):
