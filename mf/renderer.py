@@ -24,6 +24,25 @@ class AbstractRenderer:
   render_fields = dict()
   
   bind_only_one = False
+  
+  def add_extra_control(self,extra):
+    '''Adds an additional button next to the element
+    
+    :param extra: HTML for the button
+    :type extra: str
+    '''
+    self.extra_controls.append(extra)
+  
+  def get_extra_controls(self):
+    ''' Get the HTML for the extra control elements (buttons)
+    '''
+    if not self.extra_controls:
+      return ''
+    html = '<div class="form-actions mf-extra-actions control-group">'
+    for extra in self.extra_controls:
+      html += extra
+    html += '</div>'
+    return html
 
   def controls(self):
     '''Return buttons for the form
@@ -42,6 +61,8 @@ class AbstractRenderer:
     self.count = 0
     self.reset = False
     self.in_array = False
+    
+    self.extra_controls = []
     
     fieldname = name
     if parent:
@@ -300,6 +321,7 @@ class FormRenderer(AbstractRenderer):
         logging.debug("Render "+name+" for class "+klass.__class__.__name__)
         html += klass.get_renderer(name).render(value,[])
     html += self.controls()
+    html += self.get_extra_controls()
     html += '</form>'
     return html
 
@@ -318,7 +340,7 @@ class TextRenderer(AbstractRenderer):
     if parents:
       for parent in parents:
         parentname += '['+parent+']'
-    return _htmlTextField(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
+    return _htmlTextField(self.klass+parentname+'['+self.name+']',self.name,value,self.err) + self.get_extra_controls()
 
 
   def validate(self,value):
@@ -357,7 +379,7 @@ class TextChoiceRenderer(TextRenderer):
     if parents:
       for parent in parents:
         parentname += '['+parent+']'
-    return _htmlChoiceTextField(self.klass+parentname+'['+self.name+']',self.name,value,self.choices,self.err)  
+    return _htmlChoiceTextField(self.klass+parentname+'['+self.name+']',self.name,value,self.choices,self.err) + self.get_extra_controls()  
 
 class BooleanRenderer(AbstractRenderer):
   '''Renderer for booleans
@@ -374,7 +396,7 @@ class BooleanRenderer(AbstractRenderer):
       for parent in parents:
         parentname += '['+parent+']'
      html = _htmlCheckBox(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
-     return html
+     return html + self.get_extra_controls()
 
   def validate(self,value):
     if isinstance(value,bool):
@@ -421,7 +443,7 @@ class IntegerRenderer(AbstractRenderer):
     if parents:
       for parent in parents:
         parentname += '['+parent+']'
-    return _htmlNumber(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
+    return _htmlNumber(self.klass+parentname+'['+self.name+']',self.name,value,self.err) + self.get_extra_controls()
 
   def validate(self,value):
     intvalue = 0
@@ -451,7 +473,7 @@ class HiddenRenderer(TextRenderer):
     if parents:
       for parent in parents:
         parentname += '['+parent+']'
-    return _htmlHidden(self.klass+parentname+'['+self.name+']',self.name,value)
+    return _htmlHidden(self.klass+parentname+'['+self.name+']',self.name,value) + self.get_extra_controls()
 
 
 class DateTimeRenderer(AbstractRenderer):
@@ -477,7 +499,7 @@ class DateTimeRenderer(AbstractRenderer):
         strvalue = value.strftime("%d/%m/%Y")
       elif self.type == 'time':
         strvalue = value.strftime('%H:%M:%s')
-    return _htmlDateTime(self.klass+parentname+'['+self.name+']',self.name,strvalue,self.err, self.type)
+    return _htmlDateTime(self.klass+parentname+'['+self.name+']',self.name,strvalue,self.err, self.type) + self.get_extra_controls()
 
   def render_search(self, value = None):
     return _htmlDateTime('Search'+self.klass+'['+self.name+']',self.name,'','',self.type) 
@@ -541,7 +563,7 @@ class ArrayRenderer(AbstractRenderer):
     html += '</div>'
     html += '<button elt="'+elt+'" class="mf-add mf-btn btn btn-primary">Add</button>'
     html += '</div>'
-    return html
+    return html + self.get_extra_controls()
 
   def bind(self,request,instance,name,parent = []):
     self.err = False
@@ -607,7 +629,7 @@ class CompositeRenderer(AbstractRenderer):
         newparent = [self.name]
       html += renderer.render(obj,newparent)
     html += '</div>'
-    return html
+    return html + self.get_extra_controls()
 
   def bind(self,request,instance,name,parent = []):
     self.err = False
@@ -694,7 +716,7 @@ class FloatRenderer(AbstractRenderer):
     if parents:
       for parent in parents:
         parentname += '['+parent+']'
-    return _htmlNumber(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
+    return _htmlNumber(self.klass+parentname+'['+self.name+']',self.name,value,self.err) + self.get_extra_controls()
 
   def render_search(self, value = None):
     return _htmlNumber('Search'+self.klass+'['+self.name+']',self.name,'') 
@@ -734,7 +756,7 @@ class ReferenceRenderer(AbstractRenderer):
     html = '<div class="mf-reference" id="Ref'+self.klass+parentname+'['+self.name+']'+'">'
     html += _htmlAutoComplete(self.klass+parentname+'['+self.name+']',self.name,value,self._reference)
     html += '</div>'
-    return html
+    return html + self.get_extra_controls()
 
 
   def render_search(self,value = None):

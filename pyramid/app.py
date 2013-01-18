@@ -87,6 +87,7 @@ if __name__ == '__main__':
 
     renderer = mf.renderer.TextChoiceRenderer(User,'email','')
     renderer.limit([ 'nomail', 'othermail@mail.fr', 'sample@nomail' ])
+    renderer.add_extra_control('<button class="btn btn-info">Fake button</button>')
 
     groupid_renderer = mf.renderer.SimpleReferenceRenderer(User,'groupid',Group)
 
