@@ -2,7 +2,7 @@
 
 <ul class="nav nav-tabs">
   <li class="active">
-    <a href="#" id="dashboard">Dashboard</a>
+    <a href="#" id="dashboard" class="dashboard-item">Dashboard</a>
   </li>
   % for object in objects:
   <li><a href="#" class="dashboard-item" id="${object}">${object}s</a></li>
