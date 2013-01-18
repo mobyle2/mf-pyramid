@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='mf',
-      version='0.1.6',
+      version='0.1.7',
       description='MongoKit forms generation and Pyramid Administration Dashboard',
       author='Olivier Sallou',
       author_email='olivier.sallou@irisa.fr',
