@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="/static/css/mf.css">
   <script src="/static/js/jquery-1.8.3.min.js"></script>
   <script src="/static/js/date.format.js"></script>
-  <script src="/static/js/dashboard.js"></script>
+  <script src="/static/js/mf.js"></script>
 </head>
 
 <body>
