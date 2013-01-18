@@ -8,18 +8,19 @@ class Dashboard:
   ''' Manage administration dashboard for pyramid
   '''
 
-  dconfig = { 'permission' : None }
+  dconfig = { 'permission' : None, 'templates' : '' }
 
 
   @staticmethod
-  def set_config(dconfig):
+  def set_config(config):
     '''Global config for dashboard.
      - permission: Pyramid permission for /admin views, no permission by default
+     - templates: path to Mako dashboard template, default is Dashboard.mako
 
     :param config: configuration dictionary
     :type config: dict
     '''
-    Dashboard.config = dconfig
+    Dashboard.dconfig = config
 
 
   @staticmethod
@@ -63,8 +64,11 @@ class Dashboard:
       config.add_view(mf_edit, route_name='mf_object', renderer='json', request_method='POST')
       config.add_view(mf_delete, route_name='mf_object', renderer='json', request_method='DELETE')
       config.add_view(mf_add, route_name='mf_objects', renderer='json', request_method='PUT')
+      templates = Dashboard.dconfig['templates']
+      if not templates:
+        templates = 'dashboard.mako'
       if Dashboard.dconfig['permission'] is not None:
-        config.add_view(mf_admin, route_name='mf_admin', renderer='dashboard.mako', permission = Dashboard.dconfig['permission'])
+        config.add_view(mf_admin, route_name='mf_admin', renderer=templates, permission = Dashboard.dconfig['permission'])
       else:
-        config.add_view(mf_admin, route_name='mf_admin', renderer='dashboard.mako')
+        config.add_view(mf_admin, route_name='mf_admin', renderer=templates)
 
