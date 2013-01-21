@@ -179,10 +179,10 @@ $(document).ready(function() {
        mfdelete("${prefix}");
        clear_form_elements("#show-"+curObject);
      }
-     if(event.target.id.indexOf("mf-search") == 0) {
+     if(event.target.id.indexOf("mf-search-"+curObject) == 0) {
        mfsearch("${prefix}");
      }
-     if(event.target.id.indexOf("mf-search-clear") == 0) {
+     if(event.target.id.indexOf("mf-search-clear-"+curObject) == 0) {
        clear_form_elements("#mf-search-form-"+curObject);
      }
    });

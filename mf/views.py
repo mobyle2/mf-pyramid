@@ -67,8 +67,8 @@ def mf_search(request):
         # This is fine
         param = None
       renderer = objklass().get_renderer(field)
-      if isinstance(renderer,BooleanRenderer) and param is None:
-        param = False
+      #if isinstance(renderer,BooleanRenderer) and param is None:
+      #  param = False
       if param is not None and param!='':
         if renderer and not isinstance(renderer,CompositeRenderer):
 
@@ -79,13 +79,13 @@ def mf_search(request):
           elif isinstance(renderer, FloatRenderer):
             filter[field] = float(param)
           elif isinstance(renderer, BooleanRenderer):
-            if param in ['True', '1']:
+            if param in ['True', 'true', '1']:
               filter[field] = True
             else:
               filter[field] = False
           else:
               filter[field] = { "$regex" : param }
-    logging.error("search "+str(filter))
+    logging.debug("search "+str(filter))
     objlist = []
     collection = DbConn.get_db(objklass.__name__).find(filter)
 

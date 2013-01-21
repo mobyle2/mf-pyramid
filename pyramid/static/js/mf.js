@@ -250,37 +250,6 @@
      $.each(data, function(key, val) {
      if(jQuery.isPlainObject(val)) {
        if( ! setSpecificObjectValue(curObject+parent+'\\['+key+'\\]',val)) {
-       /*
-       if(val['$date']!=null){
-         var objdate = new Date(val['$date']);
-         //var objdatestr = objdate.toString()
-         var month = objdate.getMonth()+1;
-         if (month<10) { month = '0'+month; }
-         var day = objdate.getDate();
-         if (day<10) { day = '0'+day; }
-         var hours = objdate.getHours();
-         if (hours<10) { hours = '0'+hours; }
-         var minutes = objdate.getMinutes();
-         if (minutes<10) { minutes = '0'+minutes; }
-         var seconds = objdate.getSeconds();
-         if (seconds<10) { seconds = '0'+seconds; }
-         var objdatestr = objdate.getFullYear()+'/'+month+'/'+day+' '+hours+':'+minutes+':'+seconds
-         var type = $('#'+curObject+parent+'\\['+key+'\\]').attr('type');
-         if (type == 'date') { objdatestr = objdate.toDateString(); }
-         if (type == 'time') { objdatestr = objdate.toTimeString(); }
-         $('#'+curObject+parent+'\\['+key+'\\]').val(objdatestr);
-       }
-       else if(val['$oid']!=null){
-         $('#'+curObject+parent+'\\['+key+'\\]').val(val['$oid']);
-       }
-       else if(val['_id']!=null && val['_id']['$oid']!=null){
-         // Db object reference
-         $('#'+curObject+parent+'\\['+key+'\\]').val(val['_id']['$oid']);
-         $('#DbRef'+curObject+parent+'\\['+key+'\\]').text(val['_id']['$oid']);
-         searchDbRef(curObject+parent+'\\['+key+'\\]');
-       }       
-       else {
-       */
          var newparent = parent + '\\['+key+'\\]';
          json2form(val,newparent);
        }
@@ -318,6 +287,9 @@
                      }
                      else {
                        ielt.val(val[elt][key]);
+                       if(ielt.attr('data-type') == 'choice') {
+           			       ielt.val(val[elt][key].toString());
+         			   }
                      }
                    }
                  });
@@ -367,6 +339,10 @@
        else {
          elt = $('#'+curObject+parent+'\\['+key+'\\]');
          elt.val(val);
+         if(elt.attr('data-type') == 'choice') {
+           elt.val(val.toString());
+         }
+
          if(elt.attr('data-type') == 'dbref' && elt.val()!=null && elt.val()!='') {
            searchDbRef(curObject+parent+'\\['+key+'\\]');
          }

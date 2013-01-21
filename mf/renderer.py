@@ -386,7 +386,8 @@ class BooleanRenderer(AbstractRenderer):
   '''
 
   def render_search(self, value = None):
-    return _htmlCheckBox('Search'+self.klass+'['+self.name+']',self.name,False) 
+    #return _htmlCheckBox('Search'+self.klass+'['+self.name+']',self.name,False)
+    return _htmlChoiceTextField('Search'+self.klass+'['+self.name+']',self.name,'', ["","true","false"])
 
   def render(self,value = False, parents = []):
      if value is None:
@@ -395,7 +396,8 @@ class BooleanRenderer(AbstractRenderer):
      if parents:
       for parent in parents:
         parentname += '['+parent+']'
-     html = _htmlCheckBox(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
+     #html = _htmlCheckBox(self.klass+parentname+'['+self.name+']',self.name,value,self.err)
+     html = _htmlChoiceTextField(self.klass+parentname+'['+self.name+']',self.name,value, ["true","false"],self.err)
      return html + self.get_extra_controls()
 
   def validate(self,value):
@@ -414,7 +416,6 @@ class BooleanRenderer(AbstractRenderer):
   def unserialize(self,value):
     if self.validate(value):
       if isinstance(value,bool):
-        print "IS BOOL"
         return value
       if isinstance(value,int):
         if value == 0:
@@ -806,13 +807,13 @@ def _htmlChoiceTextField(id,name,value,choice_list,error = False):
   errorClass = ''
   if error:
     errorClass = 'error'
-  html = '<div class="mf-field mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><select id="'+id+'" name="'+id+'">'
+  html = '<div class="mf-field mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><select data-type="choice" id="'+id+'" name="'+id+'">'
   for choice in choice_list:
     if choice == value:
       selected = 'selected'
     else:
       selected = ''
-    html += '<option value="'+choice+'"  '+selected+'>'+choice+'</option>'
+    html += '<option value="'+choice+'"  '+selected+'>'+(choice or 'Any')+'</option>'
   html += '</select></div></div>'
   return html
 
