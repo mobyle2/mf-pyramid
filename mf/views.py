@@ -118,6 +118,9 @@ def mf_list(request):
     #for obj in collection.find(filter):
     #  objlist.append(obj)
     objects = DbConn.get_db(objklass.__name__).find(filter)
+    if 'order' in request.params:
+      print '#### order'
+      objects = objects.sort(request.params.getone('order'),int(request.params.getone('order_type')))
     for obj in objects:
       objlist.append(obj)
     objlist = json.dumps(objlist, default=json_util.default)

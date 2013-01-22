@@ -47,8 +47,6 @@
 
 <script>
 
-
-
    var curObject;
 
    var count=0;
@@ -65,6 +63,7 @@ $(document).ready(function() {
    //$(".mf-search").hide();
    $(".mf-template").hide();
    $(".dashboard-item").click(function(event){
+     mfsort = {};
      $('.nav li').removeClass('active');
      var $this = $(this).parent();
      if (!$this.hasClass('active')) {

@@ -7,6 +7,30 @@
 
    var curObject;
 
+   var curPage = 0;
+
+   var pageSize = 10;
+
+   var mfsort = {};
+
+$(function() {
+
+$(document).on("change", ".mf-psize", function(event) {
+  pageSize = $(this).val();
+});
+
+$(document).on("click", ".mf-sort", function(event) {
+  var param = $(this).text();
+  if(mfsort["key"]!=null && mfsort["key"]==param) {
+    if(mfsort["value"]==1) { mfsort["value"] = -1; }
+    else { mfsort["value"] = 1; }
+  }
+  else { mfsort["key"] = param; mfsort["value"] = 1; }
+  loadObjectList(curObject);  
+});
+
+});
+
   /**
   * Delete an object
   */
@@ -131,9 +155,10 @@
   * Loads a list of objects and create a sortable table
   */
   function loadObjectList(id,clean) {
-    if(clean) {
+    if(clean==null || clean) {
       clear_form_elements("#show-"+curObject);
     }
+    curPage = 0;
     $(".mf-list").hide();
     //$(".mf-object").hide();
     $(".accordion").hide();
@@ -142,7 +167,12 @@
     //$("#show-"+curObject).show();
     //$("#search-"+curObject).show();
     route = '/'+id.toLowerCase()+'s/';
-    $.getJSON(route, function(data) {
+    var filter='';
+    if(mfsort['key']!=null) {
+      filter += 'order='+mfsort['key']+'&order_type='+mfsort['value']
+    }
+    if(filter!='') { filter = '?'+filter; }
+    $.getJSON(route+filter, function(data) {
      updateObjectList(data);
      });
    }
@@ -170,8 +200,9 @@
 
       });
       // Table header
-      $.each(keys, function(key) { thead += "<th>"+keys[key]+"</th>"; });
+      $.each(keys, function(key) { thead += '<th class="mf-sort">'+keys[key]+'</th>'; });
       // Now for each object get values from key
+      var nbelt = 0;
       $.each(data, function(obj) {
         tbody += '<tr id="'+data[obj]["_id"]["$oid"]+'" class="mf-list-object '+curObject+'">';
         $.each(keys, function(key) {
@@ -192,11 +223,38 @@
           tbody += "<td>"+val+"</td>";
         });
         tbody += "</tr>";
+        nbelt += 1;
       });
 
       thead += '</tr></thead>';
       tbody += '</tbody>';
-      $("#table-"+curObject).html(thead+tbody);
+      tfoot = '<tfoot><tr><td><form class="form-inline"><div class="control-group"><label for="psize">Page size</label><select class="mf-psize" id="psize-'+curObject+'">';
+      var selected10='';
+      var selected20='';
+      var selected50=''; 
+      if(pageSize==10) {
+        selected10 = 'selected';
+      }
+      else if(pageSize==20) {
+        selected20 = 'selected';
+      }
+      else if(pageSize==50) {
+        selected50 = 'selected';
+      }
+
+       
+      tfoot += '<option value="10" '+selected10+'>10</option>';
+      tfoot += '<option value="20" '+selected20+'>20</option>';
+      tfoot += '<option value="50" '+selected50+'>50</option>';
+      tfoot += '</select></form></div></td><td><form class="form-inline"><div class="control-group">';
+      if(curPage>0) {
+      tfoot += '<a class="mf-prev" href="#">Previous</a>';
+      }
+      if(nbelt>=pageSize) {
+      tfoot += '<a class="mf-next" href="#">Next</a>';
+      }
+      tfoot += '</div></form></td></tr></tfoot>';
+      $("#table-"+curObject).html(thead+tbody+tfoot);
       $("#list-"+curObject).show();
    }
 
