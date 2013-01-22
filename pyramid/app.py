@@ -37,6 +37,9 @@ if __name__ == '__main__':
     group["name"] = "sampleGroup"
     group["creation_date"] = datetime.utcnow()
     group.save()
+
+    group.set_display_fields(['name','creation_date'])
+
     user1 = connection.User()
     user1["name"] = "Mike"
     user1["age"] = 50

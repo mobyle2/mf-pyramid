@@ -41,6 +41,15 @@ class TestDashboard(unittest.TestCase):
     except Exception as e:
       self.fail("Error while generating html: "+str(e))
 
+  def test_render_with_specific_list(self):
+    Dashboard.add_dashboard([User])
+    myuser = User()
+    myuser.set_display_fields(['name','email','options'])
+    try:
+      html = myuser.html()
+    except Exception as e:
+      self.fail("Error while generating html: "+str(e))
+
 
   def test_bind_user(self):
     Dashboard.add_dashboard([User])

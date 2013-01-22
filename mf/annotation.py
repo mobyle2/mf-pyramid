@@ -118,7 +118,10 @@ def render(self,fields = None):
     rtype: str
     """
     if not fields:
-      fields = sorted(self.__class__.render_fields)
+      if self.__class__.__field_display:
+        fields = self.__class__.__field_display
+      else:
+        fields = sorted(self.__class__.render_fields)
     logging.debug(self.__class__.render_fields)
     form = FormRenderer(self.__class__,None)
     return form.render(self,fields)
@@ -179,11 +182,21 @@ def bind_form(self,request):
     return self.__field_errors
 
 
+def set_display_fields(self,fields):
+    """
+    Sets the fields to be displayed, and in which order
+
+    param: fields List of fields to show
+    type: list
+    """
+    self.__class__.__field_display = fields
+
 def mf_decorator(klass):
     '''
     Decorator used with annotations on an object class.
     It is used with the @mf_decorator declaration.
     '''
+    klass.__field_display = []
     klass.__field_errors = []
     klass.render_fields = dict()
     original_methods = klass.__dict__.copy()
@@ -196,6 +209,7 @@ def mf_decorator(klass):
     setattr(klass, "renderer", renderer)
     setattr(klass, "get_renderer", get_renderer)
     setattr(klass, "set_renderer", set_renderer)
+    setattr(klass, "set_display_fields", set_display_fields)
 
     attributes = dir(klass)
     if Annotation.use_schema_variable() is not None:
