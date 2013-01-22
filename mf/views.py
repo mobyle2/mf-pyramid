@@ -90,6 +90,13 @@ def mf_search(request):
     collection = DbConn.get_db(objklass.__name__).find(filter)
     if 'order' in request.params:
       collection = collection.sort(request.params.getone('order'),int(request.params.getone('order_type')))
+    if 'page' in request.params and 'pagesize' in request.params:
+      psize = int(request.params.getone('pagesize'))
+      page = int(request.params.getone('page'))
+      if page>0:
+        collection = collection.skip(page*psize).limit(psize)
+      else:
+        collection = collection.limit(psize)
     for obj in collection:
       objlist.append(obj)
     objlist = json.dumps(objlist, default=json_util.default)
@@ -121,6 +128,14 @@ def mf_list(request):
     objects = DbConn.get_db(objklass.__name__).find(filter)
     if 'order' in request.params:
       objects = objects.sort(request.params.getone('order'),int(request.params.getone('order_type')))
+    if 'page' in request.params and 'pagesize' in request.params:
+      psize = int(request.params.getone('pagesize'))
+      page = int(request.params.getone('page'))
+      if page>0:
+        objects = objects.skip(page*psize).limit(psize)
+      else:
+        objects = objects.limit(psize)
+
     for obj in objects:
       objlist.append(obj)
     objlist = json.dumps(objlist, default=json_util.default)

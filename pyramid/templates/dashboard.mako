@@ -64,6 +64,7 @@ $(document).ready(function() {
    $(".mf-template").hide();
    $(".dashboard-item").click(function(event){
      mfsort = {};
+     curPage = 0;
      $('.nav li').removeClass('active');
      var $this = $(this).parent();
      if (!$this.hasClass('active')) {

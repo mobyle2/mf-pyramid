@@ -9,7 +9,7 @@
 
    var curPage = 0;
 
-   var pageSize = 10;
+   var pageSize = 20;
 
    var mfsort = {};
 
@@ -28,6 +28,20 @@ $(document).on("click", ".mf-sort", function(event) {
   else { mfsort["key"] = param; mfsort["value"] = 1; }
   loadObjectList(curObject);  
 });
+
+$(document).on("click", ".mf-next", function(event) {
+  curPage = curPage + pageSize;
+  loadObjectList(curObject,true);
+});
+$(document).on("click", ".mf-prev", function(event) {
+  curPage = curPage - pageSize;
+  if(curPage<0) {
+    curPage = 0;
+  }
+  loadObjectList(curObject,true);
+});
+
+
 
 });
 
@@ -158,7 +172,6 @@ $(document).on("click", ".mf-sort", function(event) {
     if(clean==null || clean) {
       clear_form_elements("#show-"+curObject);
     }
-    curPage = 0;
     $(".mf-list").hide();
     //$(".mf-object").hide();
     $(".accordion").hide();
@@ -167,11 +180,10 @@ $(document).on("click", ".mf-sort", function(event) {
     //$("#show-"+curObject).show();
     //$("#search-"+curObject).show();
     route = '/'+id.toLowerCase()+'s/';
-    var filter='';
+    var filter='?page='+curPage+'&pagesize='+pageSize;
     if(mfsort['key']!=null) {
-      filter += 'order='+mfsort['key']+'&order_type='+mfsort['value']
+      filter += '&order='+mfsort['key']+'&order_type='+mfsort['value']
     }
-    if(filter!='') { filter = '?'+filter; }
     $.getJSON(route+filter, function(data) {
      updateObjectList(data);
      });
@@ -248,10 +260,10 @@ $(document).on("click", ".mf-sort", function(event) {
       tfoot += '<option value="50" '+selected50+'>50</option>';
       tfoot += '</select></form></div></td><td><form class="form-inline"><div class="control-group">';
       if(curPage>0) {
-      tfoot += '<a class="mf-prev" href="#">Previous</a>';
+      tfoot += '<i class="mf-prev icon-backward"> </i>';
       }
       if(nbelt>=pageSize) {
-      tfoot += '<a class="mf-next" href="#">Next</a>';
+      tfoot += '<i class="mf-next icon-forward"> </i>';
       }
       tfoot += '</div></form></td></tr></tfoot>';
       $("#table-"+curObject).html(thead+tbody+tfoot);

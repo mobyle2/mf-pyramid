@@ -10,6 +10,18 @@ hr {
     background:         linear-gradient(left, hsla(0,0%,0%,0) 0%, hsla(0,0%,0%,.75) 50%, hsla(0,0%,0%,0) 100%);
 }
 
+.mf-next {
+  margin: 10px;
+}
+
+.mf-prev {
+  margin: 10px;
+}
+
+.mf-psize {
+  margin: 10px;
+}
+
 .mf-dbref {
   min-width: 206px;
   margin-left: 0px;
