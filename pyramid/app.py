@@ -8,6 +8,7 @@ from mf.dashboard import Dashboard
 from user import *
 from user import User
 from group import Group
+from supergroup import SuperGroup
 
 #Use pymongo
 from pymongo import MongoClient
@@ -31,7 +32,7 @@ if __name__ == '__main__':
     db.drop_collection('groups')
 
     connection = Connection()
-    connection.register([User,Group])
+    connection.register([User,Group,SuperGroup])
 
     group = connection.Group()
     group["name"] = "sampleGroup"
@@ -86,7 +87,7 @@ if __name__ == '__main__':
 
     Dashboard.set_connection(connection)
 
-    Dashboard.add_dashboard([User,Group],config)
+    Dashboard.add_dashboard([User, Group, SuperGroup],config)
 
     renderer = mf.renderer.TextChoiceRenderer(User,'email','')
     renderer.limit([ 'nomail', 'othermail@mail.fr', 'sample@nomail' ])
