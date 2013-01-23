@@ -105,6 +105,27 @@ Other functions may be implemented in objects to override default behaviour:
 
 If any is defined in object, then object method is used, else default implementation is used.
 
+# Custom display
+
+Some functions helps you to customize the rendering.
+
+    group = connection.Group()
+    group.set_display_fields(['name','creation_date'])
+
+set_display_fields will define the parameters to display, and in which order. This will only work for "first level" parameters (not params of a dict).
+
+    renderer = mf.renderer.TextChoiceRenderer(User,'email','')
+    renderer.limit([ 'nomail', 'othermail@mail.fr', 'sample@nomail' ])
+
+Defines for the objects User a new renderer (TextRenderer by default), in this case a TextChoiceRenderer.
+Simply create a new renderer with class as first parameter and param name as second parameter to change the default renderer.
+
+
+    renderer.add_extra_control('<button class="btn btn-info">Fake button</button>')
+
+Adds an extra button for the field (up to you to defined in Javascript what to do with this button).
+
+
 
 Acknowledgements:
 
