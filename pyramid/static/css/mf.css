@@ -70,7 +70,7 @@ hr {
   border-color: black;
   border-width: 1px;
   padding: 5px;
-  display: inline-block;
+  display: block;
 }
 
 .mf-textfield {
