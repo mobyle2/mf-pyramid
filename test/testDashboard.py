@@ -3,6 +3,7 @@ import user
 from user import User
 import group
 from group import Group
+from supergroup import SuperGroup
 import mf.dashboard
 from mf.dashboard import Dashboard
 from mf.db_conn import DbConn
@@ -13,7 +14,7 @@ from datetime import datetime
 import logging
 
 connection = Connection()
-connection.register([User,Group])
+connection.register([User,Group,SuperGroup])
 Dashboard.set_connection(connection)
 
 class TestDashboard(unittest.TestCase):
@@ -115,6 +116,13 @@ class TestDashboard(unittest.TestCase):
     user.bind_form(request)
     user.save()
     assert(group["_id"] == user["groups"][0]["_id"])
+
+  def test_inheritance(self):
+    Dashboard.add_dashboard([User])
+    sgroup = connection.SuperGroup()
+    sgroup["name"] = "sampleGroup"
+    sgroup["creation_date"] = datetime.utcnow()
+    sgroup.save()
 
 
   def test_bind_multi_array(self):
