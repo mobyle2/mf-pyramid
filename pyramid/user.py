@@ -24,6 +24,8 @@ class User(Document):
   'multi' : [ { 'name' : Group, 'role' : basestring } ], 'groupid' : str
   }
 
+  default_values = { 'name' : 'Mike' }
+
   use_autorefs = True
 
 

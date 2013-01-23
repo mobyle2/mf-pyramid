@@ -135,7 +135,7 @@ $(document).on("click", ".mf-prev", function(event) {
                  clear_form_elements("#show-"+curObject);
                  $("#mf-flash").attr('class','alert alert-success');
                  if(method == "POST") {
-                   $("#mf-flash").text(curObject+" successfully updated");
+                   $("#mf-flash").text(curObject+" Operation successful");
                  }
                  else { 
                    $("#mf-flash").text(curObject+" successfully added");
@@ -470,18 +470,33 @@ $(document).on("click", ".mf-prev", function(event) {
                 //$(this).attr('class','');
                 $(this).removeClass("error");
                 $(this).removeClass("mf-error");
-                $(this).val('');
+                if( $(this).attr('data-default')!=null) {
+                  $(this).val($(this).attr('data-default'));
+                }
+                else {
+                  $(this).val('');
+                }
                 break;
             case 'checkbox':
             case 'radio':
                 $(this).removeClass("error");
                 $(this).removeClass("mf-error");
-                this.checked = false;
+                if( $(this).attr('data-default')!=null && $(this).attr('data-default')=="true") {
+                  this.checked = true;
+                }
+                else {
+                  this.checked = false;
+                }
                 break;
             case 'number':
                 $(this).removeClass("error");
                 $(this).removeClass("mf-error");
-                $(this).val('0');
+                if( $(this).attr('data-default')!=null) {
+                  $(this).val($(this).attr('data-default'));
+                }
+                else {
+                  $(this).val('0');
+                }
         }
     });
   }
@@ -500,15 +515,14 @@ $(document).on("click", ".mf-prev", function(event) {
             case 'date':
             case 'time':
             case 'datetime':
+            case 'number':
                 $(this).attr('class','');
-                $(this).val('');
+				$(this).val('');
                 break;
             case 'checkbox':
             case 'radio':
                 this.checked = false;
                 break;
-            case 'number':
-                $(this).val('');
         }
     });
   }

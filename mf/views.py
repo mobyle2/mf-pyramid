@@ -2,7 +2,7 @@ from pyramid.view import view_config
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden
 from mf.annotation import Annotation
-from mf.renderer import FormRenderer, CompositeRenderer, FloatRenderer, IntegerRenderer, BooleanRenderer, ReferenceRenderer
+from mf.renderer import FormRenderer, CompositeRenderer, FloatRenderer, IntegerRenderer, BooleanRenderer, ReferenceRenderer, SimpleReferenceRenderer
 import logging
 
 import json
@@ -72,7 +72,7 @@ def mf_search(request):
       if param is not None and param!='':
         if renderer and not isinstance(renderer,CompositeRenderer):
 
-          if isinstance(renderer, ReferenceRenderer):
+          if isinstance(renderer, ReferenceRenderer) and not isinstance(renderer, SimpleReferenceRenderer): 
             filter[field+'.$id'] =  ObjectId(param)
           elif isinstance(renderer, IntegerRenderer):
             filter[field] = int(param)
@@ -85,7 +85,7 @@ def mf_search(request):
               filter[field] = False
           else:
               filter[field] = { "$regex" : param }
-    logging.debug("search "+str(filter))
+    logging.error("search "+str(filter))
     objlist = []
     collection = DbConn.get_db(objklass.__name__).find(filter)
     if 'order' in request.params:

@@ -807,7 +807,7 @@ def _htmlChoiceTextField(id,name,value,choice_list,error = False):
   errorClass = ''
   if error:
     errorClass = 'error'
-  html = '<div class="mf-field mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><select data-type="choice" id="'+id+'" name="'+id+'">'
+  html = '<div class="mf-field mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><select data-default="'+(str(value) or '')+'" data-type="choice" id="'+id+'" name="'+id+'">'
   for choice in choice_list:
     if choice == value:
       selected = 'selected'
@@ -821,22 +821,22 @@ def _htmlTextField(id,name,value,error = False):
   errorClass = ''
   if error:
     errorClass = 'error'
-  return '<div class="mf-field mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="text" id="'+id+'" name="'+id+'"   value="'+(str(value or ''))+'"/></div></div>'
+  return '<div class="mf-field mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input data-default="'+(str(value) or '')+'" type="text" id="'+id+'" name="'+id+'"   value="'+(str(value or ''))+'"/></div></div>'
 
 def _htmlAutoComplete(id,name,value,klass,error = False):
   errorClass = ''
   if error:
     errorClass = 'error'
-  return '<div class="mf-field mf-autocomplete control-group '+errorClass+'"><label class="control-label" for="DbRef'+id+'">'+name.title()+'</label><div class="controls"><input data-type="dbref" type="hidden" id="'+id+'" name="'+id+'"   value="'+(str(value or ''))+'"/><input type="text" data-object="'+klass+'" data-dbref="'+id+'" id="DbRef'+id+'" class="mf-dbref"><i data-dbref="'+id+'" id="DbRefClear'+id+'" class="mf-clear-object icon-trash"></i></div></div>'
+  return '<div class="mf-field mf-autocomplete control-group '+errorClass+'"><label class="control-label" for="DbRef'+id+'">'+name.title()+'</label><div class="controls"><input data-default="'+(str(value) or '')+'" data-type="dbref" type="hidden" id="'+id+'" name="'+id+'"   value="'+(str(value or ''))+'"/><input type="text" data-object="'+klass+'" data-dbref="'+id+'" id="DbRef'+id+'" class="mf-dbref"><i data-dbref="'+id+'" id="DbRefClear'+id+'" class="mf-clear-object icon-trash"></i></div></div>'
 
 def _htmlDateTime(id,name,value,error = False, type = 'datetime'):
   errorClass = ''
   if error:
     errorClass = 'error'
-  return '<div class="mf-field mf-datetime control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="'+type+'" id="'+id+'" name="'+id+'"   value="'+(str(value or ''))+'"/></div></div>'
+  return '<div class="mf-field mf-datetime control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input data-default="'+(str(value) or '')+'" type="'+type+'" id="'+id+'" name="'+id+'"   value="'+(str(value or ''))+'"/></div></div>'
 
 def _htmlHidden(id,name,value):
-  return '<div class="mf-field mf-textfield control-group"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="text" id="'+id+'" name="'+id+'"   value="'+(str(value or ''))+'"  disabled/></div></div>'
+  return '<div class="mf-field mf-textfield control-group"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input data-default="'+(str(value) or '')+'" type="text" id="'+id+'" name="'+id+'"   value="'+(str(value or ''))+'"  disabled/></div></div>'
 
 def _htmlCheckBox(id,name,value,error = False):
   errorClass = ''
@@ -845,13 +845,13 @@ def _htmlCheckBox(id,name,value,error = False):
   checked = ''
   if value:
      checked = 'checked'
-  return '<div class="mf-field mf-checkbox control-group '+errorClass+'"><div class="controls"><label class="checkbox"><input type="checkbox" value="'+str(value)+'" id="'+id+'" name="'+id+'" '+checked+'>'+name+'</label></div></div>'
+  return '<div class="mf-field mf-checkbox control-group '+errorClass+'"><div class="controls"><label class="checkbox"><input data-default="'+str(value)+'" type="checkbox" value="'+str(value)+'" id="'+id+'" name="'+id+'" '+checked+'>'+name+'</label></div></div>'
  
 def _htmlNumber(id,name,value,error = False):
   errorClass = ''
   if error:
     errorClass = 'error'
-  return '<div class="mf-field mf-numberfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input type="number" id="'+id+'" name="'+id+'" value="'+str(value)+'"/></div></div>'
+  return '<div class="mf-field mf-numberfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><input data-default="'+str(value)+'" type="number" id="'+id+'" name="'+id+'" value="'+str(value)+'"/></div></div>'
 
 
 def _htmlControls(name):
