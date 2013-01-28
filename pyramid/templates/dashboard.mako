@@ -1,13 +1,5 @@
 <%inherit file="layout.mako"/>
 
-<ul class="nav nav-tabs">
-  <li class="active">
-    <a href="#" id="dashboard" class="dashboard-item">Dashboard</a>
-  </li>
-  % for object in objects:
-  <li><a href="#" class="dashboard-item" id="${object}">${object}s</a></li>
-  % endfor
-</ul>
 <div id="mf-flash" class="mf-flash"></div>
 
 <div id="dashboard" class="mf-dashboard mf-list">
@@ -65,6 +57,9 @@ $(document).ready(function() {
    $(".dashboard-item").click(function(event){
      mfsort = {};
      curPage = 0;
+     $("#mf-flash").text("");
+     $("#mf-flash").attr('class','');
+
      $('.nav li').removeClass('active');
      var $this = $(this).parent();
      if (!$this.hasClass('active')) {
