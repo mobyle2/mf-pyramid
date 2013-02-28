@@ -39,7 +39,7 @@ if __name__ == '__main__':
     group["creation_date"] = datetime.utcnow()
     group.save()
 
-    group.set_display_fields(['name','creation_date'])
+    Group.set_display_fields(['name','creation_date'])
 
     user1 = connection.User()
     user1["name"] = "Mike"

@@ -140,17 +140,19 @@ def render_search(self, fields = None):
     form = SearchFormRenderer(self.__class__,None)
     return form.render(self,fields)
 
-def get_renderer(self,name):
+@classmethod
+def get_renderer(klass,name):
     """
     Gets the renderer for an object attribute
     """
-    return self.__class__.render_fields[name]
+    return klass.render_fields[name]
 
-def set_renderer(self,name,renderer):
+@classmethod
+def set_renderer(klass,name,renderer):
     """
     Sets the renderer for an object attribute
     """
-    self.__class__.render_fields[name] = renderer
+    klass.render_fields[name] = renderer
 
 
 def bind_form(self,request):
@@ -182,14 +184,15 @@ def bind_form(self,request):
     return self.__field_errors
 
 
-def set_display_fields(self,fields):
+@classmethod
+def set_display_fields(klass,fields):
     """
     Sets the fields to be displayed, and in which order
 
     param: fields List of fields to show
     type: list
     """
-    self.__class__.__field_display = fields
+    klass.__field_display = fields
 
 def mf_decorator(klass):
     '''
@@ -209,6 +212,7 @@ def mf_decorator(klass):
     setattr(klass, "renderer", renderer)
     setattr(klass, "get_renderer", get_renderer)
     setattr(klass, "set_renderer", set_renderer)
+    #klass.set_display_fields = set_display_fields
     setattr(klass, "set_display_fields", set_display_fields)
 
     attributes = dir(klass)

@@ -44,8 +44,8 @@ class TestDashboard(unittest.TestCase):
 
   def test_render_with_specific_list(self):
     Dashboard.add_dashboard([User])
+    User.set_display_fields(['name','email','options'])
     myuser = User()
-    myuser.set_display_fields(['name','email','options'])
     try:
       html = myuser.html()
     except Exception as e:

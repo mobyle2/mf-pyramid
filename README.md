@@ -109,8 +109,7 @@ If any is defined in object, then object method is used, else default implementa
 
 Some functions helps you to customize the rendering.
 
-    group = connection.Group()
-    group.set_display_fields(['name','creation_date'])
+    Group.set_display_fields(['name','creation_date'])
 
 set_display_fields will define the parameters to display, and in which order. This will only work for "first level" parameters (not params of a dict).
 
