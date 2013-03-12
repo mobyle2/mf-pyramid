@@ -1,4 +1,5 @@
-1.0.10: set some methods as class methods to be called by clas sinstead of instance (set_display_fields, set_renderer and get_renderer)
-1.0.9: add default values, #9
-1.0.8: add sorting and pagination, #1,#7
-1.0.7: use dropdown for boolean types  #6
+0.1.11: fix url prefixing, fix search
+0.1.10: set some methods as class methods to be called by clas sinstead of instance (set_display_fields, set_renderer and get_renderer)
+0.1.9: add default values, #9
+0.1.8: add sorting and pagination, #1,#7
+0.1.7: use dropdown for boolean types  #6
