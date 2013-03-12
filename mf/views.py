@@ -62,7 +62,7 @@ def mf_search(request):
 
     for field in objklass.render_fields:
       try:
-        param = request.params.getone('Search'+objname.title()+'['+field+']')
+        param = request.params.getone('Search'+objklass.__name__+'['+field+']')
       except Exception:
         # This is fine
         param = None
