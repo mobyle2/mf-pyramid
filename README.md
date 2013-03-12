@@ -41,6 +41,8 @@ For dashboard, to add User and Group, insert in Pyramid init :
     connection.register([User,Group])
     Dashboard.set_connection(connection)
     Dashboard.add_dashboard([User,Group],config)
+    or
+    Dashboard.add_dashboard([User,Group],config,'/test') to add an URL prefix
 
 Warning: this should be added after your routes declaration because it inserts generic routes to match objets:
 

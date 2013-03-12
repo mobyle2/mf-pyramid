@@ -1,6 +1,6 @@
 
 /**
-* Javascritp library used in example dashboard
+* Javascript library used in example dashboard
 *
 *
 **/
@@ -12,6 +12,8 @@
    var pageSize = 20;
 
    var mfsort = {};
+
+   var mfprefix = '';
 
 $(function() {
 
@@ -48,9 +50,9 @@ $(document).on("click", ".mf-prev", function(event) {
   /**
   * Delete an object
   */
-  function mfdelete(prefix){
+  function mfdelete(){
     id = $("#"+curObject+"\\[_id\\]").val();
-    route = '/'+curObject.toLowerCase()+'s/'+id;
+    route = mfprefix+'/'+curObject.toLowerCase()+'s/'+id;
      $.ajax({type:"DELETE", url: route,
             success: function(msg){
               if(msg["status"]==1) {
@@ -88,9 +90,9 @@ $(document).on("click", ".mf-prev", function(event) {
   /**
   * Search
   */
-  function mfsearch(prefix) {
+  function mfsearch() {
      updateCheckboxValues();
-     $.ajax({type:"POST", data: $("#mf-search-form-"+curObject).serialize(), url: prefix+"/"+curObject.toLowerCase()+"s/",
+     $.ajax({type:"POST", data: $("#mf-search-form-"+curObject).serialize(), url: mfprefix+"/"+curObject.toLowerCase()+"s/",
             success: function(msg){
                if(msg["status"]==1) {
                    $("#mf-flash").attr('class','alert alert-error');
@@ -111,12 +113,12 @@ $(document).on("click", ".mf-prev", function(event) {
   /**
   * Submit the form
   */
-  function mfsubmit(prefix) {
+  function mfsubmit() {
      updateCheckboxValues();
      id = $("#"+curObject+"\\[_id\\]").val();
      method = "POST";
      if(id ==null || id == '') { method = "PUT"; id = "" }
-     $.ajax({type:method, data: $("#mf-form-"+curObject).serialize(), url: prefix+"/"+curObject.toLowerCase()+"s/"+id,
+     $.ajax({type:method, data: $("#mf-form-"+curObject).serialize(), url: mfprefix+"/"+curObject.toLowerCase()+"s/"+id,
             success: function(msg){
                if(msg["status"]==1) {
                  $.each(msg["error"], function(err){
@@ -155,7 +157,7 @@ $(document).on("click", ".mf-prev", function(event) {
   */
   function loadObject(id) {
     clear_form_elements("#show-"+curObject);
-    route = '/'+curObject.toLowerCase()+'s/'+id;
+    route = mfprefix+'/'+curObject.toLowerCase()+'s/'+id;
     $.getJSON(route, function(data) {
       json2form(data[curObject.toLowerCase()],"");
      });
@@ -179,7 +181,7 @@ $(document).on("click", ".mf-prev", function(event) {
     $("#accordion"+curObject).show();
     //$("#show-"+curObject).show();
     //$("#search-"+curObject).show();
-    route = '/'+id.toLowerCase()+'s/';
+    route = mfprefix+'/'+id.toLowerCase()+'s/';
     var filter='?page='+curPage+'&pagesize='+pageSize;
     if(mfsort['key']!=null) {
       filter += '&order='+mfsort['key']+'&order_type='+mfsort['value']
@@ -439,7 +441,7 @@ $(document).on("click", ".mf-prev", function(event) {
       id = $('#'+container).val();
       var obj = $('#DbRef'+container).attr("data-object");
       if(obj==null) { return; }
-      route = '/'+obj.toLowerCase()+'s/'+id;
+      route = mfprefix+'/'+obj.toLowerCase()+'s/'+id;
       $.getJSON(route, function(data) {
         if(data[obj.toLowerCase()]['name']!=null) {
           $('#DbRef'+container).val(data[obj.toLowerCase()]['name']);
@@ -536,7 +538,7 @@ $(document).on("click", ".mf-prev", function(event) {
     autocompleteelt = autocompleteelt.replace(/\[/g,'\\[');
     autocompleteelt = autocompleteelt.replace(/\]/g,'\\]');
 
-    route = '/'+objname.toLowerCase()+'s/';
+    route = mfprefix + '/'+objname.toLowerCase()+'s/';
     return $.ajax({type:"POST", data: 'Search'+objname+"[name]="+query, url: route,
             success: function(msg){
                if(msg["status"]==1) {

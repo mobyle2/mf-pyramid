@@ -47,6 +47,8 @@
 
    var autocompleteelt = null;
 
+   mfprefix = "${prefix}";
+
 $(document).ready(function() {
 
    $(".mf-list").hide();
@@ -162,20 +164,21 @@ $(document).ready(function() {
    
    });
 
+
    $('.mf-btn').click(function(event) {
     // Submit or clear form
      if(event.target.id.indexOf("mf-save") == 0) {
-       mfsubmit("${prefix}");
+       mfsubmit();
      }
      if(event.target.id.indexOf("mf-clear") == 0) {
        clear_form_elements("#show-"+curObject);
      }
      if(event.target.id.indexOf("mf-delete") == 0) {
-       mfdelete("${prefix}");
+       mfdelete();
        clear_form_elements("#show-"+curObject);
      }
      if(event.target.id.indexOf("mf-search-"+curObject) == 0) {
-       mfsearch("${prefix}");
+       mfsearch();
      }
      if(event.target.id.indexOf("mf-search-clear-"+curObject) == 0) {
        clear_form_elements("#mf-search-form-"+curObject);

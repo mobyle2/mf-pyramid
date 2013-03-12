@@ -87,7 +87,7 @@ if __name__ == '__main__':
 
     Dashboard.set_connection(connection)
 
-    Dashboard.add_dashboard([User, Group, SuperGroup],config)
+    Dashboard.add_dashboard([User, Group, SuperGroup],config,'/test')
 
     renderer = mf.renderer.TextChoiceRenderer(User,'email','')
     renderer.limit([ 'nomail', 'othermail@mail.fr', 'sample@nomail' ])
