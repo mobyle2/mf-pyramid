@@ -24,6 +24,9 @@ class AbstractRenderer:
   render_fields = dict()
   
   bind_only_one = False
+
+  # If object is a CustomType, store its class
+  custom_type = None
   
   def add_extra_control(self,extra):
     '''Adds an additional button next to the element
@@ -63,6 +66,8 @@ class AbstractRenderer:
     self.in_array = False
     
     self.extra_controls = []
+
+    self.custom_type = None
     
     fieldname = name
     if parent:
@@ -347,6 +352,8 @@ class TextRenderer(AbstractRenderer):
     return isinstance(value,basestring)
 
   def unserialize(self,value):
+    if self.custom_type is not None:
+      return self.custom_type.unserialize(value)
     if self.validate(value):
       return value
     else:
@@ -414,6 +421,8 @@ class BooleanRenderer(AbstractRenderer):
       return False
 
   def unserialize(self,value):
+    if self.custom_type is not None:
+      return self.custom_type.unserialize(value)
     if self.validate(value):
       if isinstance(value,bool):
         return value
@@ -455,6 +464,8 @@ class IntegerRenderer(AbstractRenderer):
     return True
 
   def unserialize(self,value):
+    if self.custom_type is not None:
+      return self.custom_type.unserialize(value)
     if self.validate(value):
       return int(value)
     else:
@@ -506,6 +517,8 @@ class DateTimeRenderer(AbstractRenderer):
     return _htmlDateTime('Search'+self.klass+'['+self.name+']',self.name,'','',self.type) 
 
   def unserialize(self,value):
+      if self.custom_type is not None:
+        return self.custom_type.unserialize(value)
       try:
         if self.type == 'datetime':
 	  return datetime.strptime(value,'%Y/%m/%d %H:%M:%S')
@@ -731,6 +744,8 @@ class FloatRenderer(AbstractRenderer):
     return True
 
   def unserialize(self,value):
+    if self.custom_type is not None:
+      return self.custom_type.unserialize(value)
     if self.validate(value):
       return float(value)
     else:

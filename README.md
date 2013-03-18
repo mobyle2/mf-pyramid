@@ -10,7 +10,9 @@ More customization will also be available to force type of the attribute (Checkb
 
 Pyramid routes and templates will be set automatically to access objects via REST (though optional). Dashboard is accessible via /admin route.
 Dashboard is not automatically installed, it is only for help and can (should?) be customized.
-Copy the pyramid directory content in your pyramid application according to your setup.
+Copy the pyramid directory content in your pyramid application according to your setup:
+  - dashboard needs mf.css, mf.js
+  - dashboard.mako is a template example and can be copied/adapted to get a base dashboard.
 
 # TODO
 
@@ -106,6 +108,29 @@ Other functions may be implemented in objects to override default behaviour:
       """
 
 If any is defined in object, then object method is used, else default implementation is used.
+
+# Custom types
+
+If using custom types in MongoKit (CustomType), library will use default TextRenderer. One can change the renderer afterward (see Custom display).
+However, class must define a new method *unserialize* to return an object from a string (to be able to map an HTML form attribute to an object attribute).
+
+
+    class CustomStatus(CustomType):
+
+        @staticmethod
+        def unserialize(value)
+            ''' unserizalize from str to expected format
+
+            :param value: input value
+            :type value: str
+            :return: an integer for this example
+            '''
+            return int(value)
+    
+        ...
+
+In this example, we take input string value coming from HTML request parameter and cast it to an int.
+
 
 # Custom display
 

@@ -11,6 +11,7 @@ import inspect
 from renderer import SearchFormRenderer, FormRenderer,TextRenderer, BooleanRenderer, CompositeRenderer, ArrayRenderer, IntegerRenderer, FloatRenderer, HiddenRenderer, DateTimeRenderer, ReferenceRenderer,AbstractRenderer
 
 from mongokit.database import Database
+from mongokit import CustomType 
 
 #logging.basicConfig(level=logging.DEBUG)
 
@@ -101,6 +102,11 @@ def renderer(klass,name,attr,parent=''):
      elif isinstance(attr,dict):
          logging.debug(name+" is dict")
          return CompositeRenderer(klass,name,attr,parent)
+     elif issubclass(attr,CustomType):
+         logging.debug(name+" is CustomType, defaults to TextRenderer")
+         renderer = TextRenderer(klass,name,parent)
+         renderer.custom_type = attr
+         return renderer
      elif inspect.isclass(attr):
          logging.debug(name+" is dbref")
          renderer = ReferenceRenderer(klass,name,attr,parent)

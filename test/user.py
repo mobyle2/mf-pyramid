@@ -4,12 +4,31 @@ from mf.annotation import *
 from pyramid.response import Response
 from pyramid.view import view_config
 import mf.views
-from mongokit import Document, Connection
+from mongokit import Document, Connection, CustomType
 from group import Group
 
 def home(request):
     return Response('hello World')
 
+
+class CustomStatus(CustomType):
+
+    mongo_type = int
+    python_type = int
+
+    def to_bson(self, value):
+        return int(value)
+
+    def to_python(self, value):
+        if value is not None:
+            return int(value)
+
+    def validate(self, value, path):
+        return isinstance(value, int)
+
+    @staticmethod
+    def unserialize(value):
+        return str(value)
 
 
 @mf_decorator
@@ -21,7 +40,8 @@ class User(Document):
 
   structure = { 'name': basestring, 'email': basestring, 'age': int, 'admin': bool,
   'options' : { 'tags': basestring , 'categories': basestring }, 'creation_date' : datetime, 'today': basestring, 'array' : [basestring] , 'groups' : [ Group ],
-  'multi' : [ { 'name' : basestring, 'role' : basestring } ]
+  'multi' : [ { 'name' : basestring, 'role' : basestring } ],
+  'custom' :  CustomStatus
   }
 
   use_autorefs = True

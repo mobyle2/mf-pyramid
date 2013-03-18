@@ -134,4 +134,16 @@ class TestDashboard(unittest.TestCase):
     assert(len(user["multi"]) == 2)      
     assert(user["multi"][0]["role"] == "role1")
 
+  def test_bind_custom(self):
+    Dashboard.add_dashboard([User])
+    from mf.renderer import TextRenderer
+    from user import CustomStatus
+    assert(isinstance(User.get_renderer("custom"),TextRenderer) == True)
+    request = [("User[custom]","one")]
+    user = User()
+    user.bind_form(request)
+    print "custom= "+str(user)
+    assert(user["custom"] == CustomStatus.unserialize("one"))
+
+
     
