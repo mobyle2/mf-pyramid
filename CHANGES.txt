@@ -1,3 +1,5 @@
+0.1.13: Remove trailing slash in routes
+        Add 'Any' option for Choice renderers in Search forms.
 0.1.12: Add CustomType support
 0.1.11: fix url prefixing, fix search
 0.1.10: set some methods as class methods to be called by clas sinstead of instance (set_display_fields, set_renderer and get_renderer)
