@@ -56,7 +56,7 @@ class Dashboard:
       Annotation.addKlass(klass)
     if config is not None:
       config.add_route('mf_admin',prefix+'/admin')
-      config.add_route('mf_objects',prefix+'/{objname}s/')
+      config.add_route('mf_objects',prefix+'/{objname}s')
       config.add_route('mf_object',prefix+'/{objname}s/{id}')
       config.add_view(mf_search, route_name='mf_objects', renderer='json', request_method='POST')      
       config.add_view(mf_list, route_name='mf_objects', renderer='json', request_method='GET')

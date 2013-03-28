@@ -92,7 +92,7 @@ $(document).on("click", ".mf-prev", function(event) {
   */
   function mfsearch() {
      updateCheckboxValues();
-     $.ajax({type:"POST", data: $("#mf-search-form-"+curObject).serialize(), url: mfprefix+"/"+curObject.toLowerCase()+"s/",
+     $.ajax({type:"POST", data: $("#mf-search-form-"+curObject).serialize(), url: mfprefix+"/"+curObject.toLowerCase()+"s",
             success: function(msg){
                if(msg["status"]==1) {
                    $("#mf-flash").attr('class','alert alert-error');
@@ -181,7 +181,7 @@ $(document).on("click", ".mf-prev", function(event) {
     $("#accordion"+curObject).show();
     //$("#show-"+curObject).show();
     //$("#search-"+curObject).show();
-    route = mfprefix+'/'+id.toLowerCase()+'s/';
+    route = mfprefix+'/'+id.toLowerCase()+'s';
     var filter='?page='+curPage+'&pagesize='+pageSize;
     if(mfsort['key']!=null) {
       filter += '&order='+mfsort['key']+'&order_type='+mfsort['value']
@@ -538,7 +538,7 @@ $(document).on("click", ".mf-prev", function(event) {
     autocompleteelt = autocompleteelt.replace(/\[/g,'\\[');
     autocompleteelt = autocompleteelt.replace(/\]/g,'\\]');
 
-    route = mfprefix + '/'+objname.toLowerCase()+'s/';
+    route = mfprefix + '/'+objname.toLowerCase()+'s';
     return $.ajax({type:"POST", data: 'Search'+objname+"[name]="+query, url: route,
             success: function(msg){
                if(msg["status"]==1) {
