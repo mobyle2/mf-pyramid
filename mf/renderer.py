@@ -823,6 +823,7 @@ def _htmlChoiceTextField(id,name,value,choice_list,error = False):
   if error:
     errorClass = 'error'
   html = '<div class="mf-field mf-textfield control-group '+errorClass+'"><label class="control-label" for="'+id+'">'+name.title()+'</label><div class="controls"><select data-default="'+(str(value) or '')+'" data-type="choice" id="'+id+'" name="'+id+'">'
+  html += '<option value="">Any</option>'
   for choice in choice_list:
     if choice == value:
       selected = 'selected'
