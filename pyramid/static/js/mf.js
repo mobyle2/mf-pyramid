@@ -118,7 +118,11 @@ $(document).on("click", ".mf-prev", function(event) {
      id = $("#"+curObject+"\\[_id\\]").val();
      method = "POST";
      if(id ==null || id == '') { method = "PUT"; id = "" }
-     $.ajax({type:method, data: $("#mf-form-"+curObject).serialize(), url: mfprefix+"/"+curObject.toLowerCase()+"s/"+id,
+     route = mfprefix+"/"+curObject.toLowerCase()+"s";
+     if(id != "") {
+        route = mfprefix+"/"+curObject.toLowerCase()+"s/"+id
+     }
+     $.ajax({type:method, data: $("#mf-form-"+curObject).serialize(), url: route,
             success: function(msg){
                if(msg["status"]==1) {
                  $.each(msg["error"], function(err){
