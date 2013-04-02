@@ -1,3 +1,4 @@
+0.1.15: CustomType are declared with instance and not class
 0.1.14: Fix trailing slash in routes for PUT
 0.1.13: Remove trailing slash in routes
         Add 'Any' option for Choice renderers in Search forms.
