@@ -102,10 +102,10 @@ def renderer(klass,name,attr,parent=''):
      elif isinstance(attr,dict):
          logging.debug(name+" is dict")
          return CompositeRenderer(klass,name,attr,parent)
-     elif issubclass(attr,CustomType):
+     elif issubclass(attr.__class__,CustomType):
          logging.debug(name+" is CustomType, defaults to TextRenderer")
          renderer = TextRenderer(klass,name,parent)
-         renderer.custom_type = attr
+         renderer.custom_type = attr.__class__
          return renderer
      elif inspect.isclass(attr):
          logging.debug(name+" is dbref")

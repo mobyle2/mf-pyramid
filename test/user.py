@@ -17,6 +17,8 @@ class CustomStatus(CustomType):
     python_type = int
 
     def to_bson(self, value):
+        if value is None:
+            return 0
         return int(value)
 
     def to_python(self, value):
@@ -41,7 +43,7 @@ class User(Document):
   structure = { 'name': basestring, 'email': basestring, 'age': int, 'admin': bool,
   'options' : { 'tags': basestring , 'categories': basestring }, 'creation_date' : datetime, 'today': basestring, 'array' : [basestring] , 'groups' : [ Group ],
   'multi' : [ { 'name' : basestring, 'role' : basestring } ],
-  'custom' :  CustomStatus
+  'custom' :  CustomStatus()
   }
 
   use_autorefs = True
