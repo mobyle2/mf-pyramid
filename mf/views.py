@@ -168,7 +168,7 @@ def mf_show(request):
     obj= collection.find_one(filter)
     if not obj:
       raise HTTPNotFound()
-    response = { 'object' :  objname, 'status': 'list', objname : obj, 'filter' : filter }
+    response = { 'object' :  objname, 'status': 0, objname : obj, 'filter' : filter }
     response = json.dumps(response, default=json_util.default)
     return Response(body=response,content_type = "application/json")
 
