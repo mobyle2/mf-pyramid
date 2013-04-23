@@ -165,7 +165,15 @@ library cannot guess which object the objectid references.
 
 In MongoKit definition, one can define the parameter link as a basestring or an
 ObjectId and must declare the above example (an ObjectId does not give
-information on object)
+information on object)a
+
+If parameter is defined as an ObjectId, one *may* simply call the set_reference
+function to update the renderer:
+
+    renderer = User.get_renderer('groupRef')
+    renderer.set_reference(Group)
+
+
 
 
 

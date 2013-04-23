@@ -748,6 +748,14 @@ class ReferenceRenderer(AbstractRenderer):
 
     collection = None
 
+    def set_reference(self,klass):
+        '''Update the object class referencedby this renderer
+
+        :param klass: Class of the object linked to the parameter
+        :type klass: Class
+        '''
+        self._reference = klass.__name__
+
     def __init__(self,klass,name,attr,parent=''):
         self._reference = None
         if attr is not None:
