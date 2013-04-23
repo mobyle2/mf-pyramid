@@ -151,6 +151,23 @@ Simply create a new renderer with class as first parameter and param name as sec
 
 Adds an extra button for the field (up to you to defined in Javascript what to do with this button).
 
+# Object references
+
+DBref are supported, but if one need to refer to an other object using
+ObjectIds, it is possible to specify a parameter as a *SimpleReferenceRenderer*:
+
+        groupid_renderer = mf.renderer.SimpleReferenceRenderer(User,'groupid',Group)
+
+This specifies the User parameter *groupid* is in fact an ObjectId reference to
+the Group object.
+This initial setup is required to define the link between the objects as the
+library cannot guess which object the objectid references.
+
+In MongoKit definition, one can define the parameter link as a basestring or an
+ObjectId and must declare the above example (an ObjectId does not give
+information on object)
+
+
 
 
 Acknowledgements:

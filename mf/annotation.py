@@ -8,10 +8,10 @@ import inspect
 
 
 #import renderer
-from renderer import SearchFormRenderer, FormRenderer,TextRenderer, BooleanRenderer, CompositeRenderer, ArrayRenderer, IntegerRenderer, FloatRenderer, HiddenRenderer, DateTimeRenderer, ReferenceRenderer,AbstractRenderer
+from mf.renderer import SearchFormRenderer, FormRenderer,TextRenderer, BooleanRenderer, CompositeRenderer, ArrayRenderer, IntegerRenderer, FloatRenderer, HiddenRenderer, DateTimeRenderer, ReferenceRenderer,AbstractRenderer, SimpleReferenceRenderer
 
 from mongokit.database import Database
-from mongokit import CustomType 
+from mongokit import CustomType, ObjectId
 
 #logging.basicConfig(level=logging.DEBUG)
 
@@ -109,7 +109,11 @@ def renderer(klass,name,attr,parent=''):
          return renderer
      elif inspect.isclass(attr):
          logging.debug(name+" is dbref")
-         renderer = ReferenceRenderer(klass,name,attr,parent)
+         if attr.__class__.__name__ == ObjectId.__class__.__name__:
+            renderer = SimpleReferenceRenderer(klass,name,attr,parent)
+            renderer.is_object_id = True
+         else:
+            renderer = ReferenceRenderer(klass,name,attr,parent)
          return renderer
      else:
          raise Exception(name+", "+attr.__class__.__name__+" is not a managed type")

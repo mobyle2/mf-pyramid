@@ -9,7 +9,7 @@ from mf.dashboard import Dashboard
 from mf.db_conn import DbConn
 from mf.annotation import Annotation
 import pymongo
-from mongokit import Document, Connection
+from mongokit import Document, Connection, ObjectId
 from datetime import datetime
 import logging
 
@@ -146,4 +146,18 @@ class TestDashboard(unittest.TestCase):
     assert(user["custom"] == CustomStatus.unserialize("one"))
 
 
-    
+  def test_objectdbref(self):
+      Dashboard.add_dashboard([User])
+      group = connection.Group()
+      group["name"] = "sampleGroup"
+      group["creation_date"] = datetime.utcnow()
+      group.save()
+      request = [("User[groups][0]",str(group["_id"]))]
+      user = connection.User()
+      user["name"] = "sampleUser"
+      user["email"] = "test@nomail.com"
+      user["groupRef"] = group["_id"]
+      user.save()
+      assert(group["_id"] == user['groupRef'])
+      assert(isinstance(user['groupRef'],ObjectId))
+

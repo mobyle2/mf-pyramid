@@ -43,7 +43,8 @@ class User(Document):
   structure = { 'name': basestring, 'email': basestring, 'age': int, 'admin': bool,
   'options' : { 'tags': basestring , 'categories': basestring }, 'creation_date' : datetime, 'today': basestring, 'array' : [basestring] , 'groups' : [ Group ],
   'multi' : [ { 'name' : basestring, 'role' : basestring } ],
-  'custom' :  CustomStatus()
+  'custom' :  CustomStatus(),
+  'groupRef' : ObjectId,
   }
 
   use_autorefs = True
