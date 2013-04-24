@@ -85,7 +85,7 @@ def mf_search(request):
               filter[field] = False
           else:
               filter[field] = { "$regex" : param }
-    logging.error("search "+str(filter))
+    logging.debug("search "+str(filter))
     objlist = []
     collection = DbConn.get_db(objklass.__name__).find(filter)
     if 'order' in request.params:
