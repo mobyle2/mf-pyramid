@@ -93,6 +93,9 @@ if __name__ == '__main__':
     renderer.limit([ 'nomail', 'othermail@mail.fr', 'sample@nomail' ])
     renderer.add_extra_control('<button class="btn btn-info">Fake button</button>')
 
+    renderer = User.get_renderer('groupRef')
+    renderer.set_reference(Group)
+
     groupid_renderer = mf.renderer.SimpleReferenceRenderer(User,'groupid',Group)
 
     app = config.make_wsgi_app()

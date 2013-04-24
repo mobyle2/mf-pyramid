@@ -4,7 +4,7 @@ from mf.annotation import *
 from pyramid.response import Response
 from pyramid.view import view_config
 import mf.views
-from mongokit import Document, Connection
+from mongokit import Document, Connection, ObjectId
 from group import Group
 
 def home(request):
@@ -21,7 +21,8 @@ class User(Document):
 
   structure = { 'name': basestring, 'email': basestring, 'age': int, 'admin': bool,
   'options' : { 'tags': basestring , 'categories': basestring }, 'creation_date' : datetime, 'today': basestring, 'array' : [basestring] , 'group' : Group,
-  'multi' : [ { 'name' : Group, 'role' : basestring } ], 'groupid' : str
+  'multi' : [ { 'name' : Group, 'role' : basestring } ], 'groupid' : str,
+  'groupRef' : ObjectId,
   }
 
   default_values = { 'name' : 'Mike' }
