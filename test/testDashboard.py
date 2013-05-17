@@ -158,6 +158,7 @@ class TestDashboard(unittest.TestCase):
       user["email"] = "test@nomail.com"
       user["groupRef"] = group["_id"]
       renderer = User.get_renderer("groupRef")
+      assert(renderer.is_object_id == True)
       renderer.set_reference(Group)
       user.save()
       assert(group["_id"] == user['groupRef'])

@@ -812,7 +812,7 @@ class SimpleReferenceRenderer(ReferenceRenderer):
         logging.debug("match obj "+str(obj)+" with id "+str(value))
         if not obj:
             return None
-        if is_object_id:
+        if self.is_object_id:
             return ObjectId(value)
         return str(value)
 
