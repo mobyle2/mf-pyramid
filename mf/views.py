@@ -8,38 +8,43 @@ import logging
 import json
 from bson import json_util
 from bson.objectid import ObjectId
-from bson.dbref import DBRef
+#from bson.dbref import DBRef
 
 from mf.db_conn import DbConn
 
 MF_LIST = 'list'
 MF_MANAGE = 'manage'
 
+
 def pluralize(name):
-  '''Pluralize a name
-  :param name: Name of the object
-  :type name: str
-  :return: str - lowercase object name with a final s
-  '''
-  return name.lower()+"s"
+    '''Pluralize a name
+    :param name: Name of the object
+    :type name: str
+    :return: str - lowercase object name with a final s
+    '''
+    return name.lower() + "s"
+
 
 def mf_filter(objname, control):
-    '''Return a mongo filter on object. It calls, if exists, the *my* method of the current object and returns the filter obtained from this method.
+    '''Return a mongo filter on object. It calls, if exists,
+    the *my* method of the current object and returns the filter
+    obtained from this method.
     '''
     objklass = None
     for klass in Annotation.klasses():
-      if pluralize(klass.__name__) == pluralize(objname):
-        objklass = klass
-        break
+        if pluralize(klass.__name__) == pluralize(objname):
+            objklass = klass
+            break
     if objklass is None:
-      return {}
+        return {}
     attr = None
-    if hasattr(objklass(),'my'):
-      attr = getattr(objklass(),'my')
-    filter = {}
+    if hasattr(objklass(), 'my'):
+        attr = getattr(objklass(), 'my')
+    mffilter = {}
     if attr is not None and callable(attr):
-        filter = attr(control)
-    return filter
+        mffilter = attr(control)
+    return mffilter
+
 
 def mf_search(request):
     '''Returns a JSON list of objects matching criteria on object
@@ -50,57 +55,59 @@ def mf_search(request):
     objklass = None
     objname = request.matchdict['objname']
     for klass in Annotation.klasses():
-      if pluralize(klass.__name__) == pluralize(objname):
-        objklass = klass
-        break
+        if pluralize(klass.__name__) == pluralize(objname):
+            objklass = klass
+            break
     if objklass is None:
-      response = json.dumps({ 'status' : 1, 'error' : [], 'message' : 'Object does not exist' }, default=json_util.default)
-      return Response(body = response,content_type = "application/json")
-    filter = mf_filter(objname, MF_LIST)
-    if filter is None:
-      raise HTTPForbidden
+        response = json.dumps({'status': 1, 'error': [], 'message': 'Object does not exist'}, default=json_util.default)
+        return Response(body=response, content_type="application/json")
+    mffilter = mf_filter(objname, MF_LIST)
+    if mffilter is None:
+        raise HTTPForbidden
 
     for field in objklass.render_fields:
-      try:
-        param = request.params.getone('Search'+objklass.__name__+'['+field+']')
-      except Exception:
-        # This is fine
-        param = None
-      renderer = objklass().get_renderer(field)
-      #if isinstance(renderer,BooleanRenderer) and param is None:
-      #  param = False
-      if param is not None and param!='':
-        if renderer and not isinstance(renderer,CompositeRenderer):
+        try:
+            param = request.params.getone('Search' + objklass.__name__ + '[' + field + ']')
+        except Exception:
+            # This is fine
+            param = None
+        renderer = objklass().get_renderer(field)
+        #if isinstance(renderer,BooleanRenderer) and param is None:
+        #  param = False
+        if param is not None and param != '':
+            if renderer and not isinstance(renderer, CompositeRenderer):
 
-          if isinstance(renderer, ReferenceRenderer) and not isinstance(renderer, SimpleReferenceRenderer): 
-            filter[field+'.$id'] =  ObjectId(param)
-          elif isinstance(renderer, IntegerRenderer):
-            filter[field] = int(param)
-          elif isinstance(renderer, FloatRenderer):
-            filter[field] = float(param)
-          elif isinstance(renderer, BooleanRenderer):
-            if param in ['True', 'true', '1']:
-              filter[field] = True
-            else:
-              filter[field] = False
-          else:
-              filter[field] = { "$regex" : param }
-    logging.debug("search "+str(filter))
+                if isinstance(renderer, ReferenceRenderer) and \
+                    not isinstance(renderer, SimpleReferenceRenderer):
+                    mffilter[field + '.$id'] = ObjectId(param)
+                elif isinstance(renderer, IntegerRenderer):
+                    mffilter[field] = int(param)
+                elif isinstance(renderer, FloatRenderer):
+                    mffilter[field] = float(param)
+                elif isinstance(renderer, BooleanRenderer):
+                    if param in ['True', 'true', '1']:
+                        mffilter[field] = True
+                    else:
+                        mffilter[field] = False
+                else:
+                    mffilter[field] = {"$regex": param}
+    logging.debug("search " + str(mffilter))
     objlist = []
-    collection = DbConn.get_db(objklass.__name__).find(filter)
+    collection = DbConn.get_db(objklass.__name__).find(mffilter)
     if 'order' in request.params:
-      collection = collection.sort(request.params.getone('order'),int(request.params.getone('order_type')))
+        collection = collection.sort(request.params.getone('order'), int(request.params.getone('order_type')))
     if 'page' in request.params and 'pagesize' in request.params:
-      psize = int(request.params.getone('pagesize'))
-      page = int(request.params.getone('page'))
-      if page>0:
-        collection = collection.skip(page*psize).limit(psize)
-      else:
-        collection = collection.limit(psize)
+        psize = int(request.params.getone('pagesize'))
+        page = int(request.params.getone('page'))
+        if page > 0:
+            collection = collection.skip(page * psize).limit(psize)
+        else:
+            collection = collection.limit(psize)
     for obj in collection:
-      objlist.append(obj)
+        objlist.append(obj)
     objlist = json.dumps(objlist, default=json_util.default)
-    return Response(body=objlist,content_type = "application/json")
+    return Response(body=objlist, content_type="application/json")
+
 
 #@view_config(name='mf_list', route_name='mf_list', renderer='json', request_method='GET')
 def mf_list(request):
@@ -113,33 +120,33 @@ def mf_list(request):
     :return: json - List of objects
     '''
     objname = request.matchdict['objname']
-    filter = mf_filter(objname, MF_LIST)
-    if filter is None:
-      raise HTTPForbidden
+    mffilter = mf_filter(objname, MF_LIST)
+    if mffilter is None:
+        raise HTTPForbidden
     objlist = []
     objklass = None
     for klass in Annotation.klasses():
-      if pluralize(klass.__name__) == pluralize(objname):
-        objklass = klass
-        break
+        if pluralize(klass.__name__) == pluralize(objname):
+            objklass = klass
+            break
     #collection = Annotation.db_conn[pluralize(objname)]
-    #for obj in collection.find(filter):
+    #for obj in collection.find(mffilter):
     #  objlist.append(obj)
-    objects = DbConn.get_db(objklass.__name__).find(filter)
+    objects = DbConn.get_db(objklass.__name__).find(mffilter)
     if 'order' in request.params:
-      objects = objects.sort(request.params.getone('order'),int(request.params.getone('order_type')))
+        objects = objects.sort(request.params.getone('order'), int(request.params.getone('order_type')))
     if 'page' in request.params and 'pagesize' in request.params:
-      psize = int(request.params.getone('pagesize'))
-      page = int(request.params.getone('page'))
-      if page>0:
-        objects = objects.skip(page*psize).limit(psize)
-      else:
-        objects = objects.limit(psize)
+        psize = int(request.params.getone('pagesize'))
+        page = int(request.params.getone('page'))
+        if page > 0:
+            objects = objects.skip(page * psize).limit(psize)
+        else:
+            objects = objects.limit(psize)
 
     for obj in objects:
-      objlist.append(obj)
+        objlist.append(obj)
     objlist = json.dumps(objlist, default=json_util.default)
-    return Response(body=objlist,content_type = "application/json")
+    return Response(body=objlist, content_type="application/json")
 
 
 #@view_config(name='mf_show', route_name='mf_show', renderer='json', request_method='GET')
@@ -153,24 +160,25 @@ def mf_show(request):
     :return: json - Object from database
     '''
     objname = request.matchdict['objname']
-    filter = mf_filter(objname, MF_MANAGE)
+    mffilter = mf_filter(objname, MF_MANAGE)
     try:
-      filter["_id"] = ObjectId(request.matchdict['id'])
-    except Exception as e:
-      raise HTTPNotFound()
-    objlist = []
+        mffilter["_id"] = ObjectId(request. matchdict['id'])
+    except Exception:
+        raise HTTPNotFound()
+    #objlist = []
     objklass = None
     for klass in Annotation.klasses():
-      if pluralize(klass.__name__) == pluralize(objname):
-        objklass = klass
-        break
+        if pluralize(klass.__name__) == pluralize(objname):
+            objklass = klass
+            break
     collection = DbConn.get_db(objklass.__name__)
-    obj= collection.find_one(filter)
+    obj = collection.find_one(mffilter)
     if not obj:
-      raise HTTPNotFound()
-    response = { 'object' :  objname, 'status': 0, objname : obj, 'filter' : filter }
+        raise HTTPNotFound()
+    response = {'object': objname, 'status': 0, objname: obj, 'filter': mffilter}
     response = json.dumps(response, default=json_util.default)
-    return Response(body=response,content_type = "application/json")
+    return Response(body=response, content_type="application/json")
+
 
 #@view_config(name='mf_edit', route_name='mf_edit', renderer='json', request_method='POST', context='mf.dashboard.Dashboard', permission='all')
 def mf_edit(request):
@@ -181,37 +189,38 @@ def mf_edit(request):
     :return: json - Status of update and updated object
     '''
     objname = request.matchdict['objname']
-    filter = mf_filter(objname, MF_MANAGE)
-    filter["_id"] = ObjectId(request.matchdict['id'])
-    objlist = []
+    mffilter = mf_filter(objname, MF_MANAGE)
+    mffilter["_id"] = ObjectId(request.matchdict['id'])
+    #objlist = []
 
     objklass = None
     for klass in Annotation.klasses():
-      if pluralize(klass.__name__) == pluralize(objname):
-        objklass = klass
-        break
+        if pluralize(klass.__name__) == pluralize(objname):
+            objklass = klass
+            break
     collection = DbConn.get_db(objklass.__name__)
 
     status = 0
-    obj= collection.find_one(filter)
+    obj = collection.find_one(mffilter)
     if obj:
-      err = obj.bind_form(sorted(request.params.items()))
+        err = obj.bind_form(sorted(request.params.items()))
     else:
-      status = 1
-    if err:
-      status = 1
-    if status == 0:
-      try:
-        obj.save()
-      except Exception as e:
-        logging.error("Error while saving object "+str(e))
         status = 1
-    response = json.dumps({ 'status' : status, 'error' : err, 'message' : '', 'object' : obj }, default=json_util.default)
-    return Response(body = response,content_type = "application/json")
+    if err:
+        status = 1
+    if status == 0:
+        try:
+            obj.save()
+        except Exception as e:
+            logging.error("Error while saving object " + str(e))
+            status = 1
+    response = json.dumps({'status': status, 'error': err, 'message': '', 'object': obj}, default=json_util.default)
+    return Response(body=response, content_type="application/json")
+
 
 #@view_config(name='mf_delete', route_name='mf_delete', renderer='json', request_method='DELETE', context='mf.dashboard.Dashboard', permission='all')
 def mf_delete(request):
-    '''Delete an object 
+    '''Delete an object
     If object has a function "my()", then the function is called to get a
     filter on the request
 
@@ -220,50 +229,52 @@ def mf_delete(request):
     :return: json - Status fo the operation
     '''
     objname = request.matchdict['objname']
-    filter = mf_filter(objname, MF_MANAGE)
-    filter["_id"] = ObjectId(request.matchdict['id'])
-    objlist = []
+    mffilter = mf_filter(objname, MF_MANAGE)
+    mffilter["_id"] = ObjectId(request.matchdict['id'])
+    #objlist = []
 
     objklass = None
     for klass in Annotation.klasses():
-      if pluralize(klass.__name__) == pluralize(objname):
-        objklass = klass
-        break
+        if pluralize(klass.__name__) == pluralize(objname):
+            objklass = klass
+            break
     collection = DbConn.get_db(objklass.__name__)
 
     #collection = Annotation.db_conn[pluralize(objname)]
-    #obj = collection.remove(filter)
-    obj = collection.find_one(filter)
+    #obj = collection.remove(mffilter)
+    obj = collection.find_one(mffilter)
     obj.delete()
-    response = json.dumps({ 'status' : 0, 'error' : [], 'message' : 'Object deleted' }, default=json_util.default)
-    return Response(body = response,content_type = "application/json")
+    response = json.dumps({'status': 0, 'error': [], 'message': 'Object deleted'}, default=json_util.default)
+    return Response(body=response, content_type="application/json")
+
 
 #@view_config(name='mf_add', route_name='mf_add', renderer='json', request_method='PUT', context='mf.dashboard.Dashboard', permission='all')
 def mf_add(request):
     objklass = None
     objname = request.matchdict['objname']
     for klass in Annotation.klasses():
-      if pluralize(klass.__name__) == pluralize(objname):
-        objklass = klass
-        break
+        if pluralize(klass. __name__) == pluralize(objname):
+            objklass = klass
+            break
     if objklass is None:
-      response = json.dumps({ 'status' : 1, 'error' : [], 'message' : 'Object does not exist' }, default=json_util.default)
-      return Response(body = response,content_type = "application/json")
+        response = json.dumps({'status': 1, 'error': [], 'message': 'Object does not exist'}, default=json_util.default)
+        return Response(body=response, content_type="application/json")
     collection = DbConn.get_db(objklass.__name__)
     obj = collection()
     err = obj.bind_form(sorted(request.params.items()))
     status = 0
     if err:
-      status = 1
+        status = 1
     else:
-      obj.save()
-    response = json.dumps({ 'status' : status, 'error' : err, 'message' : '' }, default=json_util.default)
-    return Response(body = response, content_type = "application/json")
+        obj.save()
+    response = json.dumps({'status': status, 'error': err, 'message': ''}, default=json_util.default)
+    return Response(body=response, content_type="application/json")
+
 
 #@view_config(name='mf_admin', route_name='mf_admin', renderer='dashboard.mako', context='mf.dashboard.Dashboard', permission='all')
 def mf_admin(request):
     objects = []
     for klass in Annotation.klasses():
-      objects.append(klass.__name__)
-    return {'objects':objects, 'klasses': Annotation.klasses(), 'prefix': FormRenderer.prefix }
+        objects.append(klass.__name__)
+    return {'objects': objects, 'klasses': Annotation.klasses(), 'prefix': FormRenderer.prefix}
 

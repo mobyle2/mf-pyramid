@@ -41,6 +41,9 @@ if __name__ == '__main__':
 
     Group.set_display_fields(['name','creation_date'])
 
+    SuperGroup.set_display_list_fields(['name','tags'])
+
+
     user1 = connection.User()
     user1["name"] = "Mike"
     user1["age"] = 50

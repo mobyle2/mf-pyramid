@@ -15,6 +15,8 @@
 
    var mfprefix = '';
 
+   var objectsListFields = Array();
+
 $(function() {
 
 $(document).on("change", ".mf-psize", function(event) {
@@ -210,8 +212,10 @@ $(document).on("click", ".mf-prev", function(event) {
           if( key!='id' && val!=null && ((!jQuery.isPlainObject(val)) || val['$date']!=null )) {
             var type = $('#'+curObject+'\\['+key+'\\]').attr('type');
             if ( $.inArray(key, keys) < 0) {
-              keys.push(key)
-              types[key] = type
+              if(objectsListFields[curObject]==null || $.inArray(key,objectsListFields[curObject]) >= 0) {
+              keys.push(key);
+              types[key] = type;
+              }
             }
           }
         });
@@ -301,6 +305,8 @@ $(document).on("click", ".mf-prev", function(event) {
        }
        else if(val['$oid']!=null){
          $('#'+elt).val(val['$oid']);
+         $('#DbRef'+elt).text(val['$oid']);
+         searchDbRef(elt);
        }
        else if(val['_id']!=null && val['_id']['$oid']!=null){
          // Db object reference
@@ -441,7 +447,7 @@ $(document).on("click", ".mf-prev", function(event) {
   * get id, search in database and update name in dbref container.
   */
   function searchDbRef(container){
-
+      console.log("SALLOU dbref "+container);
       id = $('#'+container).val();
       var obj = $('#DbRef'+container).attr("data-object");
       if(obj==null) { return; }

@@ -1,3 +1,9 @@
+0.1.18: Add possiblity to specify fields to show for objects list
+        with set_display_list_fields
+        Fix bug on renderer
+        Fix bug related to ObjectId bindings
+        PEP8 compliance
+0.1.17: Fix test on is_object_id for SimpleRenderer
 0.1.16: Fix status code for mf_show
 0.1.15: CustomType are declared with instance and not class
 0.1.14: Fix trailing slash in routes for PUT
