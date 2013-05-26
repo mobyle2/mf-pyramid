@@ -62,7 +62,7 @@ find_one() via connection
 
 If user must have only limited access to a query, i.e list only a subset of an object (/users), it is necessary to add to the object a function defined as:
 
-    def my(self, control):
+    def my(self, control, request=None):
       '''
       Return a mongodb filter on object
       control is a mf.views.MF_LIST or MF_MANAGE according to expected access on object
@@ -70,6 +70,8 @@ If user must have only limited access to a query, i.e list only a subset of an o
       if method returns {}, then access is allowed
       if method returns a mongo filter, it will be applied on request to access object(s)
       ....
+      Request parameter is the pyramid request object, can be used to get
+parameters, authenticated user etc...
       return filter
 
 If this function is not defined, then all elements are available via GET method.

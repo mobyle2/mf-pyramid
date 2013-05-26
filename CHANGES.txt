@@ -1,3 +1,5 @@
+0.1.19: Add request object as input to the "my" method to get context
+        information.
 0.1.18: Add possiblity to specify fields to show for objects list
         with set_display_list_fields
         Fix bug on renderer

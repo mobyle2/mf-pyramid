@@ -53,12 +53,14 @@ class User(Document):
   def html(self, fields = None):
     return self.render(fields)
 
-  def my(self,control):
+  def my(self, control, request):
     '''
     Checks user access to the object
 
     :param control: type of access
     :type control: str
+    :param request: pyramid request object
+    :type request: pyramid.request
     :return: dict - Mongodb filter to apply on object search
     '''
     if control == mf.views.MF_LIST:

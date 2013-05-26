@@ -25,10 +25,17 @@ def pluralize(name):
     return name.lower() + "s"
 
 
-def mf_filter(objname, control):
+def mf_filter(objname, control, request=None):
     '''Return a mongo filter on object. It calls, if exists,
     the *my* method of the current object and returns the filter
     obtained from this method.
+    :param objname: Name of the current object
+    :type objname: str
+    :param control: Type of operation
+    :type control: MF_LIST or MF_MANAGE
+    :param request: Current request
+    :type request: pyramid.request
+    :return: filter to use (dict)
     '''
     objklass = None
     for klass in Annotation.klasses():
@@ -42,7 +49,7 @@ def mf_filter(objname, control):
         attr = getattr(objklass(), 'my')
     mffilter = {}
     if attr is not None and callable(attr):
-        mffilter = attr(control)
+        mffilter = attr(control, request)
     return mffilter
 
 
@@ -61,7 +68,7 @@ def mf_search(request):
     if objklass is None:
         response = json.dumps({'status': 1, 'error': [], 'message': 'Object does not exist'}, default=json_util.default)
         return Response(body=response, content_type="application/json")
-    mffilter = mf_filter(objname, MF_LIST)
+    mffilter = mf_filter(objname, MF_LIST, request)
     if mffilter is None:
         raise HTTPForbidden
 
@@ -120,7 +127,7 @@ def mf_list(request):
     :return: json - List of objects
     '''
     objname = request.matchdict['objname']
-    mffilter = mf_filter(objname, MF_LIST)
+    mffilter = mf_filter(objname, MF_LIST, request)
     if mffilter is None:
         raise HTTPForbidden
     objlist = []
@@ -160,7 +167,7 @@ def mf_show(request):
     :return: json - Object from database
     '''
     objname = request.matchdict['objname']
-    mffilter = mf_filter(objname, MF_MANAGE)
+    mffilter = mf_filter(objname, MF_MANAGE, request)
     try:
         mffilter["_id"] = ObjectId(request. matchdict['id'])
     except Exception:
@@ -189,7 +196,7 @@ def mf_edit(request):
     :return: json - Status of update and updated object
     '''
     objname = request.matchdict['objname']
-    mffilter = mf_filter(objname, MF_MANAGE)
+    mffilter = mf_filter(objname, MF_MANAGE, request)
     mffilter["_id"] = ObjectId(request.matchdict['id'])
     #objlist = []
 
@@ -229,7 +236,7 @@ def mf_delete(request):
     :return: json - Status fo the operation
     '''
     objname = request.matchdict['objname']
-    mffilter = mf_filter(objname, MF_MANAGE)
+    mffilter = mf_filter(objname, MF_MANAGE, request)
     mffilter["_id"] = ObjectId(request.matchdict['id'])
     #objlist = []
 
