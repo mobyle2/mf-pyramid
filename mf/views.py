@@ -168,8 +168,11 @@ def mf_show(request):
     '''
     objname = request.matchdict['objname']
     mffilter = mf_filter(objname, MF_MANAGE, request)
+    if mffilter is None:
+        raise HTTPForbidden
+
     try:
-        mffilter["_id"] = ObjectId(request. matchdict['id'])
+        mffilter["_id"] = ObjectId(request.matchdict['id'])
     except Exception:
         raise HTTPNotFound()
     #objlist = []
@@ -197,6 +200,9 @@ def mf_edit(request):
     '''
     objname = request.matchdict['objname']
     mffilter = mf_filter(objname, MF_MANAGE, request)
+    if mffilter is None:
+            raise HTTPForbidden
+
     mffilter["_id"] = ObjectId(request.matchdict['id'])
     #objlist = []
 
@@ -237,6 +243,9 @@ def mf_delete(request):
     '''
     objname = request.matchdict['objname']
     mffilter = mf_filter(objname, MF_MANAGE, request)
+    if mffilter is None:
+            raise HTTPForbidden
+
     mffilter["_id"] = ObjectId(request.matchdict['id'])
     #objlist = []
 
