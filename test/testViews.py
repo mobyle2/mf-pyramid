@@ -82,3 +82,14 @@ class TestViews(unittest.TestCase):
         users = json.loads(response.body)
         assert(len(users)==1)
         assert(users[0]['email'] == 'other@nomail.com')
+
+    def test_show_user(self):
+        user = connection.User.find_one({'email' : 'dummy@nomail.com'})
+        request = testing.DummyRequest()
+        request.matchdict['objname'] = 'user'
+        request.matchdict['id'] = user['_id']
+        response = mf_show(request)
+        user = json.loads(response.body)
+        assert(user['user']['email'] == 'dummy@nomail.com')
+
+
