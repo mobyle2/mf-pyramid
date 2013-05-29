@@ -1,8 +1,8 @@
-
+from __future__ import absolute_import
 import mf.annotation
-from db_conn import DbConn
-from renderer import FormRenderer
-from views import *
+from .db_conn import DbConn
+from .renderer import FormRenderer
+from .views import *
 
 
 class Dashboard:
