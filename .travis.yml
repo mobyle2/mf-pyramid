@@ -9,6 +9,9 @@ branches:
 # command to install dependencies
 install: 
   - pip install coverage
+  - pip install python-coveralls
   - pip install -r requirements.txt --use-mirrors
 # command to run tests
 script: nosetests --with-coverage --cover-package=mf
+after_success:
+  - coveralls
