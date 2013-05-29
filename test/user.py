@@ -47,6 +47,9 @@ class User(Document):
   'groupRef' : ObjectId,
   }
 
+  default_values = { 'groups' : [] }
+
+
   use_autorefs = True
 
 

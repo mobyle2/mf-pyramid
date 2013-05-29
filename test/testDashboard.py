@@ -19,9 +19,9 @@ Dashboard.set_connection(connection)
 
 class TestDashboard(unittest.TestCase):
 
-  def setup(self):
+  def setUp(self):
     Dashboard.__klasses = []
-    collection = DbConn.get_db("User")
+    collection = connection.User.find()
     for user in collection:
       user.delete()
 

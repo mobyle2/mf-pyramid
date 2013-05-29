@@ -33,7 +33,7 @@ class User(Document):
   def html(self, fields = None):
     return self.render(fields)
 
-  def my(self,control):
+  def my(self, control, request):
     '''
     Checks user access to the object
 
