@@ -151,3 +151,7 @@ class TestViews(unittest.TestCase):
         raise
         
 
+    def test_mf_admin(self):
+        request = testing.DummyRequest()
+        response = mf_admin(request)
+        assert('User' in response['objects'])

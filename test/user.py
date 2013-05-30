@@ -45,16 +45,17 @@ class User(Document):
   'multi' : [ { 'name' : basestring, 'role' : basestring } ],
   'custom' :  CustomStatus(),
   'groupRef' : ObjectId,
+  'floattag' : float
   }
 
-  default_values = { 'groups' : [] }
+  default_values = { 'groups' : [], 'floattag': 0.1 }
 
 
   use_autorefs = True
 
 
   def html(self, fields = None):
-    return self.render(fields)
+    return self.render(fields)+"\n"+self.render_search(fields)
 
   def my(self, control, request):
     '''
