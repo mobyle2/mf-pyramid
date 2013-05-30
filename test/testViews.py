@@ -16,6 +16,7 @@ import logging
 import json
 
 from pyramid import testing
+from pyramid.httpexceptions import HTTPForbidden
 
 from webob.multidict import MultiDict
 
@@ -66,14 +67,14 @@ class TestViews(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def test_list_users(self):
+    def test_mf_list(self):
         request = testing.DummyRequest()
         request.matchdict['objname'] = 'user'
         response = mf_list(request)
         users = json.loads(response.body)
         assert(len(users)==2)
 
-    def test_search_user(self):
+    def test_mf_search(self):
         mdict = MultiDict()
         mdict.add('SearchUser[email]' ,'other')
         request = testing.DummyRequest(mdict)
@@ -83,7 +84,7 @@ class TestViews(unittest.TestCase):
         assert(len(users)==1)
         assert(users[0]['email'] == 'other@nomail.com')
 
-    def test_show_user(self):
+    def test_mf_show(self):
         user = connection.User.find_one({'email' : 'dummy@nomail.com'})
         request = testing.DummyRequest()
         request.matchdict['objname'] = 'user'
@@ -92,4 +93,61 @@ class TestViews(unittest.TestCase):
         user = json.loads(response.body)
         assert(user['user']['email'] == 'dummy@nomail.com')
 
+    def test_mf_add(self):
+        #  request = [("User[name]","sample"),
+        #  ("User[email]","test@nomail.com")]
+        mdict = MultiDict()
+        mdict.add('User[email]' ,'test@add')
+        mdict.add('User[name]' ,'testadd')
+        request = testing.DummyRequest(mdict)
+        request.matchdict['objname'] = 'user'
+        response = mf_add(request)
+        res = json.loads(response.body)
+        assert(res['status']==0)
+        user = connection.User.find_one({'email' : 'test@add'})
+        assert (user is not None)
+
+
+
+    def test_mf_delete(self):
+        user = connection.User.find_one({'email' : 'dummy@nomail.com'})
+        users = connection.User.find().count()
+        assert(users == 3)
+        request = testing.DummyRequest()
+        request.matchdict['objname'] = 'user'
+        request.matchdict['id'] = user['_id']
+        response = mf_delete(request)
+        res = json.loads(response.body)
+        assert(res['status']==0)
+        users = connection.User.find().count()
+        assert(users == 2)
+
+    def test_mf_edit(self):
+        user = connection.User.find_one({'email' : 'dummy@nomail.com'})
+        mdict = MultiDict()
+        mdict.add('User[name]' ,'Alfred')
+        request = testing.DummyRequest(mdict)
+        request.matchdict['objname'] = 'user'
+        request.matchdict['id'] = user['_id']
+        response = mf_edit(request)
+        res = json.loads(response.body)
+        assert(res['status']==0)
+        user = connection.User.find_one({'email' : 'dummy@nomail.com'})
+        assert(user['name'] == 'Alfred')
+
+
+    def test_mf_edit_forbidden(self):
+        user = connection.User.find_one({'email' : 'dummy@nomail.com'})
+        mdict = MultiDict()
+        mdict.add('User[name]' ,'Tommy')
+        request = testing.DummyRequest(mdict)
+        request.matchdict['objname'] = 'user'
+        request.matchdict['id'] = user['_id']
+        try:
+            response = mf_edit(request)
+        except HTTPForbidden:
+            pass
+            return
+        raise
+        
 

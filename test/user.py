@@ -68,6 +68,14 @@ class User(Document):
     '''
     if control == mf.views.MF_LIST:
       return { 'name' : 'Mike' }
+    if control == mf.views.MF_MANAGE:
+        try:
+            param = request.params.getone('User[name]')
+            if param == 'Tommy':
+                # For testing, prevent updating with name=Tommy
+                return None
+        except Exception:
+            return {}
     return {}
 
 
