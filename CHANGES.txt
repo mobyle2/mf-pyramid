@@ -1,3 +1,4 @@
+0.1.21: Add authenticated user id as input to the *my* method of user objects
 0.1.20: Add code coverage, add support for None in mf filter for MF_MANAGE
 0.1.19: Add request object as input to the "my" method to get context
         information.
