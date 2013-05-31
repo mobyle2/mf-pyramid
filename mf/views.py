@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 from pyramid.view import view_config
+from pyramid.security import authenticated_userid
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden
 from mf.annotation import Annotation
@@ -50,7 +51,11 @@ def mf_filter(objname, control, request=None):
         attr = getattr(objklass(), 'my')
     mffilter = {}
     if attr is not None and callable(attr):
-        mffilter = attr(control, request)
+        if request is not None:
+            userid = authenticated_userid(request)
+        else:
+            userid = None
+        mffilter = attr(control, request, userid)
     return mffilter
 
 

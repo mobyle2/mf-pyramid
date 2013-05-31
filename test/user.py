@@ -57,7 +57,7 @@ class User(Document):
   def html(self, fields = None):
     return self.render(fields)+"\n"+self.render_search(fields)
 
-  def my(self, control, request):
+  def my(self, control, request, authenticated_userid):
     '''
     Checks user access to the object
 
@@ -66,7 +66,11 @@ class User(Document):
     :param request: pyramid request object
     :type request: pyramid.request
     :return: dict - Mongodb filter to apply on object search
+    :param authenticated_userid: id of the user logging in
+    :type authenticated_userid: str
     '''
+    if authenticated_userid == 'anonymous':
+        return None
     if control == mf.views.MF_LIST:
       return { 'name' : 'Mike' }
     if control == mf.views.MF_MANAGE:
