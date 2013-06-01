@@ -74,8 +74,18 @@ If user must have only limited access to a query, i.e list only a subset of an o
 parameters, authenticated user etc...
       return filter
 
-If this function is not defined, then all elements are available via GET method.
-Filter is a mongo filter
+If this function is not defined, then all elements are available via
+GET/PUT/POST/DELETE method.
+
+Filter is a pymongo filter
+
+In the case of a MANAGE operation (GET/POST/DELETE/PUT for a specific object
+e.g. POST  /notes/12 ), *my* is called on the object instance, and instance
+parameters can be used to decide of the operation is allowed. Usually, a
+MF_MANAGE will only return None(reject) or {} (accept), according to current
+user and current object.
+A MF_LIST is not attached to a specific object instance (e.g. GET /notes) , so
+the *my* method will be called on a *new* object instance (e.g. notes().my())
 
 
 Other functions may be implemented in objects to override default behaviour:

@@ -47,8 +47,22 @@ def mf_filter(objname, control, request=None):
     if objklass is None:
         return {}
     attr = None
-    if hasattr(objklass(), 'my'):
-        attr = getattr(objklass(), 'my')
+
+    if control == MF_MANAGE:
+        # If MANAGE operation, load related object
+        try:
+            object_id = ObjectId(request.matchdict['id'])
+        except Exception:
+            raise HTTPNotFound()
+        collection = DbConn.get_db(objklass.__name__)
+        my_object_instance = collection.find_one({ '_id' : object_id})
+
+    else:
+        # This is a list, load an empty object
+        my_object_instance = objklass()
+
+    if hasattr(my_object_instance, 'my'):
+        attr = getattr(my_object_instance, 'my')
     mffilter = {}
     if attr is not None and callable(attr):
         if request is not None:

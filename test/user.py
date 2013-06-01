@@ -75,6 +75,8 @@ class User(Document):
       return { 'name' : 'Mike' }
     if control == mf.views.MF_MANAGE:
         try:
+            if self['age'] == 10:
+                return None
             param = request.params.getone('User[name]')
             if param == 'Tommy':
                 # For testing, prevent updating with name=Tommy

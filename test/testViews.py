@@ -148,7 +148,32 @@ class TestViews(unittest.TestCase):
         except HTTPForbidden:
             pass
             return
-        raise
+        raise HTTPForbidden
+
+    def test_mf_edit_forbidden_age_10(self):
+        user = connection.User.find_one({'email' : 'dummy@nomail.com'})
+        user['age'] = 20
+        user.save()
+        mdict = MultiDict()
+        mdict.add('User[name]' ,'Alfred')
+        request = testing.DummyRequest(mdict)
+        request.matchdict['objname'] = 'user'
+        request.matchdict['id'] = user['_id']
+        response = mf_edit(request)
+        res = json.loads(response.body)
+        assert(res['status']==0)
+        user['age'] = 10
+        user.save()
+        request = testing.DummyRequest(mdict)
+        request.matchdict['objname'] = 'user'
+        request.matchdict['id'] = user['_id']
+        try:
+            response = mf_edit(request)
+        except HTTPForbidden:
+            pass
+            return
+        raise HTTPForbidden
+
         
 
     def test_mf_admin(self):
