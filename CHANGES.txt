@@ -1,3 +1,4 @@
+0.1.23: use setuptools to install requirements
 0.1.22: Load expected object instance before calling *my* method for
         MF_MANAGE operations to be able to use object parameters in ACL
         decision
