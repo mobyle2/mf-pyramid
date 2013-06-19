@@ -143,14 +143,12 @@ def mf_list(request):
     :return: json - List of objects
     '''
     objname = request.matchdict['objname']
-    print objname
     mffilter = mf_filter(objname, MF_READ, request)
     if mffilter is None:
         raise HTTPForbidden
     objlist = []
     objklass = None
     for klass in Annotation.klasses():
-        print pluralize(klass.__name__) + "==" + pluralize(objname)
         if pluralize(klass.__name__) == pluralize(objname):
             objklass = klass
             break
