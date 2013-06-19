@@ -16,7 +16,6 @@ from mf.db_conn import DbConn
 
 MF_READ = 'read'
 MF_EDIT = 'edit'
-MF_MANAGE = 'manage'
 
 def pluralize(name):
     '''Pluralize a name
