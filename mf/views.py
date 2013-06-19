@@ -14,9 +14,9 @@ from bson.objectid import ObjectId
 
 from mf.db_conn import DbConn
 
-MF_LIST = 'list'
+MF_READ = 'read'
+MF_EDIT = 'edit'
 MF_MANAGE = 'manage'
-
 
 def pluralize(name):
     '''Pluralize a name
@@ -47,18 +47,16 @@ def mf_filter(objname, control, request=None):
     if objklass is None:
         return {}
     attr = None
-
-    if control == MF_MANAGE:
-        # If MANAGE operation, load related object
+    id_to_load = None
+    if request.matchdict.has_key('id'):
+        id_to_load = request.matchdict['id']
+    if id_to_load is not None:
         try:
-            object_id = ObjectId(request.matchdict['id'])
-        except Exception:
+            collection = DbConn.get_db(objklass.__name__)
+            my_object_instance = collection.find_one({ '_id' : ObjectId(id_to_load)})
+        except:
             raise HTTPNotFound()
-        collection = DbConn.get_db(objklass.__name__)
-        my_object_instance = collection.find_one({ '_id' : object_id})
-
     else:
-        # This is a list, load an empty object
         my_object_instance = objklass()
 
     if hasattr(my_object_instance, 'my'):
@@ -71,7 +69,6 @@ def mf_filter(objname, control, request=None):
             userid = None
         mffilter = attr(control, request, userid)
     return mffilter
-
 
 def mf_search(request):
     '''Returns a JSON list of objects matching criteria on object
@@ -88,7 +85,7 @@ def mf_search(request):
     if objklass is None:
         response = json.dumps({'status': 1, 'error': [], 'message': 'Object does not exist'}, default=json_util.default)
         return Response(body=response, content_type="application/json")
-    mffilter = mf_filter(objname, MF_LIST, request)
+    mffilter = mf_filter(objname, MF_READ, request)
     if mffilter is None:
         raise HTTPForbidden
 
@@ -147,12 +144,14 @@ def mf_list(request):
     :return: json - List of objects
     '''
     objname = request.matchdict['objname']
-    mffilter = mf_filter(objname, MF_LIST, request)
+    print objname
+    mffilter = mf_filter(objname, MF_READ, request)
     if mffilter is None:
         raise HTTPForbidden
     objlist = []
     objklass = None
     for klass in Annotation.klasses():
+        print pluralize(klass.__name__) + "==" + pluralize(objname)
         if pluralize(klass.__name__) == pluralize(objname):
             objklass = klass
             break
@@ -169,7 +168,6 @@ def mf_list(request):
             objects = objects.skip(page * psize).limit(psize)
         else:
             objects = objects.limit(psize)
-
     for obj in objects:
         objlist.append(obj)
     objlist = json.dumps(objlist, default=json_util.default)
@@ -187,7 +185,7 @@ def mf_show(request):
     :return: json - Object from database
     '''
     objname = request.matchdict['objname']
-    mffilter = mf_filter(objname, MF_MANAGE, request)
+    mffilter = mf_filter(objname, MF_READ, request)
     if mffilter is None:
         raise HTTPForbidden
 
@@ -219,7 +217,7 @@ def mf_edit(request):
     :return: json - Status of update and updated object
     '''
     objname = request.matchdict['objname']
-    mffilter = mf_filter(objname, MF_MANAGE, request)
+    mffilter = mf_filter(objname, MF_EDIT, request)
     if mffilter is None:
             raise HTTPForbidden
 
@@ -262,7 +260,7 @@ def mf_delete(request):
     :return: json - Status fo the operation
     '''
     objname = request.matchdict['objname']
-    mffilter = mf_filter(objname, MF_MANAGE, request)
+    mffilter = mf_filter(objname, MF_EDIT, request)
     if mffilter is None:
             raise HTTPForbidden
 
