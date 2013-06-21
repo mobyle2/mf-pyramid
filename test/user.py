@@ -71,9 +71,9 @@ class User(Document):
     '''
     if authenticated_userid == 'anonymous':
         return None
-    if control == mf.views.MF_LIST:
+    if control == mf.views.MF_READ:
       return { 'name' : 'Mike' }
-    if control == mf.views.MF_MANAGE:
+    if control == mf.views.MF_EDIT:
         try:
             if self['age'] == 10:
                 return None
