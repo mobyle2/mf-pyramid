@@ -116,7 +116,7 @@ def renderer(klass, name, attr, parent=''):
        raise Exception(name + ", " + attr.__class__.__name__ + " is not a managed type")
 
 
-def render(self, fields = None):
+def render(self, fields=None):
     """
     Render in HTML form an object
 
@@ -224,6 +224,22 @@ def get_display_list_fields(klass):
     """
     return klass.__field_list_display
 
+
+@classmethod
+def search_by(klass, field):
+    """
+    In REST requests, search element by field instead of *_id*.
+    Field must be a unique identifier. For the moment, this method
+     works only on primary attributes, not sub attributes of the object.
+
+    ..TODO: manage sub attributes
+
+    :param field: Field name to use as key in search
+    :type field: str
+    """
+    klass.__field_search_by = field
+
+
 def mf_decorator(klass):
     '''
     Decorator used with annotations on an object class.
@@ -232,6 +248,7 @@ def mf_decorator(klass):
     klass.__field_display = []
     klass.__field_list_display = []
     klass.__field_errors = []
+    klass.__field_search_by = "_id"
     klass.render_fields = dict()
     #original_methods = klass.__dict__.copy()
     if not hasattr(klass, 'bind_form'):
@@ -247,6 +264,7 @@ def mf_decorator(klass):
     setattr(klass, "set_display_fields", set_display_fields)
     setattr(klass, "set_display_list_fields", set_display_list_fields)
     setattr(klass, "get_display_list_fields", get_display_list_fields)
+    setattr(klass, "search_by", search_by)
 
     attributes = dir(klass)
     if Annotation.use_schema_variable() is not None:

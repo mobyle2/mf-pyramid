@@ -622,7 +622,9 @@ class CompositeRenderer(AbstractRenderer):
                 parentname += '[' + parent + ']'
                 fieldname += parent + "."
         fieldname += self.name
-        html = '<div class="mf-composite" id="' + self.klass + parentname + '['+self.name+']' + '"><span class="mf-composite-label">' + self.name + '</span>'
+        html = '<div class="mf-composite" id="' + self.klass + parentname + \
+                '[' + self.name + ']' + '"><span class="mf-composite-label">' \
+                 + self.name + '</span>'
         #for renderer in self._renderers:
         for field in self._renderers:
             renderer = self.rootklass().get_renderer(fieldname + "." + field)
@@ -666,7 +668,8 @@ class CompositeRenderer(AbstractRenderer):
 
     def bind_all(self, request, instance, name, parent=[]):
         '''
-        In case of array containing Composite, one need to extract each composite one by one
+        In case of array containing Composite, one need to extract
+        each composite one by one
         '''
         self.err = False
         parent.extend([name])
@@ -724,10 +727,12 @@ class FloatRenderer(AbstractRenderer):
         if parents:
             for parent in parents:
                 parentname += '[' + parent + ']'
-        return _htmlNumber(self.klass + parentname + '[' + self.name + ']', self.name, value, self.err) + self.get_extra_controls()
+        return _htmlNumber(self.klass + parentname + '[' + self.name
+                + ']', self.name, value, self.err) + self.get_extra_controls()
 
     def render_search(self, value=None):
-        return _htmlNumber('Search' + self.klass + '[' + self.name + ']', self.name, '')
+        return _htmlNumber('Search' + self.klass
+                + '[' + self.name + ']', self.name, '')
 
     def validate(self, value):
         #intvalue = 0
@@ -773,15 +778,18 @@ class ReferenceRenderer(AbstractRenderer):
         if parents:
             for parent in parents:
                 parentname += '[' + parent + ']'
-        html = '<div class="mf-reference" id="Ref' + self.klass + parentname + '[' + self.name + ']' + '">'
-        html += _htmlAutoComplete(self.klass + parentname + '[' + self.name + ']', self.name, value, self._reference)
+        html = '<div class="mf-reference" id="Ref' + self.klass \
+                + parentname + '[' + self.name + ']' + '">'
+        html += _htmlAutoComplete(self.klass + parentname + '['
+                        + self.name + ']', self.name, value, self._reference)
         html += '</div>'
         return html + self.get_extra_controls()
 
-
     def render_search(self, value=None):
-        html = '<div class="mf-reference" id="Ref' + self.klass + '[' + self.name + ']' + '">'
-        html += _htmlAutoComplete('Search' + self.klass + '[' + self.name + ']', self.name, '', self._reference)
+        html = '<div class="mf-reference" id="Ref' + self.klass \
+                + '[' + self.name + ']' + '">'
+        html += _htmlAutoComplete('Search' + self.klass + '[' + self.name
+                        + ']', self.name, '', self._reference)
         html += '</div>'
         return html
 
@@ -829,14 +837,20 @@ def _htmlChoiceTextField(id, name, value, choice_list, error=False):
     errorClass = ''
     if error:
         errorClass = 'error'
-    html = '<div class="mf-field mf-textfield control-group ' + errorClass + '"><label class="control-label" for="' + id + '">' + name.title() + '</label><div class="controls"><select data-default="' + (str(value) or '') + '" data-type="choice" id="' + id + '" name="' + id + '">'
+    html = '<div class="mf-field mf-textfield control-group ' + errorClass \
+                + '"><label class="control-label" for="' + id + '">' \
+                + name.title() \
+                + '</label><div class="controls"><select data-default="' \
+                + (str(value) or '') + '" data-type="choice" id="' + id \
+                + '" name="' + id + '">'
     html += '<option value="">Any</option>'
     for choice in choice_list:
         if choice == value:
             selected = 'selected'
         else:
             selected = ''
-        html += '<option value="' + choice + '"  ' + selected + '>' + (choice or 'Any') + '</option>'
+        html += '<option value="' + choice + '"  ' + selected + '>' \
+                    + (choice or 'Any') + '</option>'
     html += '</select></div></div>'
     return html
 
@@ -845,25 +859,51 @@ def _htmlTextField(id, name, value, error=False):
     errorClass = ''
     if error:
         errorClass = 'error'
-    return '<div class="mf-field mf-textfield control-group ' + errorClass + '"><label class="control-label" for="' + id + '">' + name.title() + '</label><div class="controls"><input data-default="' + (str(value) or '') + '" type="text" id="' + id + '" name="' + id + '"   value="' + (str(value or '')) + '"/></div></div>'
+    return '<div class="mf-field mf-textfield control-group ' + errorClass \
+            + '"><label class="control-label" for="' + id + '">' \
+            + name.title() \
+            + '</label><div class="controls"><input data-default="' \
+            + (str(value) or '') + '" type="text" id="' + id + '" name="' \
+            + id + '"   value="' + (str(value or '')) + '"/></div></div>'
 
 
 def _htmlAutoComplete(id, name, value, klass, error=False):
     errorClass = ''
     if error:
         errorClass = 'error'
-    return '<div class="mf-field mf-autocomplete control-group' + errorClass + '"><label class="control-label" for="DbRef' + id + '">' + name.title() + '</label><div class="controls"><input data-default="' + (str(value) or '') + '" data-type="dbref" type="hidden" id="' + id + '" name="' + id + '"   value="' + (str(value or '')) + '"/><input type="text" data-object="' + klass +'" data-dbref="' + id + '" id="DbRef' + id + '" class="mf-dbref"><i data-dbref="' + id + '" id="DbRefClear' + id + '" class="mf-clear-object icon-trash"></i></div></div>'
+    return '<div class="mf-field mf-autocomplete control-group' + errorClass \
+            + '"><label class="control-label" for="DbRef' + id + '">' \
+            + name.title() \
+            + '</label><div class="controls"><input data-default="' \
+            + (str(value) or '') + '" data-type="dbref" type="hidden" id="' \
+            + id + '" name="' + id + '"   value="' + (str(value or '')) \
+            + '"/><input type="text" data-object="' + klass \
+            + '" data-dbref="' + id + '" id="DbRef' \
+            + id + '" class="mf-dbref"><i data-dbref="' \
+            + id + '" id="DbRefClear' \
+            + id + '" class="mf-clear-object icon-trash"></i></div></div>'
 
 
 def _htmlDateTime(id, name, value, error=False, type='datetime'):
     errorClass = ''
     if error:
         errorClass = 'error'
-    return '<div class="mf-field mf-datetime control-group ' + errorClass + '"><label class="control-label" for="' + id + '">' + name.title() + '</label><div class="controls"><input data-default="' + (str(value) or '') + '" type="' + type + '" id="' + id + '" name="' + id + '"   value="' + (str(value or '')) + '"/></div></div>'
+    return '<div class="mf-field mf-datetime control-group ' + errorClass \
+            + '"><label class="control-label" for="' + id + '">' \
+            + name.title() \
+            + '</label><div class="controls"><input data-default="' \
+            + (str(value) or '') + '" type="' + type \
+            + '" id="' + id + '" name="' + id \
+            + '"   value="' + (str(value or '')) + '"/></div></div>'
 
 
 def _htmlHidden(id, name, value):
-    return '<div class="mf-field mf-textfield control-group"><label class="control-label" for="' + id + '">' + name.title() + '</label><div class="controls"><input data-default="' + (str(value) or '') + '" type="text" id="' + id + '" name="' + id + '"   value="' + (str(value or '')) + '"  disabled/></div></div>'
+    return '<div class="mf-field mf-textfield control-group">' \
+            + '<label class="control-label" for="' + id + '">' + name.title() \
+            + '</label><div class="controls"><input data-default="' \
+            + (str(value) or '') + '" type="text" id="' + id \
+            + '" name="' + id + '"   value="' + (str(value or '')) \
+            + '"  disabled/></div></div>'
 
 
 def _htmlCheckBox(id, name, value, error=False):
@@ -873,18 +913,33 @@ def _htmlCheckBox(id, name, value, error=False):
     checked = ''
     if value:
         checked = 'checked'
-    return '<div class="mf-field mf-checkbox control-group ' + errorClass + '"><div class="controls"><label class="checkbox"><input data-default="' + str(value) + '" type="checkbox" value="' + str(value) + '" id="' + id + '" name="' + id + '" ' + checked + '>' + name + '</label></div></div>'
+    return '<div class="mf-field mf-checkbox control-group ' + errorClass \
+            + '"><div class="controls"><label class="checkbox">' \
+            + '<input data-default="' + str(value) \
+            + '" type="checkbox" value="' + str(value) \
+            + '" id="' + id + '" name="' + id + '" ' + checked + '>' \
+            + name + '</label></div></div>'
 
 
 def _htmlNumber(id, name, value, error=False):
     errorClass = ''
     if error:
         errorClass = 'error'
-    return '<div class="mf-field mf-numberfield control-group ' + errorClass + '"><label class="control-label" for="' + id + '">' + name.title() + '</label><div class="controls"><input data-default="' + str(value) + '" type="number" id="' + id + '" name="' + id + '" value="' + str(value) + '"/></div></div>'
+    return '<div class="mf-field mf-numberfield control-group ' + errorClass \
+            + '"><label class="control-label" for="' + id + '">' \
+            + name.title() + '</label><div class="controls">' \
+            + '<input data-default="' + str(value) + '" type="number" id="' \
+            + id + '" name="' + id \
+            + '" value="' + str(value) + '"/></div></div>'
 
 
 def _htmlControls(name):
-    return '<div class="form-actions mf-actions"><button id="mf-save-' + name + '" class="mf-btn btn btn-primary">Save</button><button id=mf-clear-' + name + '" class="mf-btn btn btn-primary">Clear</button><button id=mf-delete-' + name + '" class="mf-btn btn btn-danger">Delete</button></div>'
+    return '<div class="form-actions mf-actions"><button id="mf-save-' \
+            + name + '" class="mf-btn btn btn-primary">Save</button>' \
+            + '<button id=mf-clear-' + name \
+            + '" class="mf-btn btn btn-primary">Clear</button>' \
+            + '<button id=mf-delete-' + name \
+            + '" class="mf-btn btn btn-danger">Delete</button></div>'
 
 
 def parseDateTime(s):

@@ -4,7 +4,9 @@ from pyramid.security import authenticated_userid
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden
 from mf.annotation import Annotation
-from mf.renderer import FormRenderer, CompositeRenderer, FloatRenderer, IntegerRenderer, BooleanRenderer, ReferenceRenderer, SimpleReferenceRenderer
+from mf.renderer import FormRenderer, CompositeRenderer, FloatRenderer
+from mf.renderer import IntegerRenderer, BooleanRenderer, ReferenceRenderer
+from mf.renderer import SimpleReferenceRenderer
 import logging
 
 import json
@@ -16,6 +18,7 @@ from mf.db_conn import DbConn
 
 MF_READ = 'read'
 MF_EDIT = 'edit'
+
 
 def pluralize(name):
     '''Pluralize a name
@@ -47,12 +50,20 @@ def mf_filter(objname, control, request=None):
         return {}
     attr = None
     id_to_load = None
-    if request.matchdict.has_key('id'):
+    #if request.matchdict.has_key('id'):
+    if 'id' in request.matchdict:
         id_to_load = request.matchdict['id']
     if id_to_load is not None:
         try:
             collection = DbConn.get_db(objklass.__name__)
-            my_object_instance = collection.find_one({ '_id' : ObjectId(id_to_load)})
+            if objklass.__field_search_by is not '_id':
+                renderer = klass.render_fields[klass.__field_search_by]
+                id_to_load = renderer.unserialize(id_to_load)
+                my_object_instance = collection.find_one(
+                                    {objklass.__field_search_by: id_to_load})
+            else:
+                my_object_instance = collection.find_one(
+                                    {'_id': ObjectId(id_to_load)})
         except:
             raise HTTPNotFound()
     else:
@@ -186,16 +197,23 @@ def mf_show(request):
     if mffilter is None:
         raise HTTPForbidden
 
-    try:
-        mffilter["_id"] = ObjectId(request.matchdict['id'])
-    except Exception:
-        raise HTTPNotFound()
     #objlist = []
     objklass = None
     for klass in Annotation.klasses():
         if pluralize(klass.__name__) == pluralize(objname):
             objklass = klass
             break
+
+    try:
+        if objklass.__field_search_by is not '_id':
+            renderer = klass.render_fields[klass.__field_search_by]
+            id_to_load = renderer.unserialize(request.matchdict['id'])
+            mffilter[klass.__field_search_by] = id_to_load
+        else:
+            mffilter["_id"] = ObjectId(request.matchdict['id'])
+    except Exception:
+        raise HTTPNotFound()
+
     collection = DbConn.get_db(objklass.__name__)
     obj = collection.find_one(mffilter)
     if not obj:
@@ -218,7 +236,6 @@ def mf_edit(request):
     if mffilter is None:
             raise HTTPForbidden
 
-    mffilter["_id"] = ObjectId(request.matchdict['id'])
     #objlist = []
 
     objklass = None
@@ -227,6 +244,16 @@ def mf_edit(request):
             objklass = klass
             break
     collection = DbConn.get_db(objklass.__name__)
+
+    try:
+        if objklass.__field_search_by is not '_id':
+            renderer = klass.render_fields[klass.__field_search_by]
+            id_to_load = renderer.unserialize(request.matchdict['id'])
+            mffilter[klass.__field_search_by] = id_to_load
+        else:
+            mffilter["_id"] = ObjectId(request.matchdict['id'])
+    except Exception:
+        raise HTTPNotFound()
 
     status = 0
     obj = collection.find_one(mffilter)
@@ -261,7 +288,6 @@ def mf_delete(request):
     if mffilter is None:
             raise HTTPForbidden
 
-    mffilter["_id"] = ObjectId(request.matchdict['id'])
     #objlist = []
 
     objklass = None
@@ -269,10 +295,18 @@ def mf_delete(request):
         if pluralize(klass.__name__) == pluralize(objname):
             objklass = klass
             break
-    collection = DbConn.get_db(objklass.__name__)
 
-    #collection = Annotation.db_conn[pluralize(objname)]
-    #obj = collection.remove(mffilter)
+    try:
+        if objklass.__field_search_by is not '_id':
+            renderer = klass.render_fields[klass.__field_search_by]
+            id_to_load = renderer.unserialize(request.matchdict['id'])
+            mffilter[klass.__field_search_by] = id_to_load
+        else:
+            mffilter["_id"] = ObjectId(request.matchdict['id'])
+    except Exception:
+        raise HTTPNotFound()
+
+    collection = DbConn.get_db(objklass.__name__)
     obj = collection.find_one(mffilter)
     obj.delete()
     response = json.dumps({'status': 0, 'error': [], 'message': 'Object deleted'}, default=json_util.default)
