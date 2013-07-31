@@ -1,3 +1,6 @@
+0.1.25: add new static method to objects "search_by" to use a
+        different field than _id for object searches.
+0.1.24: change MF_MANAGE and MF_LIST to MF_READ and MF_EDIT
 0.1.23: use setuptools to install requirements
 0.1.22: Load expected object instance before calling *my* method for
         MF_MANAGE operations to be able to use object parameters in ACL
