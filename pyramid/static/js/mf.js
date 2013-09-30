@@ -447,7 +447,6 @@ $(document).on("click", ".mf-prev", function(event) {
   * get id, search in database and update name in dbref container.
   */
   function searchDbRef(container){
-      console.log("SALLOU dbref "+container);
       id = $('#'+container).val();
       var obj = $('#DbRef'+container).attr("data-object");
       if(obj==null) { return; }
