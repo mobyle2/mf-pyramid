@@ -551,7 +551,8 @@ class ArrayRenderer(AbstractRenderer):
         elt = self.klass + parentname + '[' + self.name + ']'
         html += '<div class="mf-template" id="Template' + self.klass + parentname + '[' + self.name + ']' + '">'
         html += '<div class="mf-array-elt control-group">'
-        newparent = parents.append(self.name)
+        newparent = list(parents)
+        #newparent.append(self.name)
         html += self._renderer.render(None, newparent)
         html += '<button elt="' + self.klass + parentname + '[' + self.name + ']' + '" class="mf-del mf-btn btn btn-primary controls">Remove</button>'
         html += '</div>'
@@ -634,7 +635,8 @@ class CompositeRenderer(AbstractRenderer):
             elif hasattr(value, renderer.name):
                 obj = getattr(value, renderer.name)
             if parents:
-                newparent = parents.append(self.name)
+                newparent = list(parents)
+                newparent.append(self.name)
             else:
                 newparent = [self.name]
             html += renderer.render(obj, newparent)
@@ -843,7 +845,7 @@ def _htmlChoiceTextField(id, name, value, choice_list, error=False):
                 + '</label><div class="controls"><select data-default="' \
                 + (str(value) or '') + '" data-type="choice" id="' + id \
                 + '" name="' + id + '">'
-    html += '<option value="">Any</option>'
+    #html += '<option value="">Any</option>'
     for choice in choice_list:
         if choice == value:
             selected = 'selected'
