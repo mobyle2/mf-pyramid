@@ -36,7 +36,7 @@ def mf_filter(objname, control, request=None):
     :param objname: Name of the current object
     :type objname: str
     :param control: Type of operation
-    :type control: MF_LIST or MF_MANAGE
+    :type control: MF_READ or MF_EDIT
     :param request: Current request
     :type request: pyramid.request
     :return: filter to use (dict)
