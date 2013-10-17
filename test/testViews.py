@@ -3,6 +3,8 @@ import user
 from user import User
 import group
 from group import Group
+import mytypes
+from mytypes import Types1, Types2
 from supergroup import SuperGroup
 import mf.dashboard
 from mf.dashboard import Dashboard
@@ -21,7 +23,7 @@ from pyramid.httpexceptions import HTTPForbidden
 from webob.multidict import MultiDict
 
 connection = Connection()
-connection.register([User, Group, SuperGroup])
+connection.register([User, Group, SuperGroup, Types1, Types2])
 Dashboard.set_connection(connection)
 
 
@@ -37,8 +39,15 @@ class TestViews(unittest.TestCase):
         collection = connection.Group.find()
         for a_group in collection:
             a_group.delete()
+        collection = connection.Types1.fetch()
+        for a_type in collection:
+            a_type.delete()
+        collection = connection.Types2.fetch()
+        for a_type in collection:
+            a_type.delete()
 
-        Dashboard.add_dashboard([User, Group])
+
+        Dashboard.add_dashboard([User, Group, Types1, Types2])
 
         a_group = connection.Group()
         a_group["name"] = "sampleGroup"
@@ -72,6 +81,20 @@ class TestViews(unittest.TestCase):
         response = mf_list(request)
         users = json.loads(response.body)
         assert(len(users) == 2)
+
+    def test_mf_list_multiple_types(self):
+        type1 = connection.Types1()
+        type1["name"] = "sampleType1"
+        type1.save()
+        type2 = connection.Types2()
+        type2["name"] = "sampleType2"
+        type2.save()
+        request = testing.DummyRequest()
+        request.matchdict['objname'] = 'types1'
+        response = mf_list(request)
+        types = json.loads(response.body)
+        assert(len(types) == 1)
+
 
     def test_mf_search(self):
         mdict = MultiDict()
@@ -189,7 +212,7 @@ class TestViews(unittest.TestCase):
         request.matchdict['id'] = 'John'
         try:
             response = mf_show(request)
-            fail("user should not be found")
+            self.fail("user should not be found")
         except HTTPNotFound:
             pass
         self.test_mf_show()
