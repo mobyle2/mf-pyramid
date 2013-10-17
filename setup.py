@@ -10,7 +10,7 @@ requires = [
     ]
 
 setup(name='mf',
-      version='0.1.26',
+      version='0.1.27',
       description='MongoKit forms generation and Pyramid Administration Dashboard',
       author='Olivier Sallou',
       author_email='olivier.sallou@irisa.fr',

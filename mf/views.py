@@ -127,7 +127,7 @@ def mf_search(request):
                     mffilter[field] = {"$regex": param}
     logging.debug("search " + str(mffilter))
     objlist = []
-    collection = DbConn.get_db(objklass.__name__).find(mffilter)
+    collection = DbConn.get_db(objklass.__name__).fetch(mffilter)
     if 'order' in request.params:
         collection = collection.sort(request.params.getone('order'), int(request.params.getone('order_type')))
     if 'page' in request.params and 'pagesize' in request.params:
@@ -163,10 +163,7 @@ def mf_list(request):
         if pluralize(klass.__name__) == pluralize(objname):
             objklass = klass
             break
-    #collection = Annotation.db_conn[pluralize(objname)]
-    #for obj in collection.find(mffilter):
-    #  objlist.append(obj)
-    objects = DbConn.get_db(objklass.__name__).find(mffilter)
+    objects = DbConn.get_db(objklass.__name__).fetch(mffilter)
     if 'order' in request.params:
         objects = objects.sort(request.params.getone('order'), int(request.params.getone('order_type')))
     if 'page' in request.params and 'pagesize' in request.params:
