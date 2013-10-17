@@ -1,4 +1,4 @@
-0.1.27: use fetch instead of find (#13).
+0.1.27: use fetch instead of find (Closes #13).
 0.1.26: fix issue on dashboard with composite and array renderers
         fix display issue with boolean: remove ANY except in search
 0.1.25: add new static method to objects "search_by" to use a
