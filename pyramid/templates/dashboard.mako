@@ -112,8 +112,7 @@ $(document).ready(function() {
 
 
    $('.mf-dbref').typeahead({
-      source: function (query, process) { return
-getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dataset.object,process,$(this)[0].$element[0].dataset.display);},
+      source: function (query, process) { return getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dataset.object,process,$(this)[0].$element[0].dataset.display);},
       updater: function (item) { $("#"+autocompleteelt).val(objList[item]);return item;},
       minLength: 3 
    });
@@ -122,8 +121,7 @@ getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dat
 /*
    $('body').typeahead({
       selector: '[.mfdbref]',
-      source: function (query, process) { return
-getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dataset.object,process,$(this)[0].$element[0].dataset.display);},
+      source: function (query, process) { return getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dataset.object,process,$(this)[0].$element[0].dataset.display);},
       updater: function (item) { $("#"+autocompleteelt).val(objList[item]);return item;},
       minLength: 3 
    });
@@ -168,8 +166,7 @@ getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dat
     clonediv.append(newelt);
     
     newelt.find('.mf-dbref').typeahead({
-          source: function (query, process) { return
-getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dataset.object,process,$(this)[0].$element[0].dataset.display);},
+          source: function (query, process) { return getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dataset.object,process,$(this)[0].$element[0].dataset.display);},
           updater: function (item) { $("#"+autocompleteelt).val(objList[item]);return item;},
          minLength: 3 
         });
