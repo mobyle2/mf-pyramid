@@ -760,6 +760,18 @@ class ReferenceRenderer(AbstractRenderer):
 
     collection = None
 
+    def set_display_field(self, value):
+        """
+        Use this object field to display the reference or
+        search by value instead of id.
+        Parameter must be a top-level parameter, not a sub parameter.
+
+        :param value: parameter to use
+        :type value: basestring
+        """
+        self.display_field = value
+
+
     def set_reference(self, klass):
         '''Update the object class referencedby this renderer
 
@@ -770,6 +782,7 @@ class ReferenceRenderer(AbstractRenderer):
 
     def __init__(self, klass, name, attr, parent=''):
         self._reference = None
+        self.display_field = "name"
         if attr is not None:
             self._reference = attr.__name__
         self._renderer = TextRenderer(klass, name, parent)
@@ -783,7 +796,7 @@ class ReferenceRenderer(AbstractRenderer):
         html = '<div class="mf-reference" id="Ref' + self.klass \
                 + parentname + '[' + self.name + ']' + '">'
         html += _htmlAutoComplete(self.klass + parentname + '['
-                        + self.name + ']', self.name, value, self._reference)
+                        + self.name + ']', self.name, value, self._reference, self.display_field)
         html += '</div>'
         return html + self.get_extra_controls()
 
@@ -791,7 +804,7 @@ class ReferenceRenderer(AbstractRenderer):
         html = '<div class="mf-reference" id="Ref' + self.klass \
                 + '[' + self.name + ']' + '">'
         html += _htmlAutoComplete('Search' + self.klass + '[' + self.name
-                        + ']', self.name, '', self._reference)
+                        + ']', self.name, '', self._reference, self.display_field)
         html += '</div>'
         return html
 
@@ -869,7 +882,7 @@ def _htmlTextField(id, name, value, error=False):
             + id + '"   value="' + (str(value or '')) + '"/></div></div>'
 
 
-def _htmlAutoComplete(id, name, value, klass, error=False):
+def _htmlAutoComplete(id, name, value, klass, display_field, error=False):
     errorClass = ''
     if error:
         errorClass = 'error'
@@ -879,7 +892,7 @@ def _htmlAutoComplete(id, name, value, klass, error=False):
             + '</label><div class="controls"><input data-default="' \
             + (str(value) or '') + '" data-type="dbref" type="hidden" id="' \
             + id + '" name="' + id + '"   value="' + (str(value or '')) \
-            + '"/><input type="text" data-object="' + klass \
+            + '"/><input type="text" data-display="'+display_field+'" data-object="' + klass \
             + '" data-dbref="' + id + '" id="DbRef' \
             + id + '" class="mf-dbref"><i data-dbref="' \
             + id + '" id="DbRefClear' \

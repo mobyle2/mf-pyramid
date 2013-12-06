@@ -409,7 +409,8 @@ $(document).on("click", ".mf-prev", function(event) {
              });
              objlist = {}
              newelt.find('.mf-dbref').typeahead({
-                source: function (query, process) { return getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dataset.object,process);},
+                source: function (query, process) { return
+getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dataset.object,process,$(this)[0].$element[0].dataset.display);},
                 updater: function (item) { $("#"+autocompleteelt).val(objList[item]);return item;},
                 minLength: 3 
         	  });
@@ -541,14 +542,14 @@ $(document).on("click", ".mf-prev", function(event) {
   /**
   * Get object list and set objList with obj name/obj id
   */
-  function getObjects(query,param,objname,process) {
+  function getObjects(query,param,objname,process,searchBy) {
     autocompleteelt = param;
 
     autocompleteelt = autocompleteelt.replace(/\[/g,'\\[');
     autocompleteelt = autocompleteelt.replace(/\]/g,'\\]');
 
     route = mfprefix + '/'+objname.toLowerCase()+'s';
-    return $.ajax({type:"POST", data: 'Search'+objname+"[name]="+query, url: route,
+    return $.ajax({type:"POST", data: 'Search'+objname+"["+searchBy+"]="+query, url: route,
             success: function(msg){
                if(msg["status"]==1) {
                    $("#mf-flash").attr('class','alert alert-error');
@@ -559,8 +560,8 @@ $(document).on("click", ".mf-prev", function(event) {
                    objList = {};
                    nameList = [];
                    $.each(msg, function(obj) {
-                     objList[msg[obj]["name"]] = msg[obj]["_id"]["$oid"];
-                     nameList.push(msg[obj]["name"]);
+                     objList[msg[obj][searchBy]] = msg[obj]["_id"]["$oid"];
+                     nameList.push(msg[obj][searchBy]);
                    });
                return process(nameList);
                }

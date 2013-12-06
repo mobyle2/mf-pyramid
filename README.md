@@ -169,6 +169,13 @@ DBref are supported, but if one need to refer to an other object using
 ObjectIds, it is possible to specify a parameter as a *SimpleReferenceRenderer*:
 
         groupid_renderer = mf.renderer.SimpleReferenceRenderer(User,'groupid',Group)
+        # If the reference is an ObjectID and not a string
+        groupid_renderer.is_object_id = True
+        # In the dashboard, to display a value, mf search by default the *name*
+        # parameter. If it does not exists or is not the expected parameter, one
+        # may use the following.
+        # NB: set_display_field works only with top level parameters
+        groupid_renderer.set_display_field("myfield")
 
 This specifies the User parameter *groupid* is in fact an ObjectId reference to
 the Group object.
