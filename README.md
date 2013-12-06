@@ -20,7 +20,9 @@ Copy the pyramid directory content in your pyramid application according to your
 
 # LIMITATIONS:
 
-MongoKit operators IS, OR, NOT are not supported.
+MongoKit operators OR, NOT are not supported.
+IS operator is supported for strings. In this case, the renderer is
+automatically set to a TextChoiceRenderer with options from IS list.
 
 ArrayRenderer does not support arrays of complex objects, only arrays of basic types or dicts (but not arrays of arrays)
 Collection name for objects must match object class name with lowercase and a 's'. Example:
