@@ -1,3 +1,6 @@
+0.1.29: add support for IS operator on strings
+0.1.28: add possibility to specify the field to display and search for simple db
+references
 0.1.27: use fetch instead of find (Closes #13).
 0.1.26: fix issue on dashboard with composite and array renderers
         fix display issue with boolean: remove ANY except in search
