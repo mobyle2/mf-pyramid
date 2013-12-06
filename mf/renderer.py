@@ -29,6 +29,8 @@ class AbstractRenderer:
     # If object is a CustomType, store its class
     custom_type = None
 
+    is_unicode = False
+
     def add_extra_control(self, extra):
         '''Adds an additional button next to the element
 
@@ -69,6 +71,8 @@ class AbstractRenderer:
         self.extra_controls = []
 
         self.custom_type = None
+
+        self.is_unicode = False
 
         fieldname = name
         if parent:
@@ -352,7 +356,10 @@ class TextRenderer(AbstractRenderer):
         if self.custom_type is not None:
             return self.custom_type.unserialize(value)
         if self.validate(value):
-            return value
+            if self.is_unicode:
+                return unicode(value)
+            else:
+                return value
         else:
             raise Exception("value is not correct type")
 

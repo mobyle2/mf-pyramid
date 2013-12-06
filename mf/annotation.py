@@ -75,7 +75,11 @@ def renderer(klass, name, attr, parent=''):
     """
     if isinstance(attr, str) or attr == None or isinstance(attr, basestring) or attr == basestring:
         logging.debug(name + " is string")
-        return TextRenderer(klass, name, parent)
+        renderer = TextRenderer(klass, name, parent)
+        if isinstance(attr,unicode):
+            renderer.is_unicode = True
+        return renderer
+
     elif isinstance(attr, bool) or attr == bool:
         logging.debug(name + " is bool")
         return BooleanRenderer(klass, name, parent)
@@ -115,6 +119,8 @@ def renderer(klass, name, attr, parent=''):
                 or attr._operands[0] == basestring:
                 renderer = TextChoiceRenderer(klass, name, parent)
                 renderer.limit(attr._operands)
+                if isinstance(attr._operands[0],unicode):
+                    renderer.is_unicode = True
                 return renderer
             else:
                 raise Exception("IS Schema operator supported only with strings")
