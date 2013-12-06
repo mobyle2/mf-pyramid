@@ -4,7 +4,7 @@ from mf.annotation import *
 from pyramid.response import Response
 from pyramid.view import view_config
 import mf.views
-from mongokit import Document, Connection, CustomType
+from mongokit import Document, Connection, CustomType, IS
 from group import Group
 
 def home(request):
@@ -45,7 +45,8 @@ class User(Document):
   'multi' : [ { 'name' : basestring, 'role' : basestring } ],
   'custom' :  CustomStatus(),
   'groupRef' : ObjectId,
-  'floattag' : float
+  'floattag' : float,
+  'alist' : IS(u'one', u'two', u'three')
   }
 
   default_values = { 'groups' : [], 'floattag': 0.1 }

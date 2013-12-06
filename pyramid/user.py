@@ -23,6 +23,7 @@ class User(Document):
   'options' : { 'tags': basestring , 'categories': basestring }, 'creation_date' : datetime, 'today': basestring, 'array' : [basestring] , 'group' : Group,
   'multi' : [ { 'name' : Group, 'role' : basestring } ], 'groupid' : str,
   'groupRef' : ObjectId,
+  'alist' : IS(u'one', u'two', u'three')
   }
 
   default_values = { 'name' : 'Mike' }

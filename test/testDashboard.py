@@ -60,6 +60,19 @@ class TestDashboard(unittest.TestCase):
     assert(user["name"] == "sample")
     assert(user["email"] == "test@nomail.com")
 
+  def test_bind_user_IS_operator(self):
+    Dashboard.add_dashboard([User])
+    request = [("User[name]","sample"), ("User[alist]","one")]
+    user = User()
+    user.bind_form(request)
+    assert(user["name"] == "sample")
+    assert(user["alist"] == "one")
+    request = [("User[name]","sample"), ("User[alist]","four")]
+    user = User()
+    res = user.bind_form(request)
+    assert('alist' in res)
+    assert(user["alist"] is not "four")
+
   def test_bind_user_array(self):
     Dashboard.add_dashboard([User])
     request = [("User[array][0]","test1"), ("User[array][1]","test2"),  ("User[array][3]","test3")]

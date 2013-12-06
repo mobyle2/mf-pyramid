@@ -7,9 +7,12 @@ import inspect
 
 
 #import renderer
-from mf.renderer import SearchFormRenderer, FormRenderer,TextRenderer, BooleanRenderer, CompositeRenderer, ArrayRenderer, IntegerRenderer, FloatRenderer, HiddenRenderer, DateTimeRenderer, ReferenceRenderer,AbstractRenderer, SimpleReferenceRenderer
+from mf.renderer import SearchFormRenderer, FormRenderer, TextRenderer, \
+    BooleanRenderer, CompositeRenderer, ArrayRenderer, IntegerRenderer, \
+    FloatRenderer, HiddenRenderer, DateTimeRenderer, ReferenceRenderer, \
+    AbstractRenderer, SimpleReferenceRenderer, TextChoiceRenderer
 
-from mongokit import CustomType, ObjectId
+from mongokit import CustomType, ObjectId, SchemaOperator, IS
 
 #logging.basicConfig(level=logging.DEBUG)
 
@@ -104,6 +107,19 @@ def renderer(klass, name, attr, parent=''):
         renderer = TextRenderer(klass, name, parent)
         renderer.custom_type = attr.__class__
         return renderer
+    elif issubclass(attr.__class__, SchemaOperator):
+        if isinstance(attr, IS):
+            #Manage is case
+            if isinstance(attr._operands[0], str) \
+                or isinstance(attr._operands[0], basestring) \
+                or attr._operands[0] == basestring:
+                renderer = TextChoiceRenderer(klass, name, parent)
+                renderer.limit(attr._operands)
+                return renderer
+            else:
+                raise Exception("IS Schema operator supported only with strings")
+        else:
+            raise Exception("Schema operator not supported")
     elif inspect.isclass(attr):
         logging.debug(name + " is dbref")
         if attr.__class__.__name__ == ObjectId.__class__.__name__:
