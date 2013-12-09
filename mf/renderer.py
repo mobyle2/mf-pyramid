@@ -251,10 +251,25 @@ class AbstractRenderer:
             array_regexp = ''
             if self.in_array:
                 array_regexp = '\[\d+\]'
+            # Search for x.y.z[0], y is the array
             if re.compile(rname + array_regexp + '$').search(key):
                 if delete:
                     request.pop(index)
                 return str(value)
+            else:
+                # Try to find x.y[0].z, y is the array
+                logging.debug("search for x.y[0].z")
+                params = rname.split('\[')
+                if(len(params)>2):
+                    last_param = '\['+params[len(params)-1]
+                    logging.debug("replace "+last_param)
+                    rname = rname.replace(last_param,'\[\d+\]'+last_param)
+                    logging.debug("search "+rname)
+                    if re.compile(rname + '$').search(key):
+                        if delete:
+                            request.pop(index)
+                        return str(value)
+
         return None
 
 

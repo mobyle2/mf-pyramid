@@ -147,6 +147,16 @@ class TestDashboard(unittest.TestCase):
     assert(len(user["multi"]) == 2)      
     assert(user["multi"][0]["role"] == "role1")
 
+
+  def test_bind_multi_array2(self):
+    Dashboard.add_dashboard([User])
+    request = [("User[multi][1][name]","name2"),("User[multi][0][role]","role1"),("User[multi][0][name]","name1"),("User[multi][1][role]","role2")]
+    user = User()
+    user.bind_form(sorted(request))
+    print str(user)
+    assert(len(user["multi"]) == 2)
+    assert(user["multi"][0]["role"] == "role1")
+
   def test_bind_custom(self):
     Dashboard.add_dashboard([User])
     from mf.renderer import TextRenderer
