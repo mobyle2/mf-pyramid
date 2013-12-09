@@ -422,7 +422,7 @@ getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dat
        else {
          elt = $('#'+curObject+parent+'\\['+key+'\\]');
          elt.val(val);
-         if(elt.attr('data-type') == 'choice') {
+         if(elt.attr('data-type') == 'choice' && val!=nul) {
            elt.val(val.toString());
          }
 
