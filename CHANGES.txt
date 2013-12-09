@@ -1,3 +1,4 @@
+0.1.30: fix in mf.js for array objects display mngt
 0.1.29: add support for IS operator on strings
 0.1.28: add possibility to specify the field to display and search for simple db
 references

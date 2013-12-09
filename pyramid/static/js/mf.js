@@ -330,6 +330,7 @@ $(document).on("click", ".mf-prev", function(event) {
    */
    function json2form(data,parent) {
      $.each(data, function(key, val) {
+
      if(jQuery.isPlainObject(val)) {
        if( ! setSpecificObjectValue(curObject+parent+'\\['+key+'\\]',val)) {
          var newparent = parent + '\\['+key+'\\]';
@@ -350,13 +351,13 @@ $(document).on("click", ".mf-prev", function(event) {
             inputs = newelt.find('input:not(.mf-dbref)');
             objlist = {};
             $.each(inputs, function(input) {
-              ielt = $(inputs[input])
+              ielt = $(inputs[input]);
               oldid = ielt.attr("id");
               ielt.attr("id",oldid+'['+count+']');
               ielt.attr("name",oldid+'['+count+']');
               if(jQuery.isPlainObject(val[elt])) {
                  $.each(val[elt], function(key,value) {
-                   reg1=new RegExp(key,"g");
+                   reg1=new RegExp("\\["+key+"\\]$","g");
                    if(oldid.match(reg1)) {
                      if(jQuery.isPlainObject(val[elt][key])) {
                        // Object, not simple type
@@ -422,7 +423,7 @@ getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dat
        else {
          elt = $('#'+curObject+parent+'\\['+key+'\\]');
          elt.val(val);
-         if(elt.attr('data-type') == 'choice' && val!=nul) {
+         if(elt.attr('data-type') == 'choice' && val!=null) {
            elt.val(val.toString());
          }
 
