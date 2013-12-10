@@ -156,7 +156,6 @@ class TestDashboard(unittest.TestCase):
     request = [("User[multi][1][name]","name2"),("User[multi][0][role]","role1"),("User[multi][0][name]","name1"),("User[multi][1][role]","role2")]
     user = User()
     user.bind_form(sorted(request))
-    print str(user)
     assert(len(user["multi"]) == 2)
     assert(user["multi"][0]["role"] == "role1")
 
@@ -169,16 +168,35 @@ class TestDashboard(unittest.TestCase):
 
     request = [("User[multi2][0][group]",str(group['_id'])),("User[multi2][0][role]","role1")]
     renderer = User.get_renderer("multi2.group")
-    logging.debug("#OSALLOU "+renderer.__class__.__name__)
     renderer.set_reference(Group)
 
     user = User()
     user.bind_form(sorted(request))
-    print str(user)
     assert(len(user["multi2"]) == 1)
     assert(user["multi2"][0]["role"] == "role1")
-    print "#OSALLOU "+str(user["multi2"][0])
     assert(user["multi2"][0]["group"] == group['_id'])
+
+
+  def test_bind_multi_array4(self):
+    Dashboard.add_dashboard([User])
+    group = connection.Group()
+    group["name"] = "sampleGroup"
+    group["creation_date"] = datetime.utcnow()
+    group.save()
+
+    request = [("User[multi2][0][group]",str(group['_id'])),("User[multi2][0][role]","role1")]
+    renderer = mf.renderer.SimpleReferenceRenderer(User, 'group', Group, 'multi2')
+    renderer.is_object_id = True
+    #renderer = User.get_renderer("multi2.group")
+    #renderer.set_reference(Group)
+
+    user = User()
+    user.bind_form(sorted(request))
+    print str(User.get_renderer("multi2.group").__class__.__name__)
+    assert(len(user["multi2"]) == 1)
+    assert(user["multi2"][0]["role"] == "role1")
+    assert(user["multi2"][0]["group"] == group['_id'])
+
 
   def test_bind_custom(self):
     Dashboard.add_dashboard([User])

@@ -172,7 +172,10 @@ Adds an extra button for the field (up to you to defined in Javascript what to d
 DBref are supported, but if one need to refer to an other object using
 ObjectIds, it is possible to specify a parameter as a *SimpleReferenceRenderer*:
 
-        groupid_renderer = mf.renderer.SimpleReferenceRenderer(User,'groupid',Group)
+        User example: { "mygroups" : [{ "groupid" : basestring }] }, groupid is
+        the id of a Group
+
+        groupid_renderer = mf.renderer.SimpleReferenceRenderer(User,'groupid',Group,'mygroups')
         # If the reference is an ObjectID and not a string
         groupid_renderer.is_object_id = True
         # In the dashboard, to display a value, mf search by default the *name*
@@ -190,13 +193,13 @@ In MongoKit definition, one can define the parameter link as a basestring or an
 ObjectId and must declare the above example (an ObjectId does not give
 information on object)a
 
-If parameter is defined as an ObjectId, one *may* simply call the set_reference
+If parameter is defined as an ObjectId, one *can* simply call the set_reference
 function to update the renderer:
 
-    renderer = User.get_renderer('groupRef')
+    User example: { "mygroups" : [{ "groupid" : ObjectId }] }
+
+    renderer = User.get_renderer('mygroups.groupid')
     renderer.set_reference(Group)
-
-
 
 
 

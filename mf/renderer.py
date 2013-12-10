@@ -707,6 +707,8 @@ class CompositeRenderer(AbstractRenderer):
         reset = True
         for field in self._renderers:
             renderer = self.rootklass().get_renderer(fieldname + field)
+            print "#OSALLOU bindall for "+fieldname + field
+            print "## "+renderer.__class__.__name__
             if self.in_array:
                 renderer.in_array = True
             if reset:

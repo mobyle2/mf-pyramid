@@ -100,7 +100,7 @@ def renderer(klass, name, attr, parent=''):
     elif isinstance(attr, list):
         logging.debug(name + " is array")
         renderer = ArrayRenderer(klass, name, parent)
-        renderer._renderer = renderer.rootklass.renderer(renderer. rootklass, renderer.name, attr[0])
+        renderer._renderer = renderer.rootklass.renderer(renderer.rootklass, renderer.name, attr[0])
         renderer.rootklass.render_fields[renderer.name] = renderer
         return renderer
     elif isinstance(attr, dict):
