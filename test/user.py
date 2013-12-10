@@ -46,7 +46,8 @@ class User(Document):
   'custom' :  CustomStatus(),
   'groupRef' : ObjectId,
   'floattag' : float,
-  'alist' : IS(u'one', u'two', u'three')
+  'alist' : IS(u'one', u'two', u'three'),
+  'multi2' : [ { 'group' : ObjectId, 'role' : basestring } ]
   }
 
   default_values = { 'groups' : [], 'floattag': 0.1 }

@@ -156,7 +156,7 @@ class AbstractRenderer:
 
         paramlist = []
         # Search for array items
-        logging.debug("## bind"
+        logging.debug("## bind "
             + instance.__class__.__name__ + parentname + "[" + name + "]" + "with"
             + str(self.get_param(request, instance.__class__.__name__ + parentname + "[" + name + "]")))
         while self.get_param(request, instance.__class__.__name__ + parentname + "[" + name + "]") is not None:
@@ -264,10 +264,10 @@ class AbstractRenderer:
                     last_param = '\['+params[len(params)-1]
                     logging.debug("replace "+last_param)
                     rname = rname.replace(last_param,'\[\d+\]'+last_param)
-                    logging.debug("search "+rname)
                     if re.compile(rname + '$').search(key):
                         if delete:
                             request.pop(index)
+                        logging.debug("found value "+str(value))
                         return str(value)
 
         return None
@@ -726,7 +726,7 @@ class CompositeRenderer(AbstractRenderer):
                 err = []
 
                 while err is not None:
-                    err = renderer.bind(request, instance, renderer. name, parent)
+                    err = renderer.bind(request, instance, renderer.name, parent)
                     renderer.count += 1
             except Exception:
                 logging.debug('no more element to match')
@@ -852,6 +852,20 @@ class SimpleReferenceRenderer(ReferenceRenderer):
 
     is_object_id = False
 
+    check_reference = True
+
+    @classmethod
+    def do_check_reference(klass, check):
+        """
+        When unserializing, should we check the reference exists ?
+
+        :param check: check or not the reference
+        :type check: bool
+        """
+        SimpleReferenceRenderer.check_reference = check
+
+
+
     def unserialize(self, value):
         # Check that object exists or empty string
         if(str(value) == ''):
@@ -859,12 +873,13 @@ class SimpleReferenceRenderer(ReferenceRenderer):
                 return None
             else:
                 return ''
-        collection = DbConn.get_db(self._reference)
-        ref = ObjectId(str(value))
-        obj = collection.find_one({"_id": ref})
-        logging.debug("match obj " + str(obj) + " with id " + str(value))
-        if not obj:
-            return None
+        if SimpleReferenceRenderer.check_reference:
+            collection = DbConn.get_db(self._reference)
+            ref = ObjectId(str(value))
+            obj = collection.find_one({"_id": ref})
+            logging.debug("match obj " + str(obj) + " with id " + str(value))
+            if not obj:
+                return None
         if self.is_object_id:
             return ObjectId(value)
         return str(value)
