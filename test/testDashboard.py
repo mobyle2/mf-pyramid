@@ -228,3 +228,7 @@ class TestDashboard(unittest.TestCase):
       assert(group["_id"] == user['groupRef'])
       assert(isinstance(user['groupRef'],ObjectId))
 
+  def test_parseDateTime(self):
+      from mf.renderer import parseDateTime
+      dt = parseDateTime("2013-12-25 01:02:03")
+      assert(dt is not None)
