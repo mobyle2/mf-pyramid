@@ -61,6 +61,7 @@ class Dashboard:
             config.add_view(mf_list, route_name='mf_objects', renderer='json', request_method='GET')
             config.add_view(mf_show, route_name='mf_object', renderer='json', request_method='GET')
             config.add_view(mf_edit, route_name='mf_object', renderer='json', request_method='POST')
+            config.add_view(mf_edit, route_name='mf_object', renderer='json', request_method='PUT') 
             config.add_view(mf_delete, route_name='mf_object', renderer='json', request_method='DELETE')
             config.add_view(mf_add, route_name='mf_objects', renderer='json', request_method='PUT')
             templates = Dashboard.dconfig['templates']
