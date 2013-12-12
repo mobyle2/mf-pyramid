@@ -1,3 +1,7 @@
+0.1.32: remove some debug logs
+        change routes layout, use POST for new objects and PUT for updates
+        fix initialize issue
+        fix some cases where resource is not found, return a HTTP 404.
 0.1.31: add possibility to bind forms with object array in the form x.y[0].z and
 not only x.y.z[0] when y is the array
         Fix documentation and add test for references definition
