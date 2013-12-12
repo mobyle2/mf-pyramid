@@ -921,6 +921,8 @@ def _htmlTextField(id, name, value, error=False):
 
 def _htmlAutoComplete(id, name, value, klass, display_field, error=False):
     errorClass = ''
+    if value is None:
+        value = ''
     if error:
         errorClass = 'error'
     return '<div class="mf-field mf-autocomplete control-group' + errorClass \

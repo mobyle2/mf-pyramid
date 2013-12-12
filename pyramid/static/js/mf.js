@@ -94,7 +94,7 @@ $(document).on("click", ".mf-prev", function(event) {
   */
   function mfsearch() {
      updateCheckboxValues();
-     $.ajax({type:"POST", data: $("#mf-search-form-"+curObject).serialize(), url: mfprefix+"/"+curObject.toLowerCase()+"s",
+     $.ajax({type:"GET", data: $("#mf-search-form-"+curObject).serialize(), url: mfprefix+"/"+curObject.toLowerCase()+"s",
             success: function(msg){
                if(msg["status"]==1) {
                    $("#mf-flash").attr('class','alert alert-error');
@@ -118,8 +118,8 @@ $(document).on("click", ".mf-prev", function(event) {
   function mfsubmit() {
      updateCheckboxValues();
      id = $("#"+curObject+"\\[_id\\]").val();
-     method = "POST";
-     if(id ==null || id == '') { method = "PUT"; id = "" }
+     method = "PUT";
+     if(id ==null || id == '') { method = "POST"; id = "" }
      route = mfprefix+"/"+curObject.toLowerCase()+"s";
      if(id != "") {
         route = mfprefix+"/"+curObject.toLowerCase()+"s/"+id
@@ -142,7 +142,7 @@ $(document).on("click", ".mf-prev", function(event) {
                else {
                  clear_form_elements("#show-"+curObject);
                  $("#mf-flash").attr('class','alert alert-success');
-                 if(method == "POST") {
+                 if(method == "PUT") {
                    $("#mf-flash").text(curObject+" Operation successful");
                  }
                  else { 
@@ -550,7 +550,7 @@ getObjects(query,$(this)[0].$element[0].dataset.dbref,$(this)[0].$element[0].dat
     autocompleteelt = autocompleteelt.replace(/\]/g,'\\]');
 
     route = mfprefix + '/'+objname.toLowerCase()+'s';
-    return $.ajax({type:"POST", data: 'Search'+objname+"["+searchBy+"]="+query, url: route,
+    return $.ajax({type:"GET", data: 'Search'+objname+"["+searchBy+"]="+query, url: route,
             success: function(msg){
                if(msg["status"]==1) {
                    $("#mf-flash").attr('class','alert alert-error');

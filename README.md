@@ -52,8 +52,8 @@ For dashboard, to add User and Group, insert in Pyramid init :
 
 Warning: this should be added after your routes declaration because it inserts generic routes to match objets:
 
-    /users/ (GET/PUT)
-    /users/id (POST,DELETE)
+    /users/ (GET/POST)
+    /users/id (PUT,DELETE)
     /groups/
     /groups/id
     ...

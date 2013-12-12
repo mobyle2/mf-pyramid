@@ -163,6 +163,20 @@ def mf_list(request):
         if pluralize(klass.__name__) == pluralize(objname):
             objklass = klass
             break
+
+    # Do we have a search parameter in the request ?
+    for field in objklass.render_fields:
+        try:
+            param = request.params.getone('Search' + objklass.__name__ + '[' + field + ']')
+        except Exception:
+            # This is fine
+            param = None
+        if param is not None and param != '':
+            # We search for specific objects
+            return mf_search(request)
+
+    # No search parameter, get the list
+
     objects = DbConn.get_db(objklass.__name__).fetch(mffilter)
     if 'order' in request.params:
         objects = objects.sort(request.params.getone('order'), int(request.params.getone('order_type')))

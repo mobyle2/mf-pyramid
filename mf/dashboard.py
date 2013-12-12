@@ -57,13 +57,14 @@ class Dashboard:
             config.add_route('mf_admin', prefix + '/admin')
             config.add_route('mf_objects', prefix + '/{objname}s')
             config.add_route('mf_object', prefix + '/{objname}s/{id}')
-            config.add_view(mf_search, route_name='mf_objects', renderer='json', request_method='POST')
+            #config.add_view(mf_search, route_name='mf_objects', renderer='json', request_method='POST')
+            # If no Search parameter, then call mf_list, else call mf_search
             config.add_view(mf_list, route_name='mf_objects', renderer='json', request_method='GET')
             config.add_view(mf_show, route_name='mf_object', renderer='json', request_method='GET')
-            config.add_view(mf_edit, route_name='mf_object', renderer='json', request_method='POST')
             config.add_view(mf_edit, route_name='mf_object', renderer='json', request_method='PUT') 
             config.add_view(mf_delete, route_name='mf_object', renderer='json', request_method='DELETE')
-            config.add_view(mf_add, route_name='mf_objects', renderer='json', request_method='PUT')
+            config.add_view(mf_add, route_name='mf_objects', renderer='json',
+            request_method='POST')
             templates = Dashboard.dconfig['templates']
             if not templates:
                 templates = 'dashboard.mako'
