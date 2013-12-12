@@ -253,6 +253,7 @@ def mf_edit(request):
         raise HTTPNotFound()
 
     status = 0
+    err = None
     obj = collection.find_one(mffilter)
     if obj:
         err = obj.bind_form(sorted(request.params.items()))
