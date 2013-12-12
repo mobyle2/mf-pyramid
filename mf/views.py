@@ -305,6 +305,8 @@ def mf_delete(request):
 
     collection = DbConn.get_db(objklass.__name__)
     obj = collection.find_one(mffilter)
+    if obj is None:
+        raise HTTPNotFound()
     obj.delete()
     response = json.dumps({'status': 0, 'error': [], 'message': 'Object deleted'}, default=json_util.default)
     return Response(body=response, content_type="application/json")
