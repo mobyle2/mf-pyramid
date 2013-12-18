@@ -124,7 +124,10 @@ def mf_search(request):
                     else:
                         mffilter[field] = False
                 else:
-                    mffilter[field] = {"$regex": param}
+                    if renderer.is_object_id:
+                        mffilter[field] = ObjectId(param)
+                    else:
+                        mffilter[field] = {"$regex": param}
     logging.debug("search " + str(mffilter))
     objlist = []
     collection = DbConn.get_db(objklass.__name__).fetch(mffilter)
