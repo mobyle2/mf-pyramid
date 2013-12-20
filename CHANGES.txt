@@ -1,3 +1,4 @@
+0.1.33: fix search issue when type is an objectid
 0.1.32: remove some debug logs
         change routes layout, use POST for new objects and PUT for updates
         fix initialize issue
