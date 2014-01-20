@@ -126,6 +126,8 @@ class TestViews(unittest.TestCase):
         response = mf_add(request)
         res = json.loads(response.body)
         assert(res['status'] == 0)
+        assert(res['object'] == 'user')
+        assert(res['user']['email'] == 'test@add')
         a_user = connection.User.find_one({'email': 'test@add'})
         assert (a_user is not None)
 
@@ -152,6 +154,8 @@ class TestViews(unittest.TestCase):
         response = mf_edit(request)
         res = json.loads(response.body)
         assert(res['status'] == 0)
+        assert(res['object'] == 'user')
+        assert(res['user']['name'] == 'Alfred')
         a_user = connection.User.find_one({'email': 'dummy@nomail.com'})
         assert(a_user['name'] == 'Alfred')
 

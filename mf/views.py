@@ -284,7 +284,10 @@ def mf_edit(request):
         except Exception as e:
             logging.error("Error while saving object " + str(e))
             status = 1
-    response = json.dumps({'status': status, 'error': err, 'message': '', 'object': obj}, default=json_util.default)
+    response = json.dumps({'status': status, 'error': err,
+                            objname: obj, 'object': objname,
+                            'message': ''},
+                            default=json_util.default)
     return Response(body=response, content_type="application/json")
 
 
@@ -349,7 +352,10 @@ def mf_add(request):
         status = 1
     else:
         obj.save()
-    response = json.dumps({'status': status, 'error': err, 'message': ''}, default=json_util.default)
+    response = json.dumps({'status': status, 'error': err,
+                            objname: obj, 'object': objname,
+                            'message': ''},
+                            default=json_util.default)
     return Response(body=response, content_type="application/json")
 
 
