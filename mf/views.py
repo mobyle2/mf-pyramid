@@ -146,7 +146,7 @@ def mf_search(request):
     return Response(body=objlist, content_type="application/json")
 
 
-#@view_config(name='mf_list', route_name='mf_list', renderer='json', request_method='GET')
+@view_config(name='mf_list', route_name='mf_list', renderer='json', request_method='GET')
 def mf_list(request):
     '''Returns a JSON list of the object defined in the route
     If object has a function "my()", then the function is called to get a
@@ -192,11 +192,11 @@ def mf_list(request):
             objects = objects.limit(psize)
     for obj in objects:
         objlist.append(obj)
-    objlist = json.dumps(objlist, default=json_util.default)
-    return Response(body=objlist, content_type="application/json")
+    #objlist = json.dumps(objlist, default=json_util.default)
+    return objlist
 
 
-#@view_config(name='mf_show', route_name='mf_show', renderer='json', request_method='GET')
+@view_config(name='mf_show', route_name='mf_show', renderer='json', request_method='GET')
 def mf_show(request):
     '''Returns a JSON object defined in the route
     If object has a function "my()", then the function is called to get a
@@ -233,8 +233,8 @@ def mf_show(request):
     if not obj:
         raise HTTPNotFound()
     response = {'object': objname, 'status': 0, objname: obj, 'filter': mffilter}
-    response = json.dumps(response, default=json_util.default)
-    return Response(body=response, content_type="application/json")
+    #response = json.dumps(response, default=json_util.default)
+    return response
 
 
 #@view_config(name='mf_edit', route_name='mf_edit', renderer='json', request_method='POST', context='mf.dashboard.Dashboard', permission='all')
