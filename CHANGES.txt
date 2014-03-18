@@ -1,3 +1,10 @@
+0.1.35: support definition of dicts in objects with custom key/values.
+        Objects can be defined like:
+        "keytype" : { basestring : basestring }
+        to define dicts with no predefined labels.
+        This impacts forms rendering, in this case, there is no possibility to
+        define new elements in dict from the form, only updates.
+        Updates and additions works for REST interface.
 0.1.34: return object on edit or add operation
         { .. , myobjectname: myobject, 'object': myobjectname, ...}
 0.1.33: fix search issue when type is an objectid

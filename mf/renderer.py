@@ -155,12 +155,14 @@ class AbstractRenderer:
                 parentname += "[" + p + "]"
 
         paramlist = []
+        param_name_list = []
         # Search for array items
         logging.debug("## bind "
             + instance.__class__.__name__ + parentname + "[" + name + "]" + "with"
             + str(self.get_param(request, instance.__class__.__name__ + parentname + "[" + name + "]")))
         while self.get_param(request, instance.__class__.__name__ + parentname + "[" + name + "]") is not None:
-            param = self.get_param(request, instance.__class__.__name__ + parentname + "[" + name + "]", True)
+            (param_name, param) = self.get_param(request, instance.__class__.__name__ + parentname + "[" + name + "]", True)
+            param_name_list.append(param_name)
             if not self.in_array:
                 paramlist.append(param)
             elif self.in_array and str(param) != '':
@@ -192,7 +194,14 @@ class AbstractRenderer:
             if parent:
                 obj = self.get_object(instance, parent)
                 if isinstance(obj, dict) and value:
-                    obj[name] = value[0]
+                    if "mf_basestring" in name:
+                        i = 0
+                        for mf_name in param_name_list:
+                            match = re.compile('\[(\w+)\]$').search(mf_name)
+                            obj[match.group(1)] = value[i]
+                            i = i + 1
+                    else:
+                        obj[name] = value[0]
                 else:
                     if isinstance(obj, (list, tuple)):
                         if hasattr(obj, name):
@@ -242,20 +251,25 @@ class AbstractRenderer:
         :type request: array
         :param name: parameter to search
         :type name: str
-        :return: str - Value from the form
+        :return: (str,str) - Name of the parameter, Value from the form
         '''
         for index in range(len(request)):
             key, value = request[index]
             rname = name.replace('[', '\[')
             rname = rname.replace(']', '\]')
+            if 'mf_basestring' in name:
+                rname = rname.replace("mf_basestring",'(\w+)')
             array_regexp = ''
             if self.in_array:
                 array_regexp = '\[\d+\]'
             # Search for x.y.z[0], y is the array
-            if re.compile(rname + array_regexp + '$').search(key):
+            match = re.compile(rname + array_regexp + '$').search(key)
+            if match:
                 if delete:
                     request.pop(index)
-                return str(value)
+                if 'mf_basestring' in name:
+                    name = name.replace('mf_basestring',match.group(1))
+                return ( name, str(value) )
             else:
                 # Try to find x.y[0].z, y is the array
                 logging.debug("search for x.y[0].z")
@@ -264,11 +278,14 @@ class AbstractRenderer:
                     last_param = '\['+params[len(params)-1]
                     logging.debug("replace "+last_param)
                     rname = rname.replace(last_param,'\[\d+\]'+last_param)
-                    if re.compile(rname + '$').search(key):
+                    match = re.compile(rname + '$').search(key)
+                    if match:
                         if delete:
                             request.pop(index)
-                        logging.debug("found value "+str(value))
-                        return str(value)
+                        #logging.debug("found value "+str(value))
+                        if 'mf_basestring' in name:
+                            name = name.replace('mf_basestring',match.group(1))
+                        return ( name, str(value) )
 
         return None
 
@@ -633,9 +650,14 @@ class CompositeRenderer(AbstractRenderer):
             parentname = self.name
             if parent:
                 parentname = parent + "." + self.name
-            srenderer = klass.renderer(klass, obj, attr[obj], parentname)
-            #self._renderers.append(srenderer)
-            self._renderers.append(obj)
+            if obj is str or obj is basestring:
+                srenderer = klass.renderer(klass, "mf_basestring", attr[obj], parentname)
+                self._renderers.append("mf_basestring")
+            else:
+                srenderer = klass.renderer(klass, obj, attr[obj], parentname)
+                self._renderers.append(obj)
+            #srenderer = klass.renderer(klass, obj, attr[obj], parentname)
+            #self._renderers.append(obj)
 
     def render(self, value=None, parents=[]):
         parentname = ''
@@ -652,15 +674,23 @@ class CompositeRenderer(AbstractRenderer):
         for field in self._renderers:
             renderer = self.rootklass().get_renderer(fieldname + "." + field)
             obj = None
-            if isinstance(value, dict):
-                obj = value[renderer.name]
-            elif hasattr(value, renderer.name):
-                obj = getattr(value, renderer.name)
+
             if parents:
                 newparent = list(parents)
                 newparent.append(self.name)
             else:
                 newparent = [self.name]
+
+            if isinstance(value, dict) and renderer.name == 'mf_basestring':
+                for dict_key in value:
+                    renderer.name = dict_key
+                    obj = value[dict_key]
+                    html += renderer.render(obj, newparent)
+                continue
+            elif isinstance(value, dict) and renderer.name in value:
+                obj = value[renderer.name]
+            elif hasattr(value, renderer.name):
+                obj = getattr(value, renderer.name)
             html += renderer.render(obj, newparent)
         html += '</div>'
         return html + self.get_extra_controls()

@@ -62,17 +62,20 @@ class Annotation:
 
 
 @staticmethod
-def renderer(klass, name, attr, parent=''):
+def renderer(klass, attr_name, attr, parent=''):
     """
     Gets a renderer for an attribute
 
-    param: name of the attribute
-    type: str
-    param: attribute of the object
-    type: object
-    rparam: renderer for the attribute
-    rtype: AbstractRenderer
+    :param attr_name: name of the attribute
+    :type attr_name: str
+    :param attr: attribute of the object
+    :type attr: object
+    :return: selected renderer
     """
+    if attr_name is str or attr_name is basestring:
+        name = "mf_basestring"
+    else:
+        name = str(attr_name)
     if isinstance(attr, str) or attr == None or isinstance(attr, basestring) or attr == basestring:
         logging.debug(name + " is string")
         renderer = TextRenderer(klass, name, parent)
@@ -185,6 +188,10 @@ def set_renderer(klass, name, renderer):
     """
     Sets the renderer for an object attribute
     """
+    if attr_name is str or attr_name is basestring:
+        name = "mf_basestring"
+    else:
+        name = str(attr_name)
     klass.render_fields[name] = renderer
 
 

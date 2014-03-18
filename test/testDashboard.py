@@ -40,6 +40,8 @@ class TestDashboard(unittest.TestCase):
   def test_render_new_user(self):
     Dashboard.add_dashboard([User])
     myuser = User()
+    myuser['keytype']['test1'] = 'test1'
+    myuser['keytype']['test2'] = 'test2'
     try:
       html = myuser.html()
     except Exception as e:
@@ -62,6 +64,17 @@ class TestDashboard(unittest.TestCase):
     user.bind_form(request)
     assert(user["name"] == "sample")
     assert(user["email"] == "test@nomail.com")
+
+  def test_bind_user_generic_dict(self):
+    Dashboard.add_dashboard([User])
+    request = [("User[name]","sample"), ("User[email]","test@nomail.com"),
+                ("User[keytype][test1]","test1"),
+                ("User[keytype][test2]","test2")]
+    user = User()
+    user.bind_form(request)
+    assert(user["keytype"]["test1"] == "test1")
+    assert(user["keytype"]["test2"] == "test2")
+
 
   def test_bind_user_IS_operator(self):
     Dashboard.add_dashboard([User])
