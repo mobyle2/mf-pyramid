@@ -14,6 +14,8 @@ from supergroup import SuperGroup
 from pymongo import MongoClient
 from mongokit import Document, Connection
 
+from bson import json_util
+from pyramid.renderers import JSON
 
 if __name__ == '__main__':
     my_session_factory = UnencryptedCookieSessionFactoryConfig('itsaseekreet')
@@ -100,6 +102,17 @@ if __name__ == '__main__':
     renderer.set_reference(Group)
 
     groupid_renderer = mf.renderer.SimpleReferenceRenderer(User,'groupid',Group)
+
+    # automatically serialize bson ObjectId to Mongo extended JSON
+    json_renderer = JSON()
+
+    def objectId_adapter(obj, request):
+        return json_util.default(obj)
+    def datetime_adapter(obj, request):
+        return json_util.default(obj)
+    json_renderer.add_adapter(ObjectId, objectId_adapter)
+    json_renderer.add_adapter(datetime, datetime_adapter)
+    config.add_renderer('json', json_renderer)
 
     app = config.make_wsgi_app()
     server = make_server('0.0.0.0', 6789, app)

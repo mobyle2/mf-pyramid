@@ -142,8 +142,9 @@ def mf_search(request):
             collection = collection.limit(psize)
     for obj in collection:
         objlist.append(obj)
-    objlist = json.dumps(objlist, default=json_util.default)
-    return Response(body=objlist, content_type="application/json")
+    #objlist = json.dumps(objlist, default=json_util.default)
+    #return Response(body=objlist, content_type="application/json")
+    return objlist
 
 
 #@view_config(name='mf_list', route_name='mf_list', renderer='json', request_method='GET')
@@ -192,8 +193,9 @@ def mf_list(request):
             objects = objects.limit(psize)
     for obj in objects:
         objlist.append(obj)
-    objlist = json.dumps(objlist, default=json_util.default)
-    return Response(body=objlist, content_type="application/json")
+    #objlist = json.dumps(objlist, default=json_util.default)
+    #return Response(body=objlist, content_type="application/json")
+    return objlist
 
 
 #@view_config(name='mf_show', route_name='mf_show', renderer='json', request_method='GET')
@@ -233,8 +235,9 @@ def mf_show(request):
     if not obj:
         raise HTTPNotFound()
     response = {'object': objname, 'status': 0, objname: obj, 'filter': mffilter}
-    response = json.dumps(response, default=json_util.default)
-    return Response(body=response, content_type="application/json")
+    #response = json.dumps(response, default=json_util.default)
+    #return Response(body=response, content_type="application/json")
+    return response
 
 
 #@view_config(name='mf_edit', route_name='mf_edit', renderer='json', request_method='POST', context='mf.dashboard.Dashboard', permission='all')
@@ -288,7 +291,8 @@ def mf_edit(request):
                             objname: obj, 'object': objname,
                             'message': ''},
                             default=json_util.default)
-    return Response(body=response, content_type="application/json")
+    #return Response(body=response, content_type="application/json")
+    return response
 
 
 #@view_config(name='mf_delete', route_name='mf_delete', renderer='json', request_method='DELETE', context='mf.dashboard.Dashboard', permission='all')
@@ -330,7 +334,8 @@ def mf_delete(request):
         raise HTTPNotFound()
     obj.delete()
     response = json.dumps({'status': 0, 'error': [], 'message': 'Object deleted'}, default=json_util.default)
-    return Response(body=response, content_type="application/json")
+    #return Response(body=response, content_type="application/json")
+    return response
 
 
 #@view_config(name='mf_add', route_name='mf_add', renderer='json', request_method='PUT', context='mf.dashboard.Dashboard', permission='all')
@@ -356,7 +361,8 @@ def mf_add(request):
                             objname: obj, 'object': objname,
                             'message': ''},
                             default=json_util.default)
-    return Response(body=response, content_type="application/json")
+    #return Response(body=response, content_type="application/json")
+    return response
 
 
 #@view_config(name='mf_admin', route_name='mf_admin', renderer='dashboard.mako', context='mf.dashboard.Dashboard', permission='all')

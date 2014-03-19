@@ -14,6 +14,23 @@ Copy the pyramid directory content in your pyramid application according to your
   - dashboard needs mf.css, mf.js
   - dashboard.mako is a template example and can be copied/adapted to get a base dashboard.
 
+# JSON renderer
+
+Pyramid does not allow ObjectIds and datetime json serialization by default. To allow such
+serialization, one need to add to the pyramid init the following code:
+
+    from bson import json_util
+    # automatically serialize bson ObjectId to Mongo extended JSON
+    json_renderer = JSON()
+
+    def objectId_adapter(obj, request):
+        return json_util.default(obj)
+    def datetime_adapter(obj, request):
+        return json_util.default(obj)
+    json_renderer.add_adapter(ObjectId, objectId_adapter)
+    json_renderer.add_adapter(datetime, datetime_adapter)
+    config.add_renderer('json', json_renderer)
+
 # TODO
 
   see bugs/features in github
