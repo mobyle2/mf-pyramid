@@ -93,8 +93,9 @@ def mf_search(request):
             objklass = klass
             break
     if objklass is None:
-        response = json.dumps({'status': 1, 'error': [], 'message': 'Object does not exist'}, default=json_util.default)
-        return Response(body=response, content_type="application/json")
+        #response = json.dumps({'status': 1, 'error': [], 'message': 'Object does not exist'}, default=json_util.default)
+        #return Response(body=response, content_type="application/json")
+        return {'status': 1, 'error': [], 'message': 'Object does not exist'}
     mffilter = mf_filter(objname, MF_READ, request)
     if mffilter is None:
         raise HTTPForbidden
@@ -287,10 +288,14 @@ def mf_edit(request):
         except Exception as e:
             logging.error("Error while saving object " + str(e))
             status = 1
-    response = json.dumps({'status': status, 'error': err,
-                            objname: obj, 'object': objname,
-                            'message': ''},
-                            default=json_util.default)
+    #response = json.dumps({'status': status, 'error': err,
+    #                        objname: obj, 'object': objname,
+    #                        'message': ''},
+    #                        default=json_util.default)
+    response = {'status': status, 'error': err,
+                objname: obj, 'object': objname,
+                'message': ''}
+
     #return Response(body=response, content_type="application/json")
     return response
 
@@ -333,7 +338,8 @@ def mf_delete(request):
     if obj is None:
         raise HTTPNotFound()
     obj.delete()
-    response = json.dumps({'status': 0, 'error': [], 'message': 'Object deleted'}, default=json_util.default)
+    #response = json.dumps({'status': 0, 'error': [], 'message': 'Object deleted'}, default=json_util.default)
+    response = {'status': 0, 'error': [], 'message': 'Object deleted'}
     #return Response(body=response, content_type="application/json")
     return response
 
@@ -347,8 +353,9 @@ def mf_add(request):
             objklass = klass
             break
     if objklass is None:
-        response = json.dumps({'status': 1, 'error': [], 'message': 'Object does not exist'}, default=json_util.default)
-        return Response(body=response, content_type="application/json")
+        #response = json.dumps({'status': 1, 'error': [], 'message': 'Object does not exist'}, default=json_util.default)
+        #return Response(body=response, content_type="application/json")
+        return {'status': 1, 'error': [], 'message': 'Object does not exist'}
     collection = DbConn.get_db(objklass.__name__)
     obj = collection()
     err = obj.bind_form(sorted(request.params.items()))
@@ -357,10 +364,14 @@ def mf_add(request):
         status = 1
     else:
         obj.save()
-    response = json.dumps({'status': status, 'error': err,
-                            objname: obj, 'object': objname,
-                            'message': ''},
-                            default=json_util.default)
+    #response = json.dumps({'status': status, 'error': err,
+    #                        objname: obj, 'object': objname,
+    #                        'message': ''},
+    #                        default=json_util.default)
+    response = {'status': status, 'error': err,
+                objname: obj, 'object': objname,
+                'message': ''}
+
     #return Response(body=response, content_type="application/json")
     return response
 

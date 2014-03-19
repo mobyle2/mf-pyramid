@@ -79,7 +79,8 @@ class TestViews(unittest.TestCase):
         request = testing.DummyRequest()
         request.matchdict['objname'] = 'user'
         response = mf_list(request)
-        users = json.loads(response.body)
+        #users = json.loads(response.body)
+        users = response
         assert(len(users) == 2)
 
     def test_mf_list_multiple_types(self):
@@ -92,7 +93,8 @@ class TestViews(unittest.TestCase):
         request = testing.DummyRequest()
         request.matchdict['objname'] = 'types1'
         response = mf_list(request)
-        types = json.loads(response.body)
+        #types = json.loads(response.body)
+        types = response
         assert(len(types) == 1)
 
 
@@ -102,7 +104,8 @@ class TestViews(unittest.TestCase):
         request = testing.DummyRequest(mdict)
         request.matchdict['objname'] = 'user'
         response = mf_search(request)
-        users = json.loads(response.body)
+        #users = json.loads(response.body)
+        users = response
         assert(len(users) == 1)
         assert(users[0]['email'] == 'other@nomail.com')
 
@@ -112,7 +115,8 @@ class TestViews(unittest.TestCase):
         request.matchdict['objname'] = 'user'
         request.matchdict['id'] = a_user['_id']
         response = mf_show(request)
-        a_user = json.loads(response.body)
+        #a_user = json.loads(response.body)
+        a_user = response
         assert(a_user['user']['email'] == 'dummy@nomail.com')
 
     def test_mf_add(self):
@@ -124,7 +128,8 @@ class TestViews(unittest.TestCase):
         request = testing.DummyRequest(mdict)
         request.matchdict['objname'] = 'user'
         response = mf_add(request)
-        res = json.loads(response.body)
+        #res = json.loads(response.body)
+        res = response
         assert(res['status'] == 0)
         assert(res['object'] == 'user')
         assert(res['user']['email'] == 'test@add')
@@ -139,7 +144,8 @@ class TestViews(unittest.TestCase):
         request.matchdict['objname'] = 'user'
         request.matchdict['id'] = a_user['_id']
         response = mf_delete(request)
-        res = json.loads(response.body)
+        #res = json.loads(response.body)
+        res = response
         assert(res['status'] == 0)
         users = connection.User.find().count()
         assert(users == 2)
@@ -152,7 +158,8 @@ class TestViews(unittest.TestCase):
         request.matchdict['objname'] = 'user'
         request.matchdict['id'] = a_user['_id']
         response = mf_edit(request)
-        res = json.loads(response.body)
+        #res = json.loads(response.body)
+        res = response
         assert(res['status'] == 0)
         assert(res['object'] == 'user')
         assert(res['user']['name'] == 'Alfred')
@@ -183,7 +190,8 @@ class TestViews(unittest.TestCase):
         request.matchdict['objname'] = 'user'
         request.matchdict['id'] = a_user['_id']
         response = mf_edit(request)
-        res = json.loads(response.body)
+        #res = json.loads(response.body)
+        res = response
         assert(res['status'] == 0)
         a_user['age'] = 10
         a_user.save()
@@ -208,7 +216,8 @@ class TestViews(unittest.TestCase):
         request.matchdict['objname'] = 'user'
         request.matchdict['id'] = 'John'
         response = mf_show(request)
-        a_user = json.loads(response.body)
+        #a_user = json.loads(response.body)
+        a_user = response
         assert(a_user['user']['email'] == 'different@nomail.com')
         User.search_by("_id")
         request = testing.DummyRequest()
