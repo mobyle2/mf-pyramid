@@ -19,7 +19,10 @@ Copy the pyramid directory content in your pyramid application according to your
 Pyramid does not allow ObjectIds and datetime json serialization by default. To allow such
 serialization, one need to add to the pyramid init the following code:
 
+    from pyramid.renderers import JSON
     from bson import json_util
+    from bson.objectid import ObjectId
+    import datetime
     # automatically serialize bson ObjectId to Mongo extended JSON
     json_renderer = JSON()
 

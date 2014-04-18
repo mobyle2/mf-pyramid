@@ -1,3 +1,4 @@
+0.1.36: fix issue when multiple CompositeRenderer are in an other CompositeRenderer
 0.1.35: support definition of dicts in objects with custom key/values.
         Objects can be defined like:
         "keytype" : { basestring : basestring }

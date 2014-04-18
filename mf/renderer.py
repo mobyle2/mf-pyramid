@@ -697,11 +697,12 @@ class CompositeRenderer(AbstractRenderer):
 
     def bind(self, request, instance, name, parent=[]):
         self.err = False
-        parent.extend([name])
+        renderer_parent = list(parent)
+        renderer_parent.extend([name])
         errs = []
         fieldname = ''
-        if parent:
-            for p in parent:
+        if renderer_parent:
+            for p in renderer_parent:
                 fieldname += p + "."
 
         #for renderer in self._renderers:
@@ -715,7 +716,7 @@ class CompositeRenderer(AbstractRenderer):
             #    obj = instance[name]
             if self.bind_only_one:
                 renderer.bind_only_one = True
-            err = renderer.bind(request, instance, renderer.name, parent)
+            err = renderer.bind(request, instance, renderer.name, renderer_parent)
             if err:
                 errs.extend(err)
         return errs
@@ -726,11 +727,12 @@ class CompositeRenderer(AbstractRenderer):
         each composite one by one
         '''
         self.err = False
-        parent.extend([name])
+        renderer_parent = list(parent)
+        renderer_parent.extend([name])
         errs = []
         fieldname = ''
-        if parent:
-            for p in parent:
+        if renderer_parent:
+            for p in renderer_parent:
                 fieldname += p + "."
 
         #for renderer in self._renderers:
@@ -756,7 +758,8 @@ class CompositeRenderer(AbstractRenderer):
                 err = []
 
                 while err is not None:
-                    err = renderer.bind(request, instance, renderer.name, parent)
+                    err = renderer.bind(request, instance, renderer.name,
+                    renderer_parent)
                     renderer.count += 1
             except Exception:
                 logging.debug('no more element to match')
