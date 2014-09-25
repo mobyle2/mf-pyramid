@@ -1,4 +1,5 @@
 pymongo
 pyramid
 pyramid_debugtoolbar
-mongokit
+#mongokit
+git+https://github.com/mobyle2/mongokit.git#egg=mongokit
