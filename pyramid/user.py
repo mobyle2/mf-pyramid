@@ -42,7 +42,7 @@ class User(Document):
     :type control: str
     :return: dict - Mongodb filter to apply on object search
     '''
-    if control == mf.views.MF_READ:
+    if control == mf.annotation.MF_READ:
       return { 'name' : 'Mike' }
     return {}
 
