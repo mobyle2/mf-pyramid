@@ -11,16 +11,6 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-.. automodule:: mf.annotation
-   :members:
-   :private-members:
-   :special-members:
-
-.. automodule:: mf.renderer
-   :members:
-   :private-members:
-   :special-members:
-
 .. automodule:: mf.dashboard
    :members:
    :private-members:
