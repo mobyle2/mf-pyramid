@@ -4,8 +4,8 @@ from user import User
 import group
 from group import Group
 from supergroup import SuperGroup
-import mf.dashboard
-from mf.dashboard import Dashboard
+import mfpyramid.dashboard
+from mfpyramid.dashboard import Dashboard
 from mf.db_conn import DbConn
 from mf.annotation import Annotation
 import pymongo

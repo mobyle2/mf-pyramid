@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 import mf.annotation
-from .db_conn import DbConn
-from .renderer import FormRenderer
+from mf.db_conn import DbConn
+from mf.renderer import FormRenderer
 from .views import *
 
 

@@ -6,11 +6,11 @@ from group import Group
 import mytypes
 from mytypes import Types1, Types2
 from supergroup import SuperGroup
-import mf.dashboard
-from mf.dashboard import Dashboard
+import mfpyramid.dashboard
+from mfpyramid.dashboard import Dashboard
 from mf.db_conn import DbConn
 from mf.annotation import Annotation
-from mf.views import *
+from mfpyramid.views import *
 import pymongo
 from mongokit import Connection
 from datetime import datetime

@@ -3,7 +3,7 @@ import mf.annotation
 from mf.annotation import *
 from pyramid.response import Response
 from pyramid.view import view_config
-import mf.views
+import mfpyramid.views
 from mongokit import Document, Connection, CustomType, IS
 from group import Group
 
@@ -74,9 +74,9 @@ class User(Document):
     '''
     if authenticated_userid == 'anonymous':
         return None
-    if control == mf.views.MF_READ:
+    if control == mf.annotation.MF_READ:
       return { 'name' : 'Mike' }
-    if control == mf.views.MF_EDIT:
+    if control == mf.annotion.MF_EDIT:
         try:
             if self['age'] == 10:
                 return None

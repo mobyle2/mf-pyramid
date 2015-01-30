@@ -15,7 +15,7 @@ from bson.objectid import ObjectId
 #from bson.dbref import DBRef
 
 from mf.db_conn import DbConn
-from mf.annotation import MF_READ, MD_EDIT
+from mf.annotation import MF_READ, MF_EDIT
 
 
 

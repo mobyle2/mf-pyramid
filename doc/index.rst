@@ -11,21 +11,15 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-.. automodule:: mf.dashboard
+.. automodule:: mfpyramid.dashboard
    :members:
    :private-members:
    :special-members:
 
-.. automodule:: mf.views
+.. automodule:: mfpyramid.views
    :members:
    :private-members:
    :special-members:
-
-.. automodule:: mf.db_conn
-   :members:
-   :private-members:
-   :special-members:
-
 
 
 

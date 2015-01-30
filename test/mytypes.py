@@ -2,7 +2,7 @@ import mf.annotation
 from mf.annotation import *
 from pyramid.response import Response
 from pyramid.view import view_config
-import mf.views
+import mfpyramid.views
 from mongokit import Document, Connection, CustomType
 
 class GlobalTypes(Document):
