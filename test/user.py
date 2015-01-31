@@ -76,7 +76,7 @@ class User(Document):
         return None
     if control == mf.annotation.MF_READ:
       return { 'name' : 'Mike' }
-    if control == mf.annotion.MF_EDIT:
+    if control == mf.annotation.MF_EDIT:
         try:
             if self['age'] == 10:
                 return None

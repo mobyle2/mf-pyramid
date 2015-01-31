@@ -8,6 +8,7 @@ import mfpyramid.dashboard
 from mfpyramid.dashboard import Dashboard
 from mf.db_conn import DbConn
 from mf.annotation import Annotation
+from mf.renderer import SimpleReferenceRenderer
 import pymongo
 from mongokit import Document, Connection, ObjectId
 from datetime import datetime
@@ -198,7 +199,7 @@ class TestDashboard(unittest.TestCase):
     group.save()
 
     request = [("User[multi2][0][group]",str(group['_id'])),("User[multi2][0][role]","role1")]
-    renderer = mf.renderer.SimpleReferenceRenderer(User, 'group', Group, 'multi2')
+    renderer = SimpleReferenceRenderer(User, 'group', Group, 'multi2')
     renderer.is_object_id = True
     #renderer = User.get_renderer("multi2.group")
     #renderer.set_reference(Group)

@@ -1,1 +1,4 @@
 0.1.0: Separate from mf, needs mf
+  mf.views => mfpyramid.views
+  mf.dashboard => mfpyramid.views
+  mf.views.MF_READ/EDIT => mf.annotation.MF_READ/EDIT
